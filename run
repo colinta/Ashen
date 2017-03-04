@@ -1,0 +1,7 @@
+#!/usr/local/bin/bash
+
+xcodebuild -configuration Debug build | xcpretty
+if [[ $1 != "build" ]]; then
+  xcodebuild -configuration Debug build > /dev/null 2>&1 && ./build/Debug/Ashen "$@"
+fi
+# swift build -Xlinker -lcurses

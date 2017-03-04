@@ -1,0 +1,6 @@
+.DS_Store
+/.build
+/Build
+/Packages
+/*.xcodeproj
+_ncurses_header.swift.tmp
