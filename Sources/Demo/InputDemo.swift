@@ -60,10 +60,10 @@ struct InputDemo: Program {
             .tl(x: 1, y: 3),
             model: model.secondInput,
             isFirstResponder: model.activeInput == 1,
+            multiline: true,
             onChange: { model in
                 return Message.onChange(1, model)
             })
-        secondInput.multiline = true
         return Window(components: [
             firstInput,
             secondInput,

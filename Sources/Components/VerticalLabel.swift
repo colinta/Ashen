@@ -5,8 +5,8 @@
 
 class VerticalLabelView: ComponentView {
     let size: DesiredSize
-
     let line: [Text]
+
     var linesWidth: Int { return 1 }
     var linesHeight: Int { return line.count }
 

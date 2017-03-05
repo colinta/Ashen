@@ -18,12 +18,6 @@ struct Rouge: Program {
     }
 
     struct Train {
-        enum Direction {
-            case right
-            case left
-            case down
-            case up
-        }
         enum Graphics: UInt32 {
             case one = 0
             case two = 1
@@ -32,62 +26,28 @@ struct Rouge: Program {
         }
 
         var origin: FloatPoint
-        var direction: Direction
         var graphics: Graphics
         var speed: Float
         var cars: Int
 
         var minX: Int {
-            switch direction {
-            case .left:  return Int(origin.x + 0.5)
-            case .right: return maxX - 3 * cars
-            case .up:    return Int(origin.x + 0.5)
-            case .down:  return Int(origin.x + 0.5)
-            }
+            return Int(origin.x + 0.5)
         }
         var minY: Int {
-            switch direction {
-            case .left:  return Int(origin.y + 0.5)
-            case .right: return Int(origin.y + 0.5)
-            case .up:    return Int(origin.y + 0.5)
-            case .down:  return maxY + 3 * cars
-            }
+            return Int(origin.y + 0.5)
         }
         var maxX: Int {
-            switch direction {
-            case .left:  return minX + 3 * cars
-            case .right: return Int(origin.x + 0.5)
-            case .up:    return Int(origin.x + 0.5)
-            case .down:  return Int(origin.x + 0.5)
-            }
+            return minX + 3 * cars
         }
         var maxY: Int {
-            switch direction {
-            case .left:  return minY + 1
-            case .right: return Int(origin.y + 0.5)
-            case .up:    return minY + 3 * cars
-            case .down:  return Int(origin.y + 0.5)
-            }
+            return minY + 1
         }
 
         func moveTrain(dt: Float, in screenSize: Size) -> Train? {
-            let size = FloatSize(screenSize)
             var nextTrain = self
             let delta = dt * speed
-            switch direction {
-            case .right:
-                nextTrain.origin = FloatPoint(x: nextTrain.origin.x + delta, y: nextTrain.origin.y)
-                guard nextTrain.origin.x < size.width + Float(cars) else { return nil }
-            case .left:
-                nextTrain.origin = FloatPoint(x: nextTrain.origin.x - delta, y: nextTrain.origin.y)
-                guard nextTrain.origin.x > -Float(1 + cars * 3) else { return nil }
-            case .down:
-                nextTrain.origin = FloatPoint(x: nextTrain.origin.x, y: nextTrain.origin.y + delta)
-                guard nextTrain.origin.y < size.height + Float(cars) else { return nil }
-            case .up:
-                nextTrain.origin = FloatPoint(x: nextTrain.origin.x, y: nextTrain.origin.y - delta)
-                guard nextTrain.origin.y > -Float(cars) else { return nil }
-            }
+            nextTrain.origin = FloatPoint(x: nextTrain.origin.x - delta, y: nextTrain.origin.y)
+            guard nextTrain.origin.x > -Float(1 + cars * 3) else { return nil }
 
             return nextTrain
         }
@@ -131,31 +91,12 @@ struct Rouge: Program {
 
     private func createTrain(in size: Size) -> Train {
         let graphics = Train.Graphics(rawValue: arc4random_uniform(4)) ?? Train.Graphics.one
-        let direction: Train.Direction, x: Float, y: Float
-        switch arc4random_uniform(2) {
-        case 0:
-            direction = .right
-            // x = -1
-            // y = 1 + Float(arc4random_uniform(UInt32(max(0, size.height - 2))))
-        case 1:
-            direction = .left
-            // x = Float(size.width) + 1
-            // y = 1 + Float(arc4random_uniform(UInt32(max(0, size.height - 2))))
-        case 2:
-            direction = .down
-            // x = 1 + Float(arc4random_uniform(UInt32(size.width - 2)))
-            // y = -1
-        default:
-            direction = .up
-            // x = 1 + Float(arc4random_uniform(UInt32(size.height - 2)))
-            // y = Float(size.height) + 1
-        }
+        let x: Float, y: Float
         x = Float(size.width) + 1
         y = 1 + Float(arc4random_uniform(UInt32(max(0, size.height - 2))))
 
         return Train(
             origin: FloatPoint(x: x, y: y),
-            direction: .left, // direction,
             graphics: graphics,
             speed: randFloat(min: 10, max: 25),
             cars: Int(4 + arc4random_uniform(10))

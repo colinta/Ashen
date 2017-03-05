@@ -5,8 +5,8 @@
 
 class LabelView: ComponentView {
     let size: DesiredSize
-
     let lines: [[Text]]
+
     var linesHeight: Int { return lines.count }
     var linesWidth: Int { return lines.reduce(0) { length, line in
             return max(length, line.count)

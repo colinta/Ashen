@@ -3,7 +3,7 @@
 //
 
 class LogView: ComponentLayout {
-    var size: Size
+    let size: Size
 
     init(y startY: Int, entries: [String], screenSize: Size) {
         let maxEntries = max(0, screenSize.height - startY)

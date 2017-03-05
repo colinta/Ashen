@@ -49,10 +49,9 @@ class InputView: ComponentView {
     let model: Model
     var cursor: Cursor
     /// If `forceCursor` is assigned, it will overide the auto-updating cursor
-    var forceCursor: Cursor?
-    var text: String { return model.text }
-    var isFirstResponder: Bool
-    var multiline: Bool = false
+    let forceCursor: Cursor?
+    let isFirstResponder: Bool
+    let multiline: Bool
     var onChange: OnChangeHandler
     var onEnter: OnEnterHandler?
 
@@ -60,6 +59,7 @@ class InputView: ComponentView {
         _ size: DesiredSize = DesiredSize(),
         model: Model = Model.default,
         isFirstResponder: Bool = false,
+        multiline: Bool = false,
         cursor: Cursor? = nil,
         onChange: @escaping OnChangeHandler,
         onEnter: OnEnterHandler? = nil
@@ -69,6 +69,7 @@ class InputView: ComponentView {
         self.onChange = onChange
         self.onEnter = onEnter
         self.isFirstResponder = isFirstResponder
+        self.multiline = multiline
         self.forceCursor = cursor
         self.cursor = cursor ?? Cursor.default(for: model)
         super.init()
@@ -117,7 +118,7 @@ class InputView: ComponentView {
         var yOffset = 0
         var xOffset = 0
         var cOffset = 0
-        var chars = text.characters.reduce(Screen.Chars()) { (memo, char) in
+        var chars = model.text.characters.reduce(Screen.Chars()) { (memo, char) in
             if yOffset >= size.height { return memo }
 
             var next = memo
@@ -166,7 +167,7 @@ class InputView: ComponentView {
             return next
         }
 
-        if isFirstResponder && normalCursor.at == text.characters.count && yOffset < size.height {
+        if isFirstResponder && normalCursor.at == model.text.characters.count && yOffset < size.height {
             var row = chars[yOffset] ?? [:]
             row[xOffset] = Text(" ", attrs: [.underline])
             chars[yOffset] = row
@@ -226,6 +227,7 @@ class InputView: ComponentView {
 
     private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage] {
         let offset = insert.characters.count
+        let text = model.text
         if cursor.at == text.characters.count && cursor.length == 0 {
             let nextText = text + insert
             cursor = Cursor(at: cursor.at + offset, length: 0)
@@ -243,6 +245,7 @@ class InputView: ComponentView {
     private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage] {
         if cursor.at == 0 && cursor.length == 0 { return [] }
 
+        let text = model.text
         let normalCursor = cursor.normal
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let range: Range<String.Index>
@@ -274,6 +277,7 @@ class InputView: ComponentView {
 
     private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
         let normalCursor = cursor.normal
+        let text = model.text
         if cursor.length == 0 {
             let maxCursor = text.characters.count
             cursor = Cursor(at: min(cursor.at + 1, maxCursor), length: 0)
@@ -292,6 +296,7 @@ class InputView: ComponentView {
     }
 
     private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
+        let text = model.text
         let maxCursor = text.characters.count
         if cursor.at + cursor.length == maxCursor { return [] }
         cursor = Cursor(at: cursor.at, length: cursor.length + 1)
@@ -334,6 +339,7 @@ class InputView: ComponentView {
     }
 
     private func moveDown(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage] {
+        let text = model.text
         let lines = model.textLines
         var x = 0
         var prevX = 0
@@ -372,7 +378,7 @@ class InputView: ComponentView {
     }
 
     private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage] {
-        cursor = Cursor(at: text.characters.count, length: 0)
+        cursor = Cursor(at: model.text.characters.count, length: 0)
         return [SystemMessage.rerender]
     }
 }

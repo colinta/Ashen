@@ -28,10 +28,11 @@ class SpinnerView: ComponentView {
         }
     }
 
-    let model: Model
     var index: Int?
     var timeout: Float = 0.05
-    var animating: Bool
+
+    let model: Model
+    let animating: Bool
 
     init(_ location: Location, model: Model?, animating: Bool = true) {
         self.model = model ?? Model()
