@@ -44,7 +44,9 @@ class Expectations {
         }
 
         if let description = description, !isEqual {
-            self.description = "\(description) (" + (addlDescription == "" ? "" : "\(addlDescription): ") + "\(lhs) != \(rhs))"
+            let lhsDesc: String = lhs.map { "\($0)" } ?? "nil"
+            let rhsDesc: String = rhs.map { "\($0)" } ?? "nil"
+            self.description = "\(description) (" + (addlDescription == "" ? "" : "\(addlDescription): ") + "\(lhsDesc) != \(rhsDesc))"
         }
         assert(isEqual)
         return self

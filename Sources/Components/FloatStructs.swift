@@ -7,6 +7,8 @@ struct FloatSize {
     var width: Float
     var height: Float
 
+    static let zero = FloatSize(width: 0, height: 0)
+
     init(width: Float, height: Float) {
         self.width = width
         self.height = height
@@ -17,7 +19,6 @@ struct FloatSize {
         self.height = Float(size.height)
     }
 
-    static let zero = FloatSize(width: 0, height: 0)
 }
 
 struct FloatPoint {

@@ -11,6 +11,7 @@ private let specs: [SpecRunner] = [
     OnNextSpecs(),
     OnTickSpecs(),
     ScreenSpecs(),
+    SizeDescriptionSpecs(),
     SpinnerViewSpecs(),
     WindowSpecs(),
 ]
