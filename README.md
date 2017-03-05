@@ -1,8 +1,140 @@
 # Ashen
 
 A framework for writing terminal applications in Swift.
-Based on [Elm](http://elm-lang.org) (very similar paradigm to
-[React](https://facebook.github.io/react/)).
+Based on [Elm][] (very similar paradigm to
+[React][]).
+
+In theory it's totally possible to create a `ScreenType` that could render
+something other than terminal output, but that's not why I built it.  Since
+programmers spend so much time in the terminal, it makes a lot of sense to write
+quick applications that don't require opening a GUI.  Plus, terminal apps are
+cool in an old-school kinda way.
+
+## About
+
+If you want to know more about the how and why of Ashen's application design,
+I encourage you to read about [Elm][] or [React][].  In short, though, you
+write programs for Ashen by considering the *state* that is needed to
+render *views*.  As an example let's consider an application that renders a list
+of "things".
+
+### Browsing
+
+In a traditional controller/view pattern, views are created during
+initialization, and updated later as needed with your application data.  Loading
+data from a server to load a list of views might look something like this:
+
+```swift
+init() {
+    label = LabelView()
+    label.text = "Our Things"
+    label.hidden = true
+    loadingView = SpinnerView()
+    listView = ListView()
+    loading = true
+
+    loadingView.hidden = false
+    loadingView.startAnimating()
+    listView.hidden = true
+
+    startLoadingData(completion: loaded)
+}
+
+func loaded(data: [Thing]) {
+    label.hidden = false
+    listView.data = data
+    listView.hidden = false
+    loadingView.hidden = true
+}
+
+func cellForRow(row: Thing) -> Component {
+    return LabelView(text: row.title)
+}
+```
+
+What would this look like using Ashen or Elm or React? In these frameworks,
+rendering output is stateless; it is based the model, and you render *all* the
+views and their properties based on that state.
+
+```swift
+func render(model: Model) -> Component {
+    if let data = model.data {
+        return Window(components: [
+            LabelView(text: "Our things"),
+            OptimizedListView(dataList: data, rowHeight: 3) { row in
+                // this feature is similar to how UITableView renders cells -
+                // only the rows that are visible will be rendered.
+                return LabelView(text: row.title)
+            }
+        ])
+    }
+    else {
+        return SpinnerView()
+    }
+}
+```
+
+So instead of mutating the `hidden` property of these views, we render the views
+we need based on the model.  By the way, I did not include the location/size
+information in the example, so let's see what's available there.
+
+## Location and Size structs
+
+The `Location` struct is used to place your views relative to their parent
+container.  There are nine locations:
+
+```
++------------+--------------+-------------+
+|topLeft     |   topCenter  |     topRight|  `topLeft` is so common, it has a
+|aka `at`    |              |             |  shorthand.
+|            |              |             |
++------------+--------------+-------------+  The default value for most views
+|            |              |             |  is at (x: 0, y: 0)
+|middleLeft  | middleCenter |  middleRight|
+|            |              |             |
++------------+--------------+-------------+
+|            |              |             |
+|            |              |             |
+|bottomLeft  | bottomCenter |  bottomRight|
++------------+--------------+-------------+
+```
+
+```swift
+     Examples:
+LabelView(.at(5, 10))  // label at x: 5, y: 10
+LabelView(.middleCenter())
+LabelView(.bottomRight(y: -1))  // in bottomRight corner, and up 1 row
+```
+
+Sizes can be defined absolutely, or relative to the parent view, and with positive
+or negative offsets.  They are also chainable, for a more descriptive API.
+
+```swift
+// assume the parent container is width: 80, height: 30
+LabelView(.size(5, 10))  // width: 5, height: 10
+LabelView(.width(10).height(percent: 100))  // width: 10, height: 30
+LabelView(.fullWidth(minus: 4).height(times: 0.5, plus: 5))  // width: 76, height: 20
+```
+
+###### Available size functions:
+```
+.size(width:, height:)
+.minus(0)  .minus(width:, height:)
+.plus(0)   .plus(width:, height:)
+.width(width) /* default height is 1 */      .height(height)  /* default width is 1 */
+.parentWidth(percent: 0...100, plus: 0, minus: 0)  .parentHeight(percent: 0...100, plus: 0, minus: 0)
+.parentWidth(times: 0...1, plus: 0, minus: 0)      .parentHeight(times: 0...1, plus: 0, minus: 0)
+.fullWidth(plus: 0, minus: 0)                .fullHeight(plus: 0, minus: 0)
+```
+
+Using these location and size descriptions, you can accomplish the majority of your UI, but you can
+also choose to use `Layout` classes like `FlowLayout` to position views in a
+stack or row, and `GridLayout` to specify rows and columns of views, with weights to describe the
+relative sizes.
+
+## Views
+
+
 
 ## main.swift, running your program
 
@@ -48,7 +180,7 @@ struct SpinnersDemo: Program {
     // return your initial model - if your app requires an asynchronous
     // "loading" spinner, you could use a `loading/loaded/error` enum to
     // represent those states
-    func model() -> Model {
+    func initial() -> (Model, [Command]) {
         return Model()
     }
 
@@ -73,7 +205,7 @@ struct SpinnersDemo: Program {
     // is also called when the window is resized().
     func render(model: Model, in screenSize: Size) -> Component {
         let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
-            return SpinnerView(.mc(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
+            return SpinnerView(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
         }
         return Window(
             components: spinners + [
@@ -88,3 +220,6 @@ struct SpinnersDemo: Program {
     }
 }
 ```
+
+[Elm]: http://elm-lang.org
+[React]: https://facebook.github.io/react/

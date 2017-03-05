@@ -30,7 +30,10 @@ enum LoopState {
 }
 
 
+// when running specs there are multiple apps running; we only want the
+// debugging log to output when the "outermost" application exits.
 private var runningApps: Int = 0
+
 private var logEntries: [String] = []
 // prints to stdout when application exits
 func log(_ entry: Any) {
@@ -80,13 +83,20 @@ struct App<T: Program> {
         var prevTimestamp = mach_absolute_time()
         var prevState: [(T.ModelType, Component, Screen.Chars)] = []
         var inThePast: Int?
-        var messageQueue: [T.MessageType] = []
-        var model = program.model()
+        var (model, commands) = program.initial()
+
         var window = program.render(model: model, in: screen.size)
         let chars = screen.render(window)
         prevState.append((model, window, chars))
 
         while state == .continue {
+            var messageQueue: [T.MessageType] = []
+            for command in commands {
+                program.start(command: command) { (msg: T.MessageType) in
+                    messageQueue.append(msg)
+                }
+            }
+
             let (events, nextTimestamp) = flushEvents(prevTimestamp: prevTimestamp)
             prevTimestamp = nextTimestamp
             var updateAndRender = false
@@ -141,18 +151,11 @@ struct App<T: Program> {
 
                 while messageQueue.count > 0 {
                     let message = messageQueue.removeFirst()
-                    let (newModel, commands, newState) = program.update(model: &model, message: message)
+                    let (newModel, newCommands, newState) = program.update(model: &model, message: message)
                     if newState != .continue { return newState.appState }
                     state = newState
                     model = newModel
-
-                    for command in commands {
-                        program.start(command: command) { (msg: T.MessageType?) in
-                            if let msg = msg {
-                                messageQueue.append(msg)
-                            }
-                        }
-                    }
+                    commands = newCommands
 
                     updateAndRender = true
                 }

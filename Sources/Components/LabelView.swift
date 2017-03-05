@@ -16,11 +16,11 @@ class LabelView: ComponentView {
         return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
     }
 
-    convenience init(_ location: Location, _ size: DesiredSize = DesiredSize(), text: String) {
+    convenience init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: String) {
         self.init(location, size, text: Text(text))
     }
 
-    init(_ location: Location, _ size: DesiredSize = DesiredSize(), text textString: Text) {
+    init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text textString: Text) {
         self.size = size
         let lines = textString.text.characters.split { $0 == "\n" }
         self.lines = lines.map {

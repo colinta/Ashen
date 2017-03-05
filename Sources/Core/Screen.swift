@@ -78,8 +78,10 @@ class Screen: ScreenType {
         chars = nextChars
 
         for (y, prevRow) in prevChars {
+            guard y >= 0 && y < size.height else { continue }
             let row = chars[y] ?? [:]
             for (x, _) in prevRow {
+                guard x >= 0 && x < size.width else { continue }
                 if row[x] == nil {
                     move(Int32(y), Int32(x))
                     addstr(" ")
@@ -110,7 +112,8 @@ class Screen: ScreenType {
     }
 
     func nextEvent() -> Event? {
-        return Event(getch())
+        let e = getch()
+        return Event(e)
     }
 
     func resized(height: Int, width: Int) {

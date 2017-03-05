@@ -22,8 +22,8 @@ class MockProgram: Program {
         self.mockModel = model
     }
 
-    func model() -> Any {
-        return mockModel
+    func initial() -> (Any, [MockCommand]) {
+        return (mockModel, [])
     }
 
     func update(model: inout Any, message: Any)

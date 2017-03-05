@@ -20,8 +20,8 @@ struct CanvasDemo: Program {
         var timeOffset: TimeInterval
     }
 
-    func model() -> Model {
-        return Model(animating: false, date: Date(), timeOffset: 0)
+    func initial() -> (Model, [AnyCommand]) {
+        return (Model(animating: false, date: Date(), timeOffset: 0), [])
     }
 
     func update(model: inout Model, message: Message)

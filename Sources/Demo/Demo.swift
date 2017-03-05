@@ -9,13 +9,15 @@ struct Demo: Program {
     let spinnerProgram = SpinnersDemo()
     let canvasProgram = CanvasDemo()
     let inputProgram = InputDemo()
-    let rougeProgram = Rouge()
+    let flowLayoutProgram = FlowLayoutDemo()
+    let gridLayoutProgram = GridLayoutDemo()
 
     enum ActiveDemo {
         case spinner
         case canvas
         case input
-        case rouge
+        case flowLayout
+        case gridLayout
     }
 
     struct Model {
@@ -23,7 +25,8 @@ struct Demo: Program {
         var spinnerModel: SpinnersDemo.ModelType
         var canvasModel: CanvasDemo.ModelType
         var inputModel: InputDemo.ModelType
-        var rougeModel: Rouge.ModelType
+        var flowLayoutModel: FlowLayoutDemo.ModelType
+        var gridLayoutModel: GridLayoutDemo.ModelType
         var log: [String]
     }
 
@@ -35,25 +38,29 @@ struct Demo: Program {
         case spinnerMessage(SpinnersDemo.Message)
         case canvasMessage(CanvasDemo.Message)
         case inputMessage(InputDemo.Message)
-        case rougeMessage(Rouge.Message)
+        case flowLayoutMessage(FlowLayoutDemo.Message)
+        case gridLayoutMessage(GridLayoutDemo.Message)
     }
 
     enum Command {
-        case spinnerCommand(SpinnersDemo.CommandType)
-        case canvasCommand(CanvasDemo.CommandType)
-        case inputCommand(InputDemo.CommandType)
-        case rougeCommand(Rouge.CommandType)
     }
 
-    func model() -> Model {
-        return Model(
-            activeDemo: .spinner,
-            spinnerModel: spinnerProgram.model(),
-            canvasModel: canvasProgram.model(),
-            inputModel: inputProgram.model(),
-            rougeModel: rougeProgram.model(),
+    func initial() -> (Model, [Command]) {
+        let (spinnerModel, _) = spinnerProgram.initial()
+        let (canvasModel, _) = canvasProgram.initial()
+        let (inputModel, _) = inputProgram.initial()
+        let (flowLayoutModel, _) = flowLayoutProgram.initial()
+        let (gridLayoutModel, _) = gridLayoutProgram.initial()
+
+        return (Model(
+            activeDemo: .gridLayout,
+            spinnerModel: spinnerModel,
+            canvasModel: canvasModel,
+            inputModel: inputModel,
+            flowLayoutModel: flowLayoutModel,
+            gridLayoutModel: gridLayoutModel,
             log: []
-            )
+            ), [])
     }
 
     func update(model: inout Model, message: Message)
@@ -69,44 +76,53 @@ struct Demo: Program {
         case let .appendLog(entry):
             model.log.append(entry)
         case let .spinnerMessage(spinnerMsg):
-            let (newModel, spinnerCommands, state) =
+            let (newModel, _ /* spinnerCommands */, state) =
                 spinnerProgram.update(model: &model.spinnerModel, message: spinnerMsg)
             if state == .quit {
                 model.log = []
                 model.activeDemo = .canvas
             }
             model.spinnerModel = newModel
-            let commands = spinnerCommands.map { Command.spinnerCommand($0) }
-            return (model, commands, .continue)
+            // let commands = spinnerCommands.map { Command.spinnerCommand($0) }
+            return (model, [], .continue)
         case let .canvasMessage(canvasMsg):
-            let (newModel, canvasCommands, state) =
+            let (newModel, _ /* canvasCommands */, state) =
                 canvasProgram.update(model: &model.canvasModel, message: canvasMsg)
             if state == .quit {
                 model.log = []
                 model.activeDemo = .input
             }
             model.canvasModel = newModel
-            let commands = canvasCommands.map { Command.canvasCommand($0) }
-            return (model, commands, .continue)
+            // let commands = canvasCommands.map { Command.canvasCommand($0) }
+            return (model, [], .continue)
         case let .inputMessage(inputMsg):
-            let (newModel, inputCommands, state) =
+            let (newModel, _ /* inputCommands */, state) =
                 inputProgram.update(model: &model.inputModel, message: inputMsg)
             if state == .quit {
                 model.log = []
-                model.activeDemo = .rouge
+                model.activeDemo = .flowLayout
             }
             model.inputModel = newModel
-            let commands = inputCommands.map { Command.inputCommand($0) }
-            return (model, commands, .continue)
-        case let .rougeMessage(rougeMsg):
-            let (newModel, rougeCommands, state) =
-                rougeProgram.update(model: &model.rougeModel, message: rougeMsg)
+            // let commands = inputCommands.map { Command.inputCommand($0) }
+            return (model, [], .continue)
+        case let .flowLayoutMessage(flowLayoutMsg):
+            let (newModel, _ /* flowLayoutCommands */, state) =
+                flowLayoutProgram.update(model: &model.flowLayoutModel, message: flowLayoutMsg)
             if state == .quit {
                 return (model, [], .quit)
             }
-            model.rougeModel = newModel
-            let commands = rougeCommands.map { Command.rougeCommand($0) }
-            return (model, commands, .continue)
+            model.flowLayoutModel = newModel
+            // let commands = flowLayoutCommands.map { Command.flowLayoutCommand($0) }
+            return (model, [], .continue)
+        case let .gridLayoutMessage(gridLayoutMsg):
+            let (newModel, _ /* gridLayoutCommands */, state) =
+                gridLayoutProgram.update(model: &model.gridLayoutModel, message: gridLayoutMsg)
+            if state == .quit {
+                return (model, [], .quit)
+            }
+            model.gridLayoutModel = newModel
+            // let commands = gridLayoutCommands.map { Command.gridLayoutCommand($0) }
+            return (model, [], .continue)
         }
 
         return (model, [], .continue)
@@ -144,12 +160,19 @@ struct Demo: Program {
                 .map { (msg: InputDemo.Message) -> Demo.Message in
                     return Demo.Message.inputMessage(msg)
                 }
-        case .rouge:
-            title = "Rouge"
-            demo = rougeProgram
-                .render(model: model.rougeModel, in: boxSize)
-                .map { (msg: Rouge.Message) -> Demo.Message in
-                    return Demo.Message.rougeMessage(msg)
+        case .flowLayout:
+            title = "FlowLayout Demo"
+            demo = flowLayoutProgram
+                .render(model: model.flowLayoutModel, in: boxSize)
+                .map { (msg: FlowLayoutDemo.Message) -> Demo.Message in
+                    return Demo.Message.flowLayoutMessage(msg)
+                }
+        case .gridLayout:
+            title = "GridLayout Demo"
+            demo = gridLayoutProgram
+                .render(model: model.gridLayoutModel, in: boxSize)
+                .map { (msg: GridLayoutDemo.Message) -> Demo.Message in
+                    return Demo.Message.gridLayoutMessage(msg)
                 }
         }
 
@@ -165,16 +188,6 @@ struct Demo: Program {
     }
 
     func start(command: Command, done: @escaping (Message) -> Void) {
-        switch command {
-        case let .spinnerCommand(cmd):
-            spinnerProgram.start(command: cmd) { msg in done(Message.spinnerMessage(msg)) }
-        case let .canvasCommand(cmd):
-            canvasProgram.start(command: cmd) { msg in done(Message.canvasMessage(msg)) }
-        case let .inputCommand(cmd):
-            inputProgram.start(command: cmd) { msg in done(Message.inputMessage(msg)) }
-        case let .rougeCommand(cmd):
-            rougeProgram.start(command: cmd) { msg in done(Message.rougeMessage(msg)) }
-        }
     }
 
 }

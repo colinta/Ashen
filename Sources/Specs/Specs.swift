@@ -49,8 +49,8 @@ struct Specs: Program {
         self.onEnd = onEnd
     }
 
-    func model() -> SpecsModel {
-        return SpecsModel(specs)
+    func initial() -> (SpecsModel, [SpecsCommand]) {
+        return (SpecsModel(specs), [])
     }
 
     func update(model: inout SpecsModel, message: SpecsMessage)

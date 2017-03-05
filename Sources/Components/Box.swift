@@ -12,27 +12,39 @@ class Box: ComponentLayout {
 
     let size: Size
     let border: Border?
+    let background: TextType?
 
-    init(_ location: Location, _ size: Size, border: Border? = nil, components: [Component]) {
+    init(_ location: Location, _ size: Size, border: Border? = nil, background: TextType? = nil, components: [Component]) {
         self.size = size
         self.border = border
+        self.background = background
         super.init()
         self.components = components
         self.location = location
     }
 
     override func desiredSize() -> DesiredSize {
-        return DesiredSize(width: size.width, height: size.height)
+        return DesiredSize(size)
     }
 
     override func chars(in screenSize: Size) -> Screen.Chars {
         var chars: Screen.Chars = [:]
         let size: Size
         if border == nil {
-            size = self.size
+            size = screenSize
         }
         else {
-            size = Size(width: max(0, self.size.width - 2), height: max(0, self.size.height - 2))
+            size = Size(width: max(0, screenSize.width - 2), height: max(0, screenSize.height - 2))
+        }
+
+        if let background = background, size.height > 0 && size.width > 0 {
+            for y in 0 ..< screenSize.height {
+                var newRow = chars[y] ?? [:]
+                for x in 0 ..< screenSize.width {
+                    newRow[x] = background
+                }
+                chars[y] = newRow
+            }
         }
 
         for view in components {

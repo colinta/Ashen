@@ -16,12 +16,12 @@ struct InputDemo: Program {
         var secondInput: InputView.Model
     }
 
-    func model() -> Model {
-        return Model(
+    func initial() -> (Model, [AnyCommand]) {
+        return (Model(
             activeInput: 0,
             firstInput: InputView.Model(text: "Press enter to exit, tab to switch inputs"),
             secondInput: InputView.Model.default
-            )
+            ), [])
     }
 
     func update(model: inout Model, message: Message)

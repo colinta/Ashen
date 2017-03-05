@@ -11,10 +11,10 @@ struct SpinnersDemo: Program {
         var spinners: [SpinnerView.Model]
     }
 
-    func model() -> Model {
-        return Model(spinners: (0 ..< SpinnerView.Model.availableSpinners).map { i in
+    func initial() -> (Model, [AnyCommand]) {
+        return (Model(spinners: (0 ..< SpinnerView.Model.availableSpinners).map { i in
             return SpinnerView.Model(spinner: i)
-        })
+        }), [])
     }
 
     func update(model: inout Model, message: Message)

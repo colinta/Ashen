@@ -15,7 +15,7 @@ protocol Program {
     associatedtype MessageType
     associatedtype CommandType
 
-    func model() -> ModelType
+    func initial() -> (ModelType, [CommandType])
     func update(model: inout ModelType, message: MessageType) -> (ModelType, [CommandType], LoopState)
     func render(model: ModelType, in screenSize: Size) -> Component
     func start(command: CommandType, done: @escaping (MessageType) -> Void)
