@@ -45,7 +45,7 @@ struct InputDemo: Program {
         return (model, [], .continue)
     }
 
-    func render(model: Model, in screenSize: Size) -> ComponentType {
+    func render(model: Model, in screenSize: Size) -> Component {
         let firstInput = InputView(
             .tl(x: 1, y: 1),
             model: model.firstInput,

@@ -92,7 +92,7 @@ struct Rouge: Program {
             return nextTrain
         }
 
-        func createComponent() -> ComponentType {
+        func createComponent() -> Component {
             let train: String
             let cars: String
             switch graphics {
@@ -230,10 +230,10 @@ struct Rouge: Program {
         return Point(x: x, y: y)
     }
 
-    func render(model: Model, in screenSize: Size) -> ComponentType {
+    func render(model: Model, in screenSize: Size) -> Component {
         guard let modelLocation = model.location else { return OnNext({ return Message.resize(screenSize) }) }
 
-        let keyHandlers: [ComponentType]
+        let keyHandlers: [Component]
         if model.dead {
             keyHandlers = [
                 OnKeyPress({ _ in return Message.revive }, reject: [.key_enter]),

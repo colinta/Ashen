@@ -1,9 +1,9 @@
 ////
-///  ComponentType.swift
+///  Component.swift
 //
 
 
-class ComponentType: Equatable {
+class Component: Equatable {
     var id: String = ""
 
     func messages(for _: Event) -> [AnyMessage] {
@@ -18,23 +18,23 @@ class ComponentType: Equatable {
         return self
     }
 
-    func merge(with _: ComponentType) {
+    func merge(with _: Component) {
     }
 
-    static func == (lhs: ComponentType, rhs: ComponentType) -> Bool {
+    static func == (lhs: Component, rhs: Component) -> Bool {
         return type(of: lhs) == type(of: rhs) && lhs.id == rhs.id
     }
 }
 
-class ComponentViewType: ComponentType {
+class ComponentView: Component {
     var location: Location = .tl()
     func desiredSize() -> DesiredSize {
         return DesiredSize()
     }
 }
 
-class ComponentLayoutType: ComponentViewType {
-    var components: [ComponentType] = []
+class ComponentLayout: ComponentView {
+    var components: [Component] = []
 
     override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
@@ -71,8 +71,8 @@ class ComponentLayoutType: ComponentViewType {
         return Window.chars(components: components, in: screenSize)
     }
 
-    override func merge(with prevComponent: ComponentType) {
-        guard let prevWindow = prevComponent as? ComponentLayoutType else { return }
+    override func merge(with prevComponent: Component) {
+        guard let prevWindow = prevComponent as? ComponentLayout else { return }
 
         var windowIndex = 0
         let prevComponents = prevWindow.components

@@ -87,8 +87,8 @@ struct Specs: Program {
         return (model, [], .continue)
     }
 
-    func render(model: SpecsModel, in screenSize: Size) -> ComponentType {
-        var components: [ComponentType] = []
+    func render(model: SpecsModel, in screenSize: Size) -> Component {
+        var components: [Component] = []
 
         if model.done {
             if onEnd == .quit {

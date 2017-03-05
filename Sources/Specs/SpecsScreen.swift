@@ -6,7 +6,7 @@ class SpecsScreen: ScreenType {
     var size: Size = Size.max
     var chars: Screen.Chars?
 
-    func render(_ component: ComponentType) -> Screen.Chars {
+    func render(_ component: Component) -> Screen.Chars {
         let chars = component.chars(in: size)
         render(chars: chars)
         return chars

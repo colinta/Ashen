@@ -3,7 +3,7 @@
 //
 
 
-class LabelView: ComponentViewType {
+class LabelView: ComponentView {
     let size: DesiredSize
 
     let lines: [[Text]]

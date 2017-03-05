@@ -3,7 +3,7 @@
 //
 
 
-class VerticalLabelView: ComponentViewType {
+class VerticalLabelView: ComponentView {
     let size: DesiredSize
 
     let line: [Text]

@@ -71,7 +71,7 @@ struct SpinnersDemo: Program {
     // a component - usually a Window or Box that contains child components. The
     // screenSize is used to assist view sizing or adaptive layouts.  render()
     // is also called when the window is resized().
-    func render(model: Model, in screenSize: Size) -> ComponentType {
+    func render(model: Model, in screenSize: Size) -> Component {
         let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
             return SpinnerView(.mc(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
         }

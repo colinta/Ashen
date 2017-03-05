@@ -2,7 +2,7 @@
 ///  InputView.swift
 //
 
-class InputView: ComponentViewType {
+class InputView: ComponentView {
     typealias OnChangeHandler = ((Model) -> AnyMessage)
     typealias OnEnterHandler = (() -> AnyMessage)
 
@@ -92,7 +92,7 @@ class InputView: ComponentViewType {
         return component
     }
 
-    override func merge(with prevComponent: ComponentType) {
+    override func merge(with prevComponent: Component) {
         guard let prevInput = prevComponent as? InputView else { return }
 
         cursor = forceCursor ?? prevInput.cursor

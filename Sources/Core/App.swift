@@ -78,7 +78,7 @@ struct App<T: Program> {
     func main() -> AppState {
         var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
-        var prevState: [(T.ModelType, ComponentType, Screen.Chars)] = []
+        var prevState: [(T.ModelType, Component, Screen.Chars)] = []
         var inThePast: Int?
         var messageQueue: [T.MessageType] = []
         var model = program.model()

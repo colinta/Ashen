@@ -3,9 +3,9 @@
 //
 
 
-class Window: ComponentLayoutType {
+class Window: ComponentLayout {
 
-    convenience init(components: [ComponentType]) {
+    convenience init(components: [Component]) {
         self.init()
         self.components = components
     }
@@ -14,10 +14,10 @@ class Window: ComponentLayoutType {
         return DesiredSize(width: Int.max, height: Int.max)
     }
 
-    static func chars(components: [ComponentType], in screenSize: Size) -> Screen.Chars {
+    static func chars(components: [Component], in screenSize: Size) -> Screen.Chars {
         var chars: Screen.Chars = [:]
         for view in components {
-            guard let view = view as? ComponentViewType else { continue }
+            guard let view = view as? ComponentView else { continue }
 
             let viewSize = view.desiredSize().constrain(in: screenSize)
             let viewChars = view.chars(in: viewSize)

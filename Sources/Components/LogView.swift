@@ -2,7 +2,7 @@
 ///  LogView.swift
 //
 
-class LogView: ComponentLayoutType {
+class LogView: ComponentLayout {
     var size: Size
 
     init(y startY: Int, entries: [String], screenSize: Size) {

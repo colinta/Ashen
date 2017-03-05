@@ -50,7 +50,7 @@ extension String: TextType {
 
 protocol ScreenType {
     var size: Size { get }
-    func render(_: ComponentType) -> Screen.Chars
+    func render(_: Component) -> Screen.Chars
     func render(chars _: Screen.Chars)
     func setup()
     func teardown()
@@ -68,7 +68,7 @@ class Screen: ScreenType {
     var size: Size { return Size(width: Int(getmaxx(stdscr)), height: Int(getmaxy(stdscr))) }
     var chars: Chars = [:]
 
-    func render(_ component: ComponentType) -> Chars {
+    func render(_ component: Component) -> Chars {
         render(chars: component.chars(in: size))
         return chars
     }

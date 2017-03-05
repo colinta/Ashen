@@ -13,7 +13,7 @@ private let spinners = [
     ["⠉", "⠑", "⠃", "⠊", "⠒", "⠢", "⠆", "⠔", "⠤", "⢄", "⡄", "⡠", "⣀", "⢄", "⢠", "⡠", "⠤", "⠢", "⠰", "⠔", "⠒", "⠑", "⠘", "⠊"],
 ]
 
-class SpinnerView: ComponentViewType {
+class SpinnerView: ComponentView {
     struct Model {
         static var availableSpinners: Int { return spinners.count }
         func chr(index: Int) -> String { return spinner[index] }
@@ -41,7 +41,7 @@ class SpinnerView: ComponentViewType {
         self.location = location
     }
 
-    override func merge(with prevComponent: ComponentType) {
+    override func merge(with prevComponent: Component) {
         guard let prevSpinner = prevComponent as? SpinnerView else { return }
         index = prevSpinner.index
         timeout = prevSpinner.timeout

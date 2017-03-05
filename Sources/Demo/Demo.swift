@@ -112,15 +112,15 @@ struct Demo: Program {
         return (model, [], .continue)
     }
 
-    func render(model: Model, in screenSize: Size) -> ComponentType {
+    func render(model: Model, in screenSize: Size) -> Component {
         let logHeight = 10
         let labelHeight = 1
-        var components: [ComponentType] = []
+        var components: [Component] = []
         components.append(OnDebug(Message.appendLog))
         components.append(LogView(y: screenSize.height - logHeight, entries: model.log, screenSize: screenSize))
 
         let title: String
-        let demo: ComponentType
+        let demo: Component
         let boxSize = Size(width: screenSize.width, height: screenSize.height - logHeight - labelHeight)
         switch model.activeDemo {
         case .spinner:

@@ -3,23 +3,23 @@
 //
 
 
-class FlowLayout: ComponentLayoutType {
+class FlowLayout: ComponentLayout {
     enum Orientation {
         case vertical
         case horizontal
     }
 
-    static func horizontal(components: [ComponentType]) {
+    static func horizontal(components: [Component]) {
         return FlowLayout(.horizontal, components: components)
     }
 
-    static func vertical(components: [ComponentType]) {
+    static func vertical(components: [Component]) {
         return FlowLayout(.vertical, components: components)
     }
 
-    let components: [ComponentType]
+    let components: [Component]
 
-    init(_ orientation: Orientation, components: [ComponentType]) {
+    init(_ orientation: Orientation, components: [Component]) {
 
         switch orientation {
         case .horizontal:
@@ -29,11 +29,11 @@ class FlowLayout: ComponentLayoutType {
         }
     }
 
-    func horizontalLayout(components: [ComponentType]) -> [ComponentType] {
+    func horizontalLayout(components: [Component]) -> [Component] {
         var x = 0
     }
 
-    func verticalLayout(components: [ComponentType]) -> [ComponentType] {
+    func verticalLayout(components: [Component]) -> [Component] {
 
     }
 

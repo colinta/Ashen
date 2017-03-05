@@ -54,7 +54,7 @@ struct CanvasDemo: Program {
         return "\(time)"
     }
 
-    func render(model: Model, in screenSize: Size) -> ComponentType {
+    func render(model: Model, in screenSize: Size) -> Component {
         let date = model.date.addingTimeInterval(model.timeOffset)
         let hour = Float(NSCalendar.current.component(.hour, from: date))
         let minute = Float(NSCalendar.current.component(.minute, from: date))
@@ -81,7 +81,7 @@ struct CanvasDemo: Program {
             )
 
         let canvasSize = min((screenSize.width - 2) / 2, screenSize.height - 13)
-        let timingComponent: ComponentType
+        let timingComponent: Component
         if model.animating {
             timingComponent = OnNext({ return Message.offset(3601) })
         }

@@ -2,7 +2,7 @@
 ///  CanvasView.swift
 //
 
-class CanvasView: ComponentViewType {
+class CanvasView: ComponentView {
     enum Drawable {
         case line(FloatPoint, FloatPoint)
         case box(FloatPoint, FloatSize)

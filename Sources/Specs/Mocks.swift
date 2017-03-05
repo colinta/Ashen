@@ -4,7 +4,7 @@
 
 class MockProgram: Program {
     var mockModel: Any
-    var component: ComponentType?
+    var component: Component?
 
     struct MockModel {}
     struct Quit {}
@@ -35,7 +35,7 @@ class MockProgram: Program {
         return (mockModel, [], .continue)
     }
 
-    func render(model: Any, in screenSize: Size) -> ComponentType {
+    func render(model: Any, in screenSize: Size) -> Component {
         if let component = component {
             self.component = nil
 
@@ -57,7 +57,7 @@ class MockProgram: Program {
 class MockScreen: ScreenType {
     var size: Size
     var events: [Event] = []
-    var renderedComponent: ComponentType?
+    var renderedComponent: Component?
     var renderedChars: Screen.Chars?
     var setupCalled = 0
     var teardownCalled = 0
@@ -71,7 +71,7 @@ class MockScreen: ScreenType {
         self.size = size
     }
 
-    func render(_ component: ComponentType) -> Screen.Chars {
+    func render(_ component: Component) -> Screen.Chars {
         renderedComponent = component
         let chars = component.chars(in: size)
         render(chars: chars)

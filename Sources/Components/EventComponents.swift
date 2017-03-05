@@ -3,7 +3,7 @@
 //
 
 
-class OnTick: ComponentType {
+class OnTick: Component {
     typealias OnTickHandler = (Float) -> AnyMessage
     var onTick: OnTickHandler
     var every: Float
@@ -18,7 +18,7 @@ class OnTick: ComponentType {
         self.reset = reset
     }
 
-    override func merge(with prevComponent: ComponentType) {
+    override func merge(with prevComponent: Component) {
         guard !reset else { return }
         guard let prevComponent = prevComponent as? OnTick else { return }
         prevComponent.timeout = timeout
@@ -51,7 +51,7 @@ class OnTick: ComponentType {
     }
 }
 
-class OnNext: ComponentType {
+class OnNext: Component {
     typealias OnNextHandler = () -> AnyMessage
     var onNext: OnNextHandler
 
@@ -77,7 +77,7 @@ class OnNext: ComponentType {
     }
 }
 
-class OnKeyPress: ComponentType {
+class OnKeyPress: Component {
     typealias OnKeyHandler = (KeyEvent) -> AnyMessage
     typealias EmptyKeyHandler = () -> AnyMessage
     var onKey: OnKeyHandler
@@ -119,7 +119,7 @@ class OnKeyPress: ComponentType {
     }
 }
 
-class OnDebug: ComponentType {
+class OnDebug: Component {
     typealias LogHandler = (String) -> AnyMessage
     var onLogEntry: LogHandler
 
@@ -145,7 +145,7 @@ class OnDebug: ComponentType {
     }
 }
 
-class OnResize: ComponentType {
+class OnResize: Component {
     typealias ResizeHandler = (Size) -> AnyMessage
     var onResize: ResizeHandler
 

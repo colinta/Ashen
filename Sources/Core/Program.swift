@@ -17,6 +17,6 @@ protocol Program {
 
     func model() -> ModelType
     func update(model: inout ModelType, message: MessageType) -> (ModelType, [CommandType], LoopState)
-    func render(model: ModelType, in screenSize: Size) -> ComponentType
+    func render(model: ModelType, in screenSize: Size) -> Component
     func start(command: CommandType, done: @escaping (MessageType) -> Void)
 }

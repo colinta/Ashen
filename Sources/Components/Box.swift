@@ -2,7 +2,7 @@
 ///  Box.swift
 //
 
-class Box: ComponentLayoutType {
+class Box: ComponentLayout {
     indirect enum Border {
         case lame
         case single
@@ -13,7 +13,7 @@ class Box: ComponentLayoutType {
     let size: Size
     let border: Border?
 
-    init(_ location: Location, _ size: Size, border: Border? = nil, components: [ComponentType]) {
+    init(_ location: Location, _ size: Size, border: Border? = nil, components: [Component]) {
         self.size = size
         self.border = border
         super.init()
@@ -36,7 +36,7 @@ class Box: ComponentLayoutType {
         }
 
         for view in components {
-            guard let view = view as? ComponentViewType else { continue }
+            guard let view = view as? ComponentView else { continue }
 
             let viewSize = view.desiredSize().constrain(in: size)
             let viewChars = view.chars(in: viewSize)
