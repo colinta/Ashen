@@ -69,7 +69,7 @@ struct Rouge: Program {
                 train = "🚁"
                 cars = String(repeating: "  🚲", count: self.cars)
             }
-            return LabelView(.tl(x: minX, y: minY), text: train + cars)
+            return LabelView(.topLeft(x: minX, y: minY), text: train + cars)
         }
     }
 

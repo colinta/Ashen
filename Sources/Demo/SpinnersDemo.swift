@@ -28,7 +28,7 @@ struct SpinnersDemo: Program {
 
     func render(model: Model, in screenSize: Size) -> Component {
         let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
-            return SpinnerView(.mc(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
+            return SpinnerView(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
         }
         return Window(
             components: spinners + [

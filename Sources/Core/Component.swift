@@ -27,7 +27,7 @@ class Component: Equatable {
 }
 
 class ComponentView: Component {
-    var location: Location = .tl()
+    var location: Location = .topLeft()
     func desiredSize() -> DesiredSize {
         return DesiredSize()
     }

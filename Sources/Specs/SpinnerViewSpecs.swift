@@ -8,7 +8,7 @@ struct SpinnerViewSpecs: SpecRunner {
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let subject = SpinnerView(
-            .tl(),
+            .topLeft(),
             model: SpinnerView.Model(
                 spinner: ["a", "b", "c"]
                 ))

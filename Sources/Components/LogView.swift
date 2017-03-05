@@ -20,10 +20,10 @@ class LogView: ComponentLayout {
         }
 
         super.init()
-        location = .tl(y: startY)
+        location = .topLeft(y: startY)
         var y = 0
         components = trimmedEntries.map { entry in
-            let component = LabelView(.tl(x: 1, y: y), text: entry)
+            let component = LabelView(.topLeft(x: 1, y: y), text: entry)
             y += 1
             return component
         }

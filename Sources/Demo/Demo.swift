@@ -154,10 +154,10 @@ struct Demo: Program {
         }
 
         components.append(Box(
-            .tl(x: 0, y: labelHeight),
+            .topLeft(x: 0, y: labelHeight),
             boxSize,
             components: [demo]))
-        components.append(LabelView(.tc(y: 0), text: Text(title, attrs: [.underline])))
+        components.append(LabelView(.topCenter(y: 0), text: Text(title, attrs: [.underline])))
         components.append(OnKeyPress({ key in return Demo.Message.keypress(key) }, reject: [.signal_ctrl_k]))
         components.append(OnKeyPress({ _ in return Demo.Message.resetLog }, filter: [.signal_ctrl_k]))
 

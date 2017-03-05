@@ -106,8 +106,8 @@ struct CanvasDemo: Program {
             OnKeyPress(.key_enter, { return Message.quit }),
             OnKeyPress(.key_space, { return Message.toggleAnimation }),
             timingComponent,
-            LabelView(.tl(x: 2), text: "\(lpad(Int(hour), as: .hour)):\(lpad(Int(minute), as: .minute)):\(lpad(Int(second), as: .second))\(hour >= 12 && hour < 24 ? "pm" : "am")"),
-            CanvasView(.bl(), DesiredSize(width: screenSize.width, height: 10),
+            LabelView(.topLeft(x: 2), text: "\(lpad(Int(hour), as: .hour)):\(lpad(Int(minute), as: .minute)):\(lpad(Int(second), as: .second))\(hour >= 12 && hour < 24 ? "pm" : "am")"),
+            CanvasView(.bottomLeft(), DesiredSize(width: screenSize.width, height: 10),
                 viewport: FloatFrame(x: -43_200, y: -1, width: 86_400, height: 2),
                 drawables: [
                     .line(FloatPoint(x: 0, y: -1), FloatPoint(x: 0, y: 1)),
@@ -115,7 +115,7 @@ struct CanvasDemo: Program {
                         return 0.5 - cos((totalSeconds + x) / 86_400 * 2 * Float(M_PI)) / 2
                     }),
                 ]),
-            CanvasView(.mc(y: -4), DesiredSize(width: 2 * canvasSize, height: canvasSize),
+            CanvasView(.middleCenter(y: -4), DesiredSize(width: 2 * canvasSize, height: canvasSize),
                 viewport: watchFrame,
                 drawables: watchDecorations + [
                     .border,
@@ -123,7 +123,7 @@ struct CanvasDemo: Program {
                     .line(FloatPoint.zero, hourPt),
                     .line(FloatPoint.zero, secondPt),
                 ]),
-            LabelView(.mc(x: canvasSize / 2, y: canvasSize / 4 - 4), text: timeChr),
+            LabelView(.middleCenter(x: canvasSize / 2, y: canvasSize / 4 - 4), text: timeChr),
         ])
     }
 

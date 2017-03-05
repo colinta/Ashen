@@ -48,7 +48,7 @@ struct InputViewSpecs: SpecRunner {
         let model = InputView.Model(text: startingText)
         var changedModel: InputView.Model!
         let subject = InputView(
-            .tl(),
+            .topLeft(),
             model: model,
             isFirstResponder: true,
             onChange: { model in

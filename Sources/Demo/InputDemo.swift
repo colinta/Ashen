@@ -47,7 +47,7 @@ struct InputDemo: Program {
 
     func render(model: Model, in screenSize: Size) -> Component {
         let firstInput = InputView(
-            .tl(x: 1, y: 1),
+            .topLeft(x: 1, y: 1),
             model: model.firstInput,
             isFirstResponder: model.activeInput == 0,
             onChange: { model in
@@ -57,7 +57,7 @@ struct InputDemo: Program {
                 return Message.quit
             })
         let secondInput = InputView(
-            .tl(x: 1, y: 3),
+            .topLeft(x: 1, y: 3),
             model: model.secondInput,
             isFirstResponder: model.activeInput == 1,
             multiline: true,
