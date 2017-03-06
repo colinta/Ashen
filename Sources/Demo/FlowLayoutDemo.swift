@@ -52,12 +52,12 @@ struct FlowLayoutDemo: Program {
         }
     }
 
-    func initial() -> (Model, [Command<Message>]) {
+    func initial() -> (Model, [Command]) {
         return (Model(), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command<Message>], LoopState)
+        -> (Model, [Command], LoopState)
     {
         switch message {
         case .quit:

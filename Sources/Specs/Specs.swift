@@ -45,12 +45,12 @@ struct Specs: Program {
         self.onEnd = onEnd
     }
 
-    func initial() -> (SpecsModel, [Command<SpecsMessage>]) {
+    func initial() -> (SpecsModel, [Command]) {
         return (SpecsModel(specs), [])
     }
 
     func update(model: inout SpecsModel, message: SpecsMessage)
-        -> (SpecsModel, [Command<SpecsMessage>], LoopState)
+        -> (SpecsModel, [Command], LoopState)
     {
         var runNext = false
         switch message {

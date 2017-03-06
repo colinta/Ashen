@@ -11,14 +11,14 @@ struct SpinnersDemo: Program {
         var spinners: [SpinnerView.Model]
     }
 
-    func initial() -> (Model, [Command<Message>]) {
+    func initial() -> (Model, [Command]) {
         return (Model(spinners: (0 ..< SpinnerView.Model.availableSpinners).map { i in
             return SpinnerView.Model(spinner: i)
         }), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command<Message>], LoopState)
+        -> (Model, [Command], LoopState)
     {
         switch message {
         case .quit:

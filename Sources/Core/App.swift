@@ -84,22 +84,21 @@ struct App<T: Program> {
         var prevState: [(T.ModelType, Component, Screen.Chars)] = []
         var inThePast: Int?
         var (model, commands) = program.initial()
-        log("=============== \(#file) line \(#line) ===============")
-        log("commands: \(commands)")
 
         var window = program.render(model: model, in: screen.size)
         let chars = screen.render(window)
         prevState.append((model, window, chars))
 
+        var messageQueue: [T.MessageType] = []
         while state == .continue {
-            var messageQueue: [T.MessageType] = []
             for command in commands {
-                debug("=============== \(#file) line \(#line) ===============")
-                command.start() { (msg: T.MessageType) in
-                    debug("=============== \(#file) line \(#line) ===============")
-                    messageQueue.append(msg)
+                command.start() { msg in
+                    if let msg = msg as? T.MessageType {
+                        messageQueue.append(msg)
+                    }
                 }
             }
+            commands = []
 
             let (events, nextTimestamp) = flushEvents(prevTimestamp: prevTimestamp)
             prevTimestamp = nextTimestamp

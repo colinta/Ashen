@@ -18,12 +18,12 @@ class MockProgram: Program {
         self.mockModel = model
     }
 
-    func initial() -> (Any, [Command<Any>]) {
+    func initial() -> (Any, [Command]) {
         return (mockModel, [])
     }
 
     func update(model: inout Any, message: Any)
-        -> (Any, [Command<Any>], LoopState)
+        -> (Any, [Command], LoopState)
     {
         if message is Quit {
             return (mockModel, [], .quit)

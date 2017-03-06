@@ -13,7 +13,7 @@ typealias AnyCommand = Any
 protocol Program {
     associatedtype ModelType
     associatedtype MessageType
-    typealias CommandType = Command<MessageType>
+    typealias CommandType = Command
 
     func initial() -> (ModelType, [CommandType])
     func update(model: inout ModelType, message: MessageType) -> (ModelType, [CommandType], LoopState)

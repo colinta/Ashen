@@ -46,7 +46,7 @@ struct Demo: Program {
         case httpCommandMessage(HttpCommandDemo.Message)
     }
 
-    func initial() -> (Model, [Command<Message>]) {
+    func initial() -> (Model, [Command]) {
         let (spinnerModel, _) = spinnerProgram.initial()
         let (canvasModel, _) = canvasProgram.initial()
         let (inputModel, _) = inputProgram.initial()
@@ -64,12 +64,13 @@ struct Demo: Program {
             httpCommandModel: httpCommandModel,
             log: []
             ), httpCommands.map { command in
-                return command.map { Message.httpCommandMessage($0) }
+                return command.map { (msg: HttpCommandDemo.Message) -> Message in
+                    return Message.httpCommandMessage(msg) }
             })
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command<Message>], LoopState)
+        -> (Model, [Command], LoopState)
     {
         switch message {
         case .quit:
@@ -129,14 +130,14 @@ struct Demo: Program {
             // let commands = gridLayoutCommands.map { Command.gridLayoutCommand($0) }
             return (model, [], .continue)
         case let .httpCommandMessage(httpCommandMsg):
-            let (newModel, _ /* httpCommandCommands */, state) =
+            let (newModel, httpCommandCommands, state) =
                 httpCommandProgram.update(model: &model.httpCommandModel, message: httpCommandMsg)
             if state == .quit {
                 return (model, [], .quit)
             }
             model.httpCommandModel = newModel
-            // let commands = httpCommandCommands.map { Command.httpCommandCommands($0) }
-            return (model, [], .continue)
+            let commands = httpCommandCommands.map { $0.map { Message.httpCommandMessage($0) } }
+            return (model, commands, .continue)
         }
 
         return (model, [], .continue)
@@ -189,7 +190,7 @@ struct Demo: Program {
                     return Demo.Message.gridLayoutMessage(msg)
                 }
         case .httpCommand:
-            title = "HttCommand Demo"
+            title = "HttpCommand Demo"
             demo = httpCommandProgram
                 .render(model: model.httpCommandModel, in: boxSize)
                 .map { (msg: HttpCommandDemo.Message) -> Demo.Message in

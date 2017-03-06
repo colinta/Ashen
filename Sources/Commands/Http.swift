@@ -10,24 +10,23 @@ enum HttpError: Error {
     case unknown
 }
 
-class Command<T> {
-    func start(_ done: @escaping (T) -> Void) {
+class Command {
+    func start(_ done: @escaping (AnyMessage) -> Void) {
     }
 
-    func map<T, U>(_ mapper: @escaping (T) -> U) -> Command<U> {
-        return Command<U>()
+    func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        return self
     }
 }
 
-class Http<T>: Command<T> {
+class Http: Command {
     typealias HttpResult = Result<(Data, URLResponse), HttpError>
-    typealias OnReceivedHandler = (HttpResult) -> T?
+    typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
 
     let url: URL
     var config: URLSessionConfiguration
     var onReceived: OnReceivedHandler
     init(url: URL, timeout: TimeInterval? = nil, onReceived: @escaping OnReceivedHandler) {
-        debug("create")
         self.url = url
         let config = URLSessionConfiguration.default
         if let timeout = timeout {
@@ -37,20 +36,20 @@ class Http<T>: Command<T> {
         self.onReceived = onReceived
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Command<U> {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        let command = self
         let myReceived = self.onReceived
         let onReceived: (HttpResult) -> U? = { result in
-            return myReceived(result).map { (msg: T) -> U in return mapper(msg) }
+            return myReceived(result).map { mapper($0 as! T) }
         }
-        let command = Http<U>(url: url, onReceived: onReceived)
+        command.onReceived = onReceived
         command.config = config
         return command
     }
 
-    override func start(_ done: @escaping (T) -> Void) {
+    override func start(_ done: @escaping (AnyMessage) -> Void) {
         let request = URLRequest(url: url)
         let task = URLSession(configuration: config).dataTask(with: request, completionHandler: { data, response, error in
-            debug("receive")
             let result: HttpResult
             if let data = data, let response = response {
                 result = .ok((data, response))
@@ -66,7 +65,6 @@ class Http<T>: Command<T> {
                 done(message)
             }
         })
-        debug("send")
         task.resume()
     }
 }

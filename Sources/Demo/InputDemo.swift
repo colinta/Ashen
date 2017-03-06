@@ -16,7 +16,7 @@ struct InputDemo: Program {
         var secondInput: InputView.Model
     }
 
-    func initial() -> (Model, [Command<Message>]) {
+    func initial() -> (Model, [Command]) {
         return (Model(
             activeInput: 0,
             firstInput: InputView.Model(text: "Press enter to exit, tab to switch inputs"),
@@ -25,7 +25,7 @@ struct InputDemo: Program {
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command<Message>], LoopState)
+        -> (Model, [Command], LoopState)
     {
         switch message {
         case .nextInput:

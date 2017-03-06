@@ -3,10 +3,10 @@
 //
 
 
-class SpecRunner: Command<Specs.SpecsMessage> {
+class SpecRunner: Command {
     var name: String { return "" }
 
-    override func start(_ done: @escaping (Specs.SpecsMessage) -> Void) {
+    override func start(_ done: @escaping (AnyMessage) -> Void) {
         let expectations = Expectations()
         let generator: (String) -> Expectations = { desc in
             return expectations.describe(desc)

@@ -20,12 +20,12 @@ struct CanvasDemo: Program {
         var timeOffset: TimeInterval
     }
 
-    func initial() -> (Model, [Command<Message>]) {
+    func initial() -> (Model, [Command]) {
         return (Model(animating: false, date: Date(), timeOffset: 0), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command<Message>], LoopState) {
+        -> (Model, [Command], LoopState) {
         switch message {
         case .tick:
             model.date = Date()
