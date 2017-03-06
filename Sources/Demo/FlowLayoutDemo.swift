@@ -52,12 +52,12 @@ struct FlowLayoutDemo: Program {
         }
     }
 
-    func initial() -> (Model, [AnyCommand]) {
+    func initial() -> (Model, [Command<Message>]) {
         return (Model(), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [AnyCommand], LoopState)
+        -> (Model, [Command<Message>], LoopState)
     {
         switch message {
         case .quit:
@@ -79,8 +79,5 @@ struct FlowLayoutDemo: Program {
             FlowLayout(.topLeft(y: 1), Size(width: screenSize.width, height: screenSize.height - 1), orientation: model.orientation, direction: model.direction,
                 components: labels),
             ])
-    }
-
-    func start(command: AnyCommand, done: @escaping (Message) -> Void) {
     }
 }

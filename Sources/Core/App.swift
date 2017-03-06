@@ -84,6 +84,8 @@ struct App<T: Program> {
         var prevState: [(T.ModelType, Component, Screen.Chars)] = []
         var inThePast: Int?
         var (model, commands) = program.initial()
+        log("=============== \(#file) line \(#line) ===============")
+        log("commands: \(commands)")
 
         var window = program.render(model: model, in: screen.size)
         let chars = screen.render(window)
@@ -92,7 +94,9 @@ struct App<T: Program> {
         while state == .continue {
             var messageQueue: [T.MessageType] = []
             for command in commands {
-                program.start(command: command) { (msg: T.MessageType) in
+                debug("=============== \(#file) line \(#line) ===============")
+                command.start() { (msg: T.MessageType) in
+                    debug("=============== \(#file) line \(#line) ===============")
                     messageQueue.append(msg)
                 }
             }

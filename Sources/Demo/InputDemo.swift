@@ -16,7 +16,7 @@ struct InputDemo: Program {
         var secondInput: InputView.Model
     }
 
-    func initial() -> (Model, [AnyCommand]) {
+    func initial() -> (Model, [Command<Message>]) {
         return (Model(
             activeInput: 0,
             firstInput: InputView.Model(text: "Press enter to exit, tab to switch inputs"),
@@ -25,7 +25,7 @@ struct InputDemo: Program {
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [AnyCommand], LoopState)
+        -> (Model, [Command<Message>], LoopState)
     {
         switch message {
         case .nextInput:
@@ -70,8 +70,5 @@ struct InputDemo: Program {
             OnKeyPress(.key_tab, { return Message.nextInput }),
             OnKeyPress(.key_backtab, { return Message.prevInput }),
         ])
-    }
-
-    func start(command: AnyCommand, done: @escaping (Message) -> Void) {
     }
 }

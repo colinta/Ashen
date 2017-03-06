@@ -11,6 +11,7 @@ struct Demo: Program {
     let inputProgram = InputDemo()
     let flowLayoutProgram = FlowLayoutDemo()
     let gridLayoutProgram = GridLayoutDemo()
+    let httpCommandProgram = HttpCommandDemo()
 
     enum ActiveDemo {
         case spinner
@@ -18,6 +19,7 @@ struct Demo: Program {
         case input
         case flowLayout
         case gridLayout
+        case httpCommand
     }
 
     struct Model {
@@ -27,6 +29,7 @@ struct Demo: Program {
         var inputModel: InputDemo.ModelType
         var flowLayoutModel: FlowLayoutDemo.ModelType
         var gridLayoutModel: GridLayoutDemo.ModelType
+        var httpCommandModel: HttpCommandDemo.ModelType
         var log: [String]
     }
 
@@ -40,31 +43,33 @@ struct Demo: Program {
         case inputMessage(InputDemo.Message)
         case flowLayoutMessage(FlowLayoutDemo.Message)
         case gridLayoutMessage(GridLayoutDemo.Message)
+        case httpCommandMessage(HttpCommandDemo.Message)
     }
 
-    enum Command {
-    }
-
-    func initial() -> (Model, [Command]) {
+    func initial() -> (Model, [Command<Message>]) {
         let (spinnerModel, _) = spinnerProgram.initial()
         let (canvasModel, _) = canvasProgram.initial()
         let (inputModel, _) = inputProgram.initial()
         let (flowLayoutModel, _) = flowLayoutProgram.initial()
         let (gridLayoutModel, _) = gridLayoutProgram.initial()
+        let (httpCommandModel, httpCommands) = httpCommandProgram.initial()
 
         return (Model(
-            activeDemo: .gridLayout,
+            activeDemo: .httpCommand,
             spinnerModel: spinnerModel,
             canvasModel: canvasModel,
             inputModel: inputModel,
             flowLayoutModel: flowLayoutModel,
             gridLayoutModel: gridLayoutModel,
+            httpCommandModel: httpCommandModel,
             log: []
-            ), [])
+            ), httpCommands.map { command in
+                return command.map { Message.httpCommandMessage($0) }
+            })
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [Command], LoopState)
+        -> (Model, [Command<Message>], LoopState)
     {
         switch message {
         case .quit:
@@ -123,6 +128,15 @@ struct Demo: Program {
             model.gridLayoutModel = newModel
             // let commands = gridLayoutCommands.map { Command.gridLayoutCommand($0) }
             return (model, [], .continue)
+        case let .httpCommandMessage(httpCommandMsg):
+            let (newModel, _ /* httpCommandCommands */, state) =
+                httpCommandProgram.update(model: &model.httpCommandModel, message: httpCommandMsg)
+            if state == .quit {
+                return (model, [], .quit)
+            }
+            model.httpCommandModel = newModel
+            // let commands = httpCommandCommands.map { Command.httpCommandCommands($0) }
+            return (model, [], .continue)
         }
 
         return (model, [], .continue)
@@ -174,6 +188,13 @@ struct Demo: Program {
                 .map { (msg: GridLayoutDemo.Message) -> Demo.Message in
                     return Demo.Message.gridLayoutMessage(msg)
                 }
+        case .httpCommand:
+            title = "HttCommand Demo"
+            demo = httpCommandProgram
+                .render(model: model.httpCommandModel, in: boxSize)
+                .map { (msg: HttpCommandDemo.Message) -> Demo.Message in
+                    return Demo.Message.httpCommandMessage(msg)
+                }
         }
 
         components.append(Box(
@@ -186,8 +207,4 @@ struct Demo: Program {
 
         return Window(components: components)
     }
-
-    func start(command: Command, done: @escaping (Message) -> Void) {
-    }
-
 }

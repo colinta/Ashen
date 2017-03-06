@@ -3,11 +3,10 @@
 //
 
 
-struct OnTickSpecs: SpecRunner {
-    let name = "OnTickSpecs"
-    struct OnTickModel {}
+class OnTickSpecs: SpecRunner {
+    override var name: String { return "OnTickSpecs" }
 
-    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let screen = MockScreen()
         let program = MockProgram()
         let app = App(program: program, screen: screen)

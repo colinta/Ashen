@@ -24,7 +24,7 @@ class SpinnerView: ComponentView {
         }
 
         init(spinner: [String]? = nil) {
-            self.spinner = spinner ?? spinners[Int(arc4random_uniform(UInt32(spinners.count)))]
+            self.spinner = spinner ?? spinners.last!
         }
     }
 
@@ -34,8 +34,8 @@ class SpinnerView: ComponentView {
     let model: Model
     let animating: Bool
 
-    init(_ location: Location, model: Model?, animating: Bool = true) {
-        self.model = model ?? Model()
+    init(_ location: Location, model: Model = Model(), animating: Bool = true) {
+        self.model = model
         self.index = nil
         self.animating = animating
         super.init()

@@ -29,12 +29,12 @@ struct GridLayoutDemo: Program {
         }
     }
 
-    func initial() -> (Model, [AnyCommand]) {
+    func initial() -> (Model, [Command<Message>]) {
         return (Model(), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [AnyCommand], LoopState)
+        -> (Model, [Command<Message>], LoopState)
     {
         switch message {
         case .quit:
@@ -57,8 +57,5 @@ struct GridLayoutDemo: Program {
                     })
                 }),
             ])
-    }
-
-    func start(command: AnyCommand, done: @escaping (Message) -> Void) {
     }
 }

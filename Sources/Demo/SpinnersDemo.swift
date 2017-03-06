@@ -11,14 +11,14 @@ struct SpinnersDemo: Program {
         var spinners: [SpinnerView.Model]
     }
 
-    func initial() -> (Model, [AnyCommand]) {
+    func initial() -> (Model, [Command<Message>]) {
         return (Model(spinners: (0 ..< SpinnerView.Model.availableSpinners).map { i in
             return SpinnerView.Model(spinner: i)
         }), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [AnyCommand], LoopState)
+        -> (Model, [Command<Message>], LoopState)
     {
         switch message {
         case .quit:
@@ -34,8 +34,5 @@ struct SpinnersDemo: Program {
             components: spinners + [
                 OnKeyPress(.key_enter, { return Message.quit }),
             ])
-    }
-
-    func start(command: AnyCommand, done: @escaping (Message) -> Void) {
     }
 }

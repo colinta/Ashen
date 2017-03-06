@@ -10,10 +10,6 @@ class MockProgram: Program {
     struct Quit {}
     struct Continue {}
 
-    struct MockCommand {
-        var result: Any?
-    }
-
     convenience init() {
         self.init(model: MockModel())
     }
@@ -22,12 +18,12 @@ class MockProgram: Program {
         self.mockModel = model
     }
 
-    func initial() -> (Any, [MockCommand]) {
+    func initial() -> (Any, [Command<Any>]) {
         return (mockModel, [])
     }
 
     func update(model: inout Any, message: Any)
-        -> (Any, [MockCommand], LoopState)
+        -> (Any, [Command<Any>], LoopState)
     {
         if message is Quit {
             return (mockModel, [], .quit)
@@ -45,13 +41,6 @@ class MockProgram: Program {
         return OnNext({ return Quit() })
 
     }
-
-    func start(command: MockCommand, done: @escaping (Any) -> Void) {
-        if let result = command.result {
-            done(result)
-        }
-    }
-
 }
 
 class MockScreen: ScreenType {

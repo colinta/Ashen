@@ -39,22 +39,18 @@ struct Specs: Program {
         case expectations(Int, Int)
     }
 
-    enum SpecsCommand {
-        case spec(SpecRunner)
-    }
-
     let onEnd: LoopState
 
     init(onEnd: LoopState) {
         self.onEnd = onEnd
     }
 
-    func initial() -> (SpecsModel, [SpecsCommand]) {
+    func initial() -> (SpecsModel, [Command<SpecsMessage>]) {
         return (SpecsModel(specs), [])
     }
 
     func update(model: inout SpecsModel, message: SpecsMessage)
-        -> (SpecsModel, [SpecsCommand], LoopState)
+        -> (SpecsModel, [Command<SpecsMessage>], LoopState)
     {
         var runNext = false
         switch message {
@@ -82,7 +78,7 @@ struct Specs: Program {
             else {
                 let runner = model.specRunners.removeFirst()
                 model.specLog.append("--- \(runner.name) ---")
-                return (model, [.spec(runner)], .continue)
+                return (model, [runner], .continue)
             }
         }
         return (model, [], .continue)
@@ -105,22 +101,6 @@ struct Specs: Program {
             components.append(OnNext({ SpecsMessage.begin }))
         }
         return Window(components: components)
-    }
-
-    func start(command: SpecsCommand, done: @escaping (SpecsMessage) -> Void) {
-        if case let .spec(specRunner) = command {
-            let expectations = Expectations()
-            let generator: (String) -> Expectations = { desc in
-                return expectations.describe(desc)
-            }
-            specRunner.run(expect: generator) {
-                expectations.commit()
-                for message in expectations.messages {
-                    done(SpecsMessage.specLog("\(message)"))
-                }
-                done(SpecsMessage.expectations(expectations.totalPassed, expectations.totalFailed))
-            }
-        }
     }
 }
 

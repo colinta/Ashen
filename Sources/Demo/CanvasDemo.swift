@@ -20,12 +20,12 @@ struct CanvasDemo: Program {
         var timeOffset: TimeInterval
     }
 
-    func initial() -> (Model, [AnyCommand]) {
+    func initial() -> (Model, [Command<Message>]) {
         return (Model(animating: false, date: Date(), timeOffset: 0), [])
     }
 
     func update(model: inout Model, message: Message)
-        -> (Model, [AnyCommand], LoopState) {
+        -> (Model, [Command<Message>], LoopState) {
         switch message {
         case .tick:
             model.date = Date()
@@ -126,8 +126,4 @@ struct CanvasDemo: Program {
             LabelView(.middleCenter(x: canvasSize / 2, y: canvasSize / 4 - 4), text: timeChr),
         ])
     }
-
-    func start(command: AnyCommand, done: @escaping (Message) -> Void) {
-    }
-
 }
