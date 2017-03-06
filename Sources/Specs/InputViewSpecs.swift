@@ -3,10 +3,10 @@
 //
 
 
-class InputViewSpecs: SpecRunner {
-    override var name: String { return "InputViewSpecs" }
+struct InputViewSpecs: SpecRunner {
+    var name: String { return "InputViewSpecs" }
 
-    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         withText(expect, "test", startingAt: (3, 0), pressing: .symbol_underscore, goesTo: (4, 0), "tes_t")
         withText(expect, "test", startingAt: (4, 0), pressing: .key_backspace, goesTo: (3, 0), "tes")
         withText(expect, "test", startingAt: (0, 0), pressing: .key_backspace, goesTo: (0, 0))

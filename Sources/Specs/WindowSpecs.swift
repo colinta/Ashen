@@ -3,10 +3,10 @@
 //
 
 
-class WindowSpecs: SpecRunner {
-    override var name: String { return "WindowSpecs" }
+struct WindowSpecs: SpecRunner {
+    var name: String { return "WindowSpecs" }
 
-    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let spinnerA = SpinnerView(.topLeft())
         spinnerA.index = 1
         let spinnerB = SpinnerView(.topLeft())

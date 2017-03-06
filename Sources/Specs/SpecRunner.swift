@@ -3,10 +3,13 @@
 //
 
 
-class SpecRunner: Command {
-    var name: String { return "" }
+protocol SpecRunner: Command {
+    var name: String { get }
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void)
+}
 
-    override func start(_ done: @escaping (AnyMessage) -> Void) {
+extension SpecRunner {
+    func start(_ done: @escaping (AnyMessage) -> Void) {
         let expectations = Expectations()
         let generator: (String) -> Expectations = { desc in
             return expectations.describe(desc)
@@ -19,9 +22,5 @@ class SpecRunner: Command {
             }
             done(Specs.SpecsMessage.expectations(expectations.totalPassed, expectations.totalFailed))
         }
-    }
-
-    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
-        fatalError("you should override this")
     }
 }

@@ -3,13 +3,13 @@
 //
 
 
-class SizeDescriptionSpecs: SpecRunner {
-    override var name: String { return "SizeDescriptionSpecs" }
+struct SizeDescriptionSpecs: SpecRunner {
+    var name: String { return "SizeDescriptionSpecs" }
     let parentSize = Size(width: 20, height: 40)
     let sizeZeroDescription = SizeDescription(multiplier: FloatSize(width: 0, height: 0), offset: Size(width: 0, height: 0))
     let sizeTenDescription = SizeDescription(multiplier: FloatSize(width: 0, height: 0), offset: Size(width: 10, height: 10))
 
-    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         testSize(expect, SizeDescription.size(width: 10, height: 10), becomes: Size(width: 10, height: 10), "SizeDescription.size")
 
         testSize(expect, SizeDescription.width(10), becomes: Size(width: 10, height: 1), "SizeDescription.width")

@@ -13,9 +13,8 @@ typealias AnyCommand = Any
 protocol Program {
     associatedtype ModelType
     associatedtype MessageType
-    typealias CommandType = Command
 
-    func initial() -> (ModelType, [CommandType])
-    func update(model: inout ModelType, message: MessageType) -> (ModelType, [CommandType], LoopState)
+    func initial() -> (ModelType, [Command])
+    func update(model: inout ModelType, message: MessageType) -> (ModelType, [Command], LoopState)
     func render(model: ModelType, in screenSize: Size) -> Component
 }

@@ -10,15 +10,6 @@ enum HttpError: Error {
     case unknown
 }
 
-class Command {
-    func start(_ done: @escaping (AnyMessage) -> Void) {
-    }
-
-    func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
-        return self
-    }
-}
-
 class Http: Command {
     typealias HttpResult = Result<(Data, URLResponse), HttpError>
     typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
@@ -36,7 +27,7 @@ class Http: Command {
         self.onReceived = onReceived
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+    func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let command = self
         let myReceived = self.onReceived
         let onReceived: (HttpResult) -> U? = { result in
@@ -47,7 +38,7 @@ class Http: Command {
         return command
     }
 
-    override func start(_ done: @escaping (AnyMessage) -> Void) {
+    func start(_ done: @escaping (AnyMessage) -> Void) {
         let request = URLRequest(url: url)
         let task = URLSession(configuration: config).dataTask(with: request, completionHandler: { data, response, error in
             let result: HttpResult

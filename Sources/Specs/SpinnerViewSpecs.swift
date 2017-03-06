@@ -3,10 +3,10 @@
 //
 
 
-class SpinnerViewSpecs: SpecRunner {
-    override var name: String { return "SpinnerViewSpecs" }
+struct SpinnerViewSpecs: SpecRunner {
+    var name: String { return "SpinnerViewSpecs" }
 
-    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let subject = SpinnerView(
             .topLeft(),
             model: SpinnerView.Model(

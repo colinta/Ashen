@@ -3,10 +3,10 @@
 //
 
 
-class OnNextSpecs: SpecRunner {
-    override var name: String { return "OnNextSpecs" }
+struct OnNextSpecs: SpecRunner {
+    var name: String { return "OnNextSpecs" }
 
-    override func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
+    func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let screen = MockScreen()
         let program = MockProgram()
         let app = App(program: program, screen: screen)
