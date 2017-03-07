@@ -10,13 +10,8 @@ programmers spend so much time in the terminal, it makes a lot of sense to write
 quick applications that don't require opening a GUI.  Plus, terminal apps are
 cool in an old-school kinda way.
 
-## About
-
-If you want to know more about the how and why of Ashen's application design,
-I encourage you to read about [Elm][] or [React][].  In short, though, you
-write programs for Ashen by considering the *state* that is needed to
-render *views*.  As an example let's consider an application that renders a list
-of "things".
+As a tutorial of Ashen, let's consider an application that fetches some content
+and renders them as a list.
 
 ### Browsing
 
@@ -62,10 +57,11 @@ func render(model: Model) -> Component {
         return Window(components: [
             LabelView(text: "Our things"),
             OptimizedListView(dataList: data, rowHeight: 3) { row in
-                // this feature is similar to how UITableView renders cells -
-                // only the rows that are visible will be rendered.
                 return LabelView(text: row.title)
             }
+            // 👆 this view is similar to how UITableView renders cells - only
+            // the rows that are visible will be rendered. rowHeight can also be
+            // assigned a function, btw, to support dynamic heights.
         ])
     }
     else {
@@ -75,8 +71,29 @@ func render(model: Model) -> Component {
 ```
 
 So instead of mutating the `hidden` property of these views, we render the views
-we need based on the model.  By the way, I did not include the location/size
-information in the example, so let's see what's available there.
+we need based on our model.
+
+To fetch our data, we need to call out to the runtime to ask it to perform a
+background task, and then report the results back as a `Message`. `Message` is
+how your components (aka views, but also system event emitters) can tell your
+application about changes that *might* result in a change to your model.  For
+instance, if someone types in a "name" text field you probably want to know
+about that so you can update the model's `name` property.
+
+When they press the "save" button you will want to save that data to your web
+server - this is where the `Command` type comes in.  In this case we can create
+an `HTTP.put` command instance, and when it is complete (or times out) we will
+receive another `Message` letting us know.
+
+Our work starts at the `initial()` method.  We return our initial model and a
+list of commands to run.
+
+```swift
+func initial() -> (Model, [Command]) {
+    let url = URL(string: "http://example.com")!
+    return (Model(), [Http.get(url, [.timeout(5)])])
+}
+```
 
 ## Location and Size structs
 
