@@ -44,14 +44,14 @@ enum HttpMethod: String {
     case options = "OPTIONS"
 }
 
-protocol URLSessionTaskProtocol {
-    func ashen_start()
-}
-
 typealias URLSessionCompletionHandler = (Data?, URLResponse?, Error?) -> Void
 protocol URLSessionProtocol {
     func ashen_dataTask(with: URLRequest, completionHandler: @escaping URLSessionCompletionHandler) -> URLSessionTaskProtocol
     func ashen_cancel()
+}
+
+protocol URLSessionTaskProtocol {
+    func ashen_start()
 }
 
 extension URLSession: URLSessionProtocol {
@@ -72,14 +72,14 @@ extension URLSessionTask: URLSessionTaskProtocol {
 
 enum URLSessionHandler {
     case system
-    case mock(URLSessionProtocol)
+    case mock((URLSessionConfiguration) -> URLSessionProtocol)
 
     func create(config: URLSessionConfiguration) -> URLSessionProtocol {
         switch self {
         case .system:
             return URLSession(configuration: config)
         case let .mock(mock):
-            return mock
+            return mock(config)
         }
     }
 }

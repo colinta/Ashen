@@ -7,6 +7,7 @@ import Foundation
 
 private let specs: [Spec] = [
     InputViewSpecs(),
+    HttpSpecs(),
     LabelViewSpecs(),
     OnNextSpecs(),
     OnTickSpecs(),
