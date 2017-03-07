@@ -22,9 +22,26 @@ class LabelView: ComponentView {
 
     init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text textString: Text) {
         self.size = size
-        let lines = textString.text.characters.split { $0 == "\n" }
+        let text = textString
+            .text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+
+        var line: [String] = []
+        var lines: [[String]] = []
+        for c in text.characters {
+            if c == "\n" {
+                lines.append(line)
+                line = []
+            }
+            else {
+                line.append(String(c))
+            }
+        }
+        lines.append(line)
+
         self.lines = lines.map {
-            $0.map { Text(String($0), attrs: textString.attrs) }
+            $0.map { Text($0, attrs: textString.attrs) }
         }
         super.init()
         self.location = location
