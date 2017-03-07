@@ -3,7 +3,7 @@
 //
 
 
-struct InputViewSpecs: SpecRunner {
+struct InputViewSpecs: Spec {
     var name: String { return "InputViewSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {

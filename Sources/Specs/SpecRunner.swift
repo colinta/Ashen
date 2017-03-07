@@ -3,24 +3,32 @@
 //
 
 
-protocol SpecRunner: Command {
+protocol Spec {
     var name: String { get }
     func run(expect: (String) -> Expectations, done: @escaping () -> Void)
 }
 
-extension SpecRunner {
+struct SpecRunner: Command {
+    let spec: Spec
+    let verbose: Bool
+
+    init(spec: Spec, verbose: Bool) {
+        self.spec = spec
+        self.verbose = verbose
+    }
+
     func start(_ done: @escaping (AnyMessage) -> Void) {
-        let expectations = Expectations()
+        let expectations = Expectations(showSuccess: verbose)
         let generator: (String) -> Expectations = { desc in
             return expectations.describe(desc)
         }
 
-        run(expect: generator) {
+        spec.run(expect: generator) {
             expectations.commit()
             for message in expectations.messages {
-                done(Specs.SpecsMessage.specLog("\(message)"))
+                done(SpecsProgram.SpecsMessage.specLog("\(message)"))
             }
-            done(Specs.SpecsMessage.expectations(expectations.totalPassed, expectations.totalFailed))
+            done(SpecsProgram.SpecsMessage.expectations(expectations.totalPassed, expectations.totalFailed))
         }
     }
 }

@@ -6,16 +6,25 @@ import Darwin
 
 let args = Swift.CommandLine.arguments
 let cmd: String = (args.count > 1 ? args[1] : "demo")
+let verbose = args.index(where: { $0 == "--verbose" }) != nil
 
 let state: AppState
-switch cmd {
-case "specs":
-    let app = App(program: Specs(onEnd: .continue), screen: Screen())
+if cmd.hasPrefix("specs") {
+    let onEnd: LoopState
+    let screen: ScreenType
+    if cmd.hasSuffix("-xcode") {
+        onEnd = .quit
+        screen = SpecsScreen()
+    }
+    else {
+        onEnd = .continue
+        screen = Screen()
+    }
+
+    let app = App(program: SpecsProgram(verbose: verbose, onEnd: onEnd), screen: screen)
     state = app.run()
-case "specs-xcode":
-    let app = App(program: Specs(onEnd: .quit), screen: SpecsScreen())
-    state = app.run()
-default:
+}
+else {
     let app = App(program: Demo(), screen: Screen())
     state = app.run()
 }

@@ -3,7 +3,7 @@
 //
 
 
-struct SpinnerViewSpecs: SpecRunner {
+struct SpinnerViewSpecs: Spec {
     var name: String { return "SpinnerViewSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
@@ -14,9 +14,9 @@ struct SpinnerViewSpecs: SpecRunner {
                 ))
         subject.timeout = -1
         let size = Size(width: 1, height: 1)
-        expect("outputs 'a'").assert(Specs.toString(subject.chars(in: size)) == "a")
+        expect("outputs 'a'").assert(SpecsProgram.toString(subject.chars(in: size)) == "a")
         _ = subject.messages(for: .tick(0))
-        expect("outputs 'b'").assert(Specs.toString(subject.chars(in: size)) == "b")
+        expect("outputs 'b'").assert(SpecsProgram.toString(subject.chars(in: size)) == "b")
         done()
     }
 }

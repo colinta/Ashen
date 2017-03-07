@@ -21,7 +21,7 @@ class SpecsScreen: ScreenType {
 
     func teardown() {
         guard let chars = chars else { return }
-        let output = Specs.toString(chars)
+        let output = SpecsProgram.toString(chars)
         print(output)
     }
 

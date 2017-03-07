@@ -3,7 +3,7 @@
 //
 
 
-struct ScreenSpecs: SpecRunner {
+struct ScreenSpecs: Spec {
     var name: String { return "ScreenSpecs" }
     struct ScreenModel {}
 

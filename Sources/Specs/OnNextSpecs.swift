@@ -3,7 +3,7 @@
 //
 
 
-struct OnNextSpecs: SpecRunner {
+struct OnNextSpecs: Spec {
     var name: String { return "OnNextSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {

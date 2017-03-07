@@ -3,7 +3,7 @@
 //
 
 
-struct SizeDescriptionSpecs: SpecRunner {
+struct SizeDescriptionSpecs: Spec {
     var name: String { return "SizeDescriptionSpecs" }
     let parentSize = Size(width: 20, height: 40)
     let sizeZeroDescription = SizeDescription(multiplier: FloatSize(width: 0, height: 0), offset: Size(width: 0, height: 0))

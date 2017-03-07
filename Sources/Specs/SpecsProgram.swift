@@ -1,11 +1,11 @@
 ////
-///  Specs.swift
+///  SpecsProgram.swift
 //
 
 import Foundation
 
 
-private let specs: [SpecRunner] = [
+private let specs: [Spec] = [
     InputViewSpecs(),
     LabelViewSpecs(),
     OnNextSpecs(),
@@ -17,17 +17,17 @@ private let specs: [SpecRunner] = [
 ]
 
 
-struct Specs: Program {
+struct SpecsProgram: Program {
     struct SpecsModel {
         var passed: Int = 0
         var failed: Int = 0
-        var specRunners: [SpecRunner]
+        var specs: [Spec]
         var running = false
         var done = false
         var specLog: [String]
 
-        init(_ specRunners: [SpecRunner]) {
-            self.specRunners = specRunners
+        init(_ specs: [Spec]) {
+            self.specs = specs
             specLog = ["Begin."]
         }
     }
@@ -39,9 +39,11 @@ struct Specs: Program {
         case expectations(Int, Int)
     }
 
+    let verbose: Bool
     let onEnd: LoopState
 
-    init(onEnd: LoopState) {
+    init(verbose: Bool, onEnd: LoopState) {
+        self.verbose = verbose
         self.onEnd = onEnd
     }
 
@@ -65,19 +67,23 @@ struct Specs: Program {
         case let .expectations(passed, failed):
             model.passed += passed
             model.failed += failed
+            if !verbose && failed == 0 {
+                model.specLog.append(" ✓ \(passed) passed")
+            }
             runNext = true
         }
 
         if runNext {
-            if model.specRunners.count == 0 {
+            if model.specs.count == 0 {
                 model.done = true
                 model.specLog.append("")
                 model.specLog.append("Completed \(specs.count) runs in \(stopTimer())")
                 model.specLog.append("\(model.passed) passed \(model.failed) failed")
             }
             else {
-                let runner = model.specRunners.removeFirst()
-                model.specLog.append("--- \(runner.name) ---")
+                let spec = model.specs.removeFirst()
+                model.specLog.append("--- \(spec.name) ---")
+                let runner = SpecRunner(spec: spec, verbose: verbose)
                 return (model, [runner], .continue)
             }
         }
@@ -104,7 +110,7 @@ struct Specs: Program {
     }
 }
 
-extension Specs {
+extension SpecsProgram {
     static func toString(_ chars: [Int: [Int: TextType]]) -> String {
         var output = ""
         let lines = chars
@@ -116,7 +122,7 @@ extension Specs {
                 output += "\n"
             }
 
-            var prevX = line.max { a, b in return a.0 > b.0 }!.0
+            var prevX = (line.max(by: { a, b in return a.0 > b.0 })?.0) ?? 0
             let text = line
                 .map { x, c in
                     return (x, c)

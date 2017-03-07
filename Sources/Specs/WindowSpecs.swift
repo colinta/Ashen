@@ -3,7 +3,7 @@
 //
 
 
-struct WindowSpecs: SpecRunner {
+struct WindowSpecs: Spec {
     var name: String { return "WindowSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {

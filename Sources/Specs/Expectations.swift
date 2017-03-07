@@ -4,22 +4,28 @@
 
 class Expectations {
     var description: String?
+    var showSuccess: Bool
     private var passed = 0
     private var failed = 0
     var totalPassed: Int = 0
     var totalFailed: Int = 0
     var messages: [String] = []
 
+    init(showSuccess: Bool) {
+        self.showSuccess = showSuccess
+    }
+
     func commit() {
         totalPassed += passed
         totalFailed += failed
 
         if let description = description, passed + failed > 0 {
-            if failed == 0 {
-                messages.append(" ✓ \(description)")
+            let totalCount = (passed + failed == 1 ? "" : " \(passed)/\(passed + failed)")
+            if failed > 0 {
+                messages.append(" ✘ \(description)\(totalCount)")
             }
-            else {
-                messages.append(" ✘ \(description)" + (passed + failed == 1 ? "" : " \(passed)/\(passed + failed)"))
+            else if showSuccess {
+                messages.append(" ✓ \(description)")
             }
         }
         passed = 0
