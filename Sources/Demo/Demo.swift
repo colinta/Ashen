@@ -55,7 +55,7 @@ struct Demo: Program {
         let (httpCommandModel, httpCommands) = httpCommandProgram.initial()
 
         return (Model(
-            activeDemo: .httpCommand,
+            activeDemo: .spinner,
             spinnerModel: spinnerModel,
             canvasModel: canvasModel,
             inputModel: inputModel,
@@ -82,52 +82,49 @@ struct Demo: Program {
         case let .appendLog(entry):
             model.log.append(entry)
         case let .spinnerMessage(spinnerMsg):
-            let (newModel, _ /* spinnerCommands */, state) =
+            let (newModel, _, state) =
                 spinnerProgram.update(model: &model.spinnerModel, message: spinnerMsg)
             if state == .quit {
                 model.log = []
                 model.activeDemo = .canvas
             }
             model.spinnerModel = newModel
-            // let commands = spinnerCommands.map { Command.spinnerCommand($0) }
             return (model, [], .continue)
         case let .canvasMessage(canvasMsg):
-            let (newModel, _ /* canvasCommands */, state) =
+            let (newModel, _, state) =
                 canvasProgram.update(model: &model.canvasModel, message: canvasMsg)
             if state == .quit {
                 model.log = []
                 model.activeDemo = .input
             }
             model.canvasModel = newModel
-            // let commands = canvasCommands.map { Command.canvasCommand($0) }
             return (model, [], .continue)
         case let .inputMessage(inputMsg):
-            let (newModel, _ /* inputCommands */, state) =
+            let (newModel, _, state) =
                 inputProgram.update(model: &model.inputModel, message: inputMsg)
             if state == .quit {
                 model.log = []
                 model.activeDemo = .flowLayout
             }
             model.inputModel = newModel
-            // let commands = inputCommands.map { Command.inputCommand($0) }
             return (model, [], .continue)
         case let .flowLayoutMessage(flowLayoutMsg):
-            let (newModel, _ /* flowLayoutCommands */, state) =
+            let (newModel, _, state) =
                 flowLayoutProgram.update(model: &model.flowLayoutModel, message: flowLayoutMsg)
             if state == .quit {
-                return (model, [], .quit)
+                model.log = []
+                model.activeDemo = .gridLayout
             }
             model.flowLayoutModel = newModel
-            // let commands = flowLayoutCommands.map { Command.flowLayoutCommand($0) }
             return (model, [], .continue)
         case let .gridLayoutMessage(gridLayoutMsg):
-            let (newModel, _ /* gridLayoutCommands */, state) =
+            let (newModel, _, state) =
                 gridLayoutProgram.update(model: &model.gridLayoutModel, message: gridLayoutMsg)
             if state == .quit {
-                return (model, [], .quit)
+                model.log = []
+                model.activeDemo = .httpCommand
             }
             model.gridLayoutModel = newModel
-            // let commands = gridLayoutCommands.map { Command.gridLayoutCommand($0) }
             return (model, [], .continue)
         case let .httpCommandMessage(httpCommandMsg):
             let (newModel, httpCommandCommands, state) =
