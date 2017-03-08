@@ -52,8 +52,9 @@ class SpinnerView: ComponentView {
         return DesiredSize(width: 1, height: 1)
     }
 
-    override func chars(in size: Size) -> Screen.Chars {
-        return [0: [0: model.chr(index: index ?? 0)]]
+    override func render(in buffer: Buffer, size _: Size) {
+        let chr = model.chr(index: index ?? 0)
+        buffer.write(chr, x: 0, y: 0)
     }
 
     override func messages(for event: Event) -> [AnyMessage] {

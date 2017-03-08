@@ -54,6 +54,7 @@
 		1DAF7C5A1E5CC4EB003365BA /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DAF7C591E5CC4EB003365BA /* libncurses.tbd */; };
 		1DAF7C621E5E3258003365BA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAF7C601E5E3258003365BA /* main.swift */; };
 		1DEB7C781E6E5557000BA381 /* HttpSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */; };
+		1DEB7C7C1E70A26F000BA381 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7B1E70A26F000BA381 /* Buffer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -117,6 +118,7 @@
 		1DAF7C591E5CC4EB003365BA /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		1DAF7C601E5E3258003365BA /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpSpecs.swift; sourceTree = "<group>"; };
+		1DEB7C7B1E70A26F000BA381 /* Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buffer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,9 +170,10 @@
 		1D9CF0731E6123AC003D2A48 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				1D1EB4131E690021003A2174 /* Event.swift */,
 				1D9CF07C1E612418003D2A48 /* App.swift */,
+				1DEB7C7B1E70A26F000BA381 /* Buffer.swift */,
 				1D1EB4071E670593003A2174 /* Component.swift */,
+				1D1EB4131E690021003A2174 /* Event.swift */,
 				1D9CF07E1E612418003D2A48 /* Program.swift */,
 				1D9CF07F1E612418003D2A48 /* Screen.swift */,
 			);
@@ -318,6 +321,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D3B29231E6C929800673F6D /* GridLayoutDemo.swift in Sources */,
+				1DEB7C7C1E70A26F000BA381 /* Buffer.swift in Sources */,
 				1D9CF0B01E629CAC003D2A48 /* SpinnerView.swift in Sources */,
 				1D94E8441E6C2EFF008D9D99 /* SizeDescriptionSpecs.swift in Sources */,
 				1D9CF0B11E629CAC003D2A48 /* Structs.swift in Sources */,

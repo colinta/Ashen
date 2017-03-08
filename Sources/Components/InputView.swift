@@ -113,15 +113,14 @@ class InputView: ComponentView {
         return DesiredSize(width: calcWidth, height: calcHeight)
     }
 
-    override func chars(in size: Size) -> Screen.Chars {
+    override func render(in buffer: Buffer, size: Size) {
         let normalCursor = self.cursor.normal
         var yOffset = 0
         var xOffset = 0
         var cOffset = 0
-        var chars = model.text.characters.reduce(Screen.Chars()) { (memo, char) in
-            if yOffset >= size.height { return memo }
+        for char in model.text.characters {
+            guard yOffset < size.height else { break }
 
-            var next = memo
             let attrs: [Attr]
             if normalCursor.length > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.length {
                 attrs = [.reverse]
@@ -150,9 +149,7 @@ class InputView: ComponentView {
             }
 
             if xOffset < size.width {
-                var row = memo[yOffset] ?? [:]
-                row[xOffset] = Text(printableChar, attrs: attrs)
-                next[yOffset] = row
+                buffer.write(Text(printableChar, attrs: attrs), x: xOffset, y: yOffset)
             }
 
             if char == "\n" {
@@ -164,15 +161,11 @@ class InputView: ComponentView {
             }
 
             cOffset += 1
-            return next
         }
 
         if isFirstResponder && normalCursor.at == model.text.characters.count && yOffset < size.height {
-            var row = chars[yOffset] ?? [:]
-            row[xOffset] = Text(" ", attrs: [.underline])
-            chars[yOffset] = row
+            buffer.write(Text(" ", attrs: [.underline]), x: xOffset, y: yOffset)
         }
-        return chars
     }
 
     override func messages(for event: Event) -> [AnyMessage] {

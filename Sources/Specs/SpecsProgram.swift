@@ -112,9 +112,9 @@ struct SpecsProgram: Program {
 }
 
 extension SpecsProgram {
-    static func toString(_ chars: [Int: [Int: TextType]]) -> String {
+    static func toString(_ buffer: Buffer) -> String {
         var output = ""
-        let lines = chars
+        let lines = buffer.chars
             .map { y, line in return (y, line) }
             .sorted { a, b in return a.0 < b.0 }
             .map { _, line in return line }

@@ -10,8 +10,13 @@ class Component: Equatable {
         return []
     }
 
-    func chars(in _: Size) -> Screen.Chars {
-        return [:]
+    func render(size: Size) -> Buffer {
+        let buffer = Buffer(size: size)
+        render(in: buffer, size: size)
+        return buffer
+    }
+
+    func render(in _: Buffer, size _: Size) {
     }
 
     func map<T, U>(_: @escaping (T) -> U) -> Self {
@@ -67,8 +72,8 @@ class ComponentLayout: ComponentView {
         return components.flatMap { $0.messages(for: event) }
     }
 
-    override func chars(in screenSize: Size) -> Screen.Chars {
-        return Window.chars(components: components, in: screenSize)
+    override func render(in buffer: Buffer, size screenSize: Size) {
+        Window.render(components: components, in: buffer, size: screenSize)
     }
 
     override func merge(with prevComponent: Component) {

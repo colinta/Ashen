@@ -47,23 +47,18 @@ class LabelView: ComponentView {
         self.location = location
     }
 
-    override func chars(in size: Size) -> Screen.Chars {
+    override func render(in buffer: Buffer, size: Size) {
         var yOffset = 0
-        return lines.reduce(Screen.Chars()) { (memo, line) in
-            if yOffset > size.height { return memo }
+        for line in lines {
+            if yOffset > size.height { break }
 
             var xOffset = 0
-            var row = memo
-            row[yOffset] = line.reduce([Int: TextType]()) { (memo, char) in
-                if xOffset > size.width { return memo }
-
-                var next = memo
-                next[xOffset] = char
+            for char in line {
+                if xOffset > size.width { break }
+                buffer.write(char, x: xOffset, y: yOffset)
                 xOffset += 1
-                return next
             }
             yOffset += 1
-            return row
         }
     }
 }

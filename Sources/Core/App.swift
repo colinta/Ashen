@@ -81,13 +81,13 @@ struct App<T: Program> {
     func main() -> AppState {
         var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
-        var prevState: [(T.ModelType, Component, Screen.Chars)] = []
+        var prevState: [(T.ModelType, Component, Buffer)] = []
         var inThePast: Int?
         var (model, commands) = program.initial()
 
         var window = program.render(model: model, in: screen.size)
-        let chars = screen.render(window)
-        prevState.append((model, window, chars))
+        let buffer = screen.render(window)
+        prevState.append((model, window, buffer))
 
         var messageQueue: [T.MessageType] = []
         while state == .continue {
@@ -132,8 +132,8 @@ struct App<T: Program> {
             }
 
             if let pastIndex = inThePast {
-                let (_, _, chars) = prevState[pastIndex]
-                screen.render(chars: chars)
+                let (_, _, buffer) = prevState[pastIndex]
+                screen.render(buffer: buffer)
                 messageQueue = []
                 continue
             }
@@ -171,9 +171,8 @@ struct App<T: Program> {
             }
 
             if updateAndRender || rerender {
-                let chars = screen.render(window)
-
-                prevState.append((model, window, chars))
+                let buffer = screen.render(window)
+                prevState.append((model, window, buffer))
             }
         }
 

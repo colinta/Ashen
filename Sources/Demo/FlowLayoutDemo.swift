@@ -46,8 +46,8 @@ struct FlowLayoutDemo: Program {
                 "<", ">", "/", "\\", "[", "]", "{", "}", "(", ")",
             ].map { chr in
                 let count = 3 + Int(arc4random_uniform(UInt32(4)))
-                let row = String(repeating: chr, count: count) + "\n"
-                return String(repeating: row, count: count)
+                let row = String(repeating: chr, count: count)
+                return Array<String>(repeating: row, count: count).joined(separator: "\n")
             }
         }
     }

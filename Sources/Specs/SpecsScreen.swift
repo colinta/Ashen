@@ -4,24 +4,24 @@
 
 class SpecsScreen: ScreenType {
     var size: Size = Size.max
-    var chars: Screen.Chars?
+    var buffer: Buffer?
 
-    func render(_ component: Component) -> Screen.Chars {
-        let chars = component.chars(in: size)
-        render(chars: chars)
-        return chars
+    func render(_ component: Component) -> Buffer {
+        let buffer = component.render(size: size)
+        render(buffer: buffer)
+        return buffer
     }
 
-    func render(chars: Screen.Chars) {
-        self.chars = chars
+    func render(buffer: Buffer) {
+        self.buffer = buffer
     }
 
     func setup() {
     }
 
     func teardown() {
-        guard let chars = chars else { return }
-        let output = SpecsProgram.toString(chars)
+        guard let buffer = buffer else { return }
+        let output = SpecsProgram.toString(buffer)
         print(output)
     }
 

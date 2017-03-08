@@ -46,25 +46,23 @@ class FlowLayout: ComponentLayout {
         return DesiredSize(size)
     }
 
-    override func chars(in screenSize: Size) -> Screen.Chars {
+    override func render(in buffer: Buffer, size screenSize: Size) {
         switch orientation {
         case .horizontal:
-            return horizontalLayout(in: screenSize)
+            horizontalLayout(in: buffer, size: screenSize)
         case .vertical:
-            return verticalLayout(in: screenSize)
+            verticalLayout(in: buffer, size: screenSize)
         }
     }
 
-    func horizontalLayout(in screenSize: Size) -> Screen.Chars {
+    func horizontalLayout(in buffer: Buffer, size screenSize: Size) {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var rowHeight = 0
-        var chars: Screen.Chars = [:]
         for view in components {
             guard let view = view as? ComponentView else { continue }
 
             let viewSize = view.desiredSize().constrain(in: screenSize)
-            let viewChars = view.chars(in: viewSize)
 
             rowHeight = max(rowHeight, viewSize.height)
 
@@ -88,33 +86,20 @@ class FlowLayout: ComponentLayout {
                 offset = Point(x: viewX, y: viewY)
             }
 
-            for (y, row) in viewChars {
-                let currentY = offset.y + y
-                if currentY < 0 || currentY >= screenSize.height { continue }
-
-                var newRow = chars[currentY] ?? [:]
-                for (x, c) in row {
-                    let currentX = offset.x + x
-                    if currentX < 0 || currentX >= screenSize.width { continue }
-
-                    newRow[currentX] = c
-                }
-                chars[currentY] = newRow
+            buffer.push(offset: offset) {
+                view.render(in: buffer, size: viewSize)
             }
         }
-        return chars
     }
 
-    func verticalLayout(in screenSize: Size) -> Screen.Chars {
+    func verticalLayout(in buffer: Buffer, size screenSize: Size) {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var colWidth = 0
-        var chars: Screen.Chars = [:]
         for view in components {
             guard let view = view as? ComponentView else { continue }
 
             let viewSize = view.desiredSize().constrain(in: screenSize)
-            let viewChars = view.chars(in: viewSize)
 
             colWidth = max(colWidth, viewSize.width)
 
@@ -138,21 +123,10 @@ class FlowLayout: ComponentLayout {
             }
             viewY += viewSize.height
 
-            for (y, row) in viewChars {
-                let currentY = offset.y + y
-                if currentY < 0 || currentY >= screenSize.height { continue }
-
-                var newRow = chars[currentY] ?? [:]
-                for (x, c) in row {
-                    let currentX = offset.x + x
-                    if currentX < 0 || currentX >= screenSize.width { continue }
-
-                    newRow[currentX] = c
-                }
-                chars[currentY] = newRow
+            buffer.push(offset: offset) {
+                view.render(in: buffer, size: viewSize)
             }
         }
-        return chars
     }
 
 }

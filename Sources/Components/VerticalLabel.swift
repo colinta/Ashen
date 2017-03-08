@@ -27,15 +27,11 @@ class VerticalLabelView: ComponentView {
         self.location = location
     }
 
-    override func chars(in size: Size) -> Screen.Chars {
+    override func render(in buffer: Buffer, size: Size) {
         var yOffset = 0
-        line.reduce([Int: [Int: TextType]]()) { (memo, char) in
+        for char in line {
             if yOffset > size.height { return memo }
-
-            var next = memo
-            next[yOffset] = [0: char]
-            yOffset += 1
-            return next
+            buffer.write(char, x: 0, y: yOffset)
         }
     }
 }

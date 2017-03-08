@@ -50,8 +50,8 @@ extension String: TextType {
 
 protocol ScreenType {
     var size: Size { get }
-    func render(_: Component) -> Screen.Chars
-    func render(chars _: Screen.Chars)
+    func render(_: Component) -> Buffer
+    func render(buffer _: Buffer)
     func setup()
     func teardown()
     func nextEvent() -> Event?
@@ -64,18 +64,23 @@ func ncurses_refresh() {
 
 
 class Screen: ScreenType {
-    typealias Chars = [Int: [Int: TextType]]
     var size: Size { return Size(width: Int(getmaxx(stdscr)), height: Int(getmaxy(stdscr))) }
-    var chars: Chars = [:]
+    var prevBuffer: Buffer
 
-    func render(_ component: Component) -> Chars {
-        render(chars: component.chars(in: size))
-        return chars
+    init() {
+        prevBuffer = Buffer(size: .zero)
     }
 
-    func render(chars nextChars: Chars) {
-        let prevChars = chars
-        chars = nextChars
+    func render(_ component: Component) -> Buffer {
+        let buffer = component.render(size: size)
+        render(buffer: buffer)
+        return buffer
+    }
+
+    func render(buffer: Buffer) {
+        let chars = buffer.chars
+        let prevChars = prevBuffer.chars
+        prevBuffer = buffer
 
         for (y, prevRow) in prevChars {
             guard y >= 0 && y < size.height else { continue }
@@ -108,6 +113,7 @@ class Screen: ScreenType {
                 }
             }
         }
+
         ncurses_refresh()
     }
 

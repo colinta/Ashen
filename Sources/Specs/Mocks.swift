@@ -47,7 +47,7 @@ class MockScreen: ScreenType {
     var size: Size
     var events: [Event] = []
     var renderedComponent: Component?
-    var renderedChars: Screen.Chars?
+    var renderedBuffer: Buffer?
     var setupCalled = 0
     var teardownCalled = 0
     var resizedCalled = 0
@@ -60,15 +60,15 @@ class MockScreen: ScreenType {
         self.size = size
     }
 
-    func render(_ component: Component) -> Screen.Chars {
+    func render(_ component: Component) -> Buffer {
         renderedComponent = component
-        let chars = component.chars(in: size)
-        render(chars: chars)
-        return chars
+        let buffer = component.render(size: size)
+        render(buffer: buffer)
+        return buffer
     }
 
-    func render(chars: Screen.Chars) {
-        self.renderedChars = chars
+    func render(buffer: Buffer) {
+        self.renderedBuffer = buffer
     }
 
     func setup() {

@@ -8,7 +8,8 @@ struct LabelViewSpecs: Spec {
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let subject = LabelView(.topLeft(), text: "test")
-        expect("outputs 'test'").assert(SpecsProgram.toString(subject.chars(in: Size.max)) == "test")
+        let buffer = subject.render(size: Size.max)
+        expect("outputs 'test'").assert(SpecsProgram.toString(buffer) == "test")
         done()
     }
 }

@@ -51,9 +51,8 @@ class GridLayout: ComponentLayout {
         return DesiredSize(size)
     }
 
-    override func chars(in screenSize: Size) -> Screen.Chars {
+    override func render(in buffer: Buffer, size screenSize: Size) {
         var offset: Point = .zero
-        var chars: Screen.Chars = [:]
         for (rowIndex, row) in rows.enumerated() {
             let rowHeight = Int(row.weight * Float(screenSize.height) / totalRowWeight + 0.5)
             let totalColumnWeight = self.totalColumnWeight(at: rowIndex)
@@ -68,28 +67,14 @@ class GridLayout: ComponentLayout {
 
                 let view = column.component
                 let viewSize = Size(width: colWidth, height: rowHeight)
-                let viewChars = view.chars(in: viewSize)
-                for (y, row) in viewChars {
-                    let currentY = offset.y + y
-                    if currentY < 0 || currentY >= screenSize.height { continue }
-
-                    var newRow = chars[currentY] ?? [:]
-                    for (x, c) in row {
-                        let currentX = offset.x + x
-                        if currentX < 0 || currentX >= screenSize.width { continue }
-
-                        newRow[currentX] = c
-                    }
-                    chars[currentY] = newRow
+                buffer.push(offset: offset) {
+                    view.render(in: buffer, size: viewSize)
                 }
-
                 offset.x += colWidth
             }
 
             offset.x = 0
             offset.y += rowHeight
         }
-
-        return chars
     }
 }
