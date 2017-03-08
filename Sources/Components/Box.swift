@@ -30,10 +30,13 @@ class Box: ComponentLayout {
     override func chars(in screenSize: Size) -> Screen.Chars {
         var chars: Screen.Chars = [:]
         let size: Size
+        let borderOffset: Point
         if border == nil {
+            borderOffset = .zero
             size = screenSize
         }
         else {
+            borderOffset = Point(x: 1, y: 1)
             size = Size(width: max(0, screenSize.width - 2), height: max(0, screenSize.height - 2))
         }
 
@@ -52,11 +55,11 @@ class Box: ComponentLayout {
 
             let viewSize = view.desiredSize().constrain(in: size)
             let viewChars = view.chars(in: viewSize)
-            var offset = view.location.origin(for: viewSize, in: size)
-            if border != nil {
-                offset.x += 1
-                offset.y += 1
-            }
+            let viewOffset = view.location.origin(for: viewSize, in: size)
+            let offset = Point(
+                x: viewOffset.x + borderOffset.x,
+                y: viewOffset.y + borderOffset.y
+                )
             for (y, row) in viewChars {
                 var newRow = chars[offset.y + y] ?? [:]
                 for (x, c) in row {
