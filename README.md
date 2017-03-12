@@ -175,8 +175,12 @@ switch state {
 Here's a skeleton program template:
 
 ```swift
+// `Program` defines the methods that you need to define in order to be loaded
+// by `App`.  If you are designing a subprogram, you need not adhere to
+// `Program`, though it is handy because you can easily test *just* that part of
+// your application.
 struct SpinnersDemo: Program {
-    // this is usually an enum, but it can be any type.  Your app will respond
+    // This is usually an enum, but it can be any type.  Your app will respond
     // to state changes by accepting a `Message` and returning a modified
     // `Model`.
     enum Message {
@@ -194,16 +198,18 @@ struct SpinnersDemo: Program {
     enum Command {
     }
 
-    // return your initial model - if your app requires an asynchronous
-    // "loading" spinner, you could use a `loading/loaded/error` enum to
-    // represent those states
+    // Return your initial model and commands. if your app requires
+    // initialization from an API (i.eg. a loading spinner), use a
+    // `loading/loaded/error` enum to represent the initial state.  If you
+    // persist your application to the database you could load that here, either
+    // synchronously or via a `Command`.
     func initial() -> (Model, [Command]) {
         return Model()
     }
 
     // Ashen will call this method with the current model, and a message that
-    // you use to change the model.  This will result in a screen refresh, but
-    // it also means that your Program is very easy to test; pass a model to
+    // you use to update your model.  This will result in a screen refresh, but
+    // it also means that your program is very easy to test; pass a model to
     // this method along with the message you want to test, and check the values
     // of the model.
     //
@@ -211,9 +217,9 @@ struct SpinnersDemo: Program {
     // another form of event emitters, like Components, but they talk with
     // external services, either asynchronously or synchronously.
     func update(model: inout Model, message: Message)
-        -> (Model, [Command], LoopState)
+        -> (Model, [Command], AnyMessage?)
     {
-        return (model, [], .quit)
+        return (model, [], SystemMessage.quit)
     }
 
     // Finally the render() method is given a model and a size, and you return
@@ -231,7 +237,7 @@ struct SpinnersDemo: Program {
     }
 
     // The `start` function is called with your command, and a callback you can
-    // call with one of your Program's `Message` values.  The `done` callback is
+    // call with one of your program's `Message` values.  The `done` callback is
     // often called asynchronously, e.g. after an HTTP or background process.
     func start(command: Command, done: @escaping (Message) -> Void) {
     }
