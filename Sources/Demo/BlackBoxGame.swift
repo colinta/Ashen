@@ -15,6 +15,8 @@ struct BlackBoxGame: Program {
     enum Message {
         case quit
         case fire
+        case new
+        case showAnswer
         case moveUp
         case moveDown
         case moveLeft
@@ -96,12 +98,19 @@ struct BlackBoxGame: Program {
         -> (Model, [Command], LoopState)
     {
         switch message {
+        case .showAnswer:
+            model.showAtomLocations = true
+        case .new:
+            model.board = Board(width: 10, height: 5, atomsCount: rand(min: 3, lessThan: 7))
+            model.showAtomLocations = false
         case .fire:
-            if case let .inside(x, y) = model.cursor {
-                model.board.toggleGuess(Point(x: x, y: y))
-            }
-            else {
-                model.board.fire(model.cursor)
+            if !model.showAtomLocations {
+                if case let .inside(x, y) = model.cursor {
+                    model.board.toggleGuess(Point(x: x, y: y))
+                }
+                else {
+                    model.board.fire(model.cursor)
+                }
             }
         case .moveUp:
             switch model.cursor {
@@ -227,7 +236,17 @@ struct BlackBoxGame: Program {
         }
         let guessLabels: [Component] = model.board.guesses.map { guess in
             let location = model.board.location(of: .inside(guess.x, guess.y))
-            return LabelView(location, text: "○")
+            let text: String
+            if model.showAtomLocations && model.board.atoms.contains(guess) {
+                text = "●"
+            }
+            else if model.showAtomLocations {
+                text = "×"
+            }
+            else {
+                text = "○"
+            }
+            return LabelView(location, text: text)
         }
 
         let atomLocations: [Component]
@@ -252,6 +271,8 @@ struct BlackBoxGame: Program {
                 OnKeyPress(.key_right, { return Message.moveRight }),
                 OnKeyPress(.key_enter, { return Message.quit }),
                 OnKeyPress(.key_space, { return Message.fire }),
+                OnKeyPress(.symbol_star, { return Message.new }),
+                OnKeyPress(.symbol_question, { return Message.showAnswer }),
             ])
     }
 }
