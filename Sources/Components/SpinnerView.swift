@@ -32,10 +32,10 @@ class SpinnerView: ComponentView {
     var timeout: Float = 0.05
 
     let model: Model
-    let color: Int
+    let color: Int?
     let animating: Bool
 
-    init(_ location: Location, model: Model = Model(), color: Int = -1, animating: Bool = true) {
+    init(_ location: Location, model: Model = Model(), color: Int? = nil, animating: Bool = true) {
         self.model = model
         self.index = nil
         self.color = color
@@ -56,7 +56,14 @@ class SpinnerView: ComponentView {
 
     override func render(in buffer: Buffer, size _: Size) {
         let chr = model.chr(index: index ?? 0)
-        buffer.write(Text(chr, attrs: [.color(color)]), x: 0, y: 0)
+        let attrs: [Attr]
+        if let color = color {
+            attrs = [.color(color)]
+        }
+        else {
+            attrs = []
+        }
+        buffer.write(Text(chr, attrs: attrs), x: 0, y: 0)
     }
 
     override func messages(for event: Event) -> [AnyMessage] {
