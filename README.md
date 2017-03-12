@@ -116,8 +116,9 @@ container.  There are nine locations:
 +------------+--------------+-------------+
 ```
 
+###### Examples:
+
 ```swift
-     Examples:
 LabelView(.at(5, 10))  // label at x: 5, y: 10
 LabelView(.middleCenter())
 LabelView(.bottomRight(y: -1))  // in bottomRight corner, and up 1 row
@@ -134,6 +135,7 @@ LabelView(.fullWidth(minus: 4).height(times: 0.5, plus: 5))  // width: 76, heigh
 ```
 
 ###### Available size functions:
+
 ```
 .size(width:, height:)
 .minus(0)  .minus(width:, height:)
@@ -157,11 +159,11 @@ relative sizes.
 
 To run an application, an app and run it, passing in a program and a screen.  It
 will return `.quit` or `.error`, depending on how the program exited.  The
-default provided `Screen` is recommended for the screen parameter, but in theory
-you could create a `ScreenType` that runs on iOS or outputs HTML.
+default provided `NcursesScreen` is recommended for the screen parameter, but in
+theory you could create a `ScreenType` that runs on iOS or outputs HTML.
 
 ```swift
-let app = App(program: YourProgram(), screen: Screen())
+let app = App(program: YourProgram(), screen: NcursesScreen())
 let state = app.run()
 
 switch state {
