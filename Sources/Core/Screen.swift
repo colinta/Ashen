@@ -7,15 +7,13 @@ import Darwin.ncurses
 
 
 enum Attr: Equatable {
-    case normal
     case underline
     case reverse
     case bold
-    case color(Int32)
+    case color(Int)
 
     var rawValue: Int32 {
         switch self {
-        case .normal:    return 0x000000
         case .underline: return 0x020000
         case .reverse:   return 0x040000
         case .bold:      return 0x200000
@@ -29,22 +27,22 @@ enum Attr: Equatable {
 }
 
 protocol TextType {
-    var text: String { get }
+    var text: String? { get }
     var attrs: [Attr] { get }
 }
 
 struct Text: TextType {
-    let text: String
+    let text: String?
     let attrs: [Attr]
 
-    init(_ text: String, attrs: [Attr] = []) {
+    init(_ text: String?, attrs: [Attr] = []) {
         self.text = text
         self.attrs = attrs
     }
 }
 
 extension String: TextType {
-    var text: String { return self }
+    var text: String? { return self }
     var attrs: [Attr] { return [] }
 }
 

@@ -59,9 +59,7 @@ class FlowLayout: ComponentLayout {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var rowHeight = 0
-        for view in components {
-            guard let view = view as? ComponentView else { continue }
-
+        for view in views {
             let viewSize = view.desiredSize().constrain(in: screenSize)
 
             rowHeight = max(rowHeight, viewSize.height)
@@ -86,7 +84,7 @@ class FlowLayout: ComponentLayout {
                 offset = Point(x: viewX, y: viewY)
             }
 
-            buffer.push(offset: offset) {
+            buffer.push(offset: offset, clip: viewSize) {
                 view.render(in: buffer, size: viewSize)
             }
         }
@@ -96,9 +94,7 @@ class FlowLayout: ComponentLayout {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var colWidth = 0
-        for view in components {
-            guard let view = view as? ComponentView else { continue }
-
+        for view in views {
             let viewSize = view.desiredSize().constrain(in: screenSize)
 
             colWidth = max(colWidth, viewSize.width)
@@ -123,7 +119,7 @@ class FlowLayout: ComponentLayout {
             }
             viewY += viewSize.height
 
-            buffer.push(offset: offset) {
+            buffer.push(offset: offset, clip: viewSize) {
                 view.render(in: buffer, size: viewSize)
             }
         }

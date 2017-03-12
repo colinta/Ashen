@@ -33,11 +33,14 @@ struct DesiredSize {
     }
 }
 
-struct Point {
+struct Point: Equatable {
     var x: Int
     var y: Int
 
     static let zero = Point(x: 0, y: 0)
+    static func == (lhs: Point, rhs: Point) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y
+    }
 }
 
 struct Frame {

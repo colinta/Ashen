@@ -2,15 +2,21 @@
 ///  SpinnersDemo.swift
 //
 
+import Darwin.ncurses
+
+
 struct SpinnersDemo: Program {
     enum Message {
         case quit
         case toggle
+        case advanceColor(Int)
     }
 
     struct Model {
         var spinners: [SpinnerView.Model]
         var animating: Bool
+        var color: Int
+        static var numColors: Int { return Int(COLORS) }
     }
 
     func initial() -> (Model, [Command]) {
@@ -18,7 +24,8 @@ struct SpinnersDemo: Program {
             spinners: (0 ..< SpinnerView.Model.availableSpinners).map { i in
                 return SpinnerView.Model(spinner: i)
             },
-            animating: true
+            animating: true,
+            color: -1
             ), [])
     }
 
@@ -28,10 +35,12 @@ struct SpinnersDemo: Program {
         switch message {
         case .toggle:
             model.animating = !model.animating
-            return (model, [], .continue)
+        case let .advanceColor(delta):
+            model.color = model.color + delta
         case .quit:
             return (model, [], .quit)
         }
+        return (model, [], .continue)
     }
 
     func render(model: Model, in screenSize: Size) -> Component {
@@ -39,6 +48,7 @@ struct SpinnersDemo: Program {
             return SpinnerView(
                 .middleCenter(x: 2 * i - model.spinners.count / 2),
                 model: spinnerModel,
+                color: model.color,
                 animating: model.animating
                 )
         }
@@ -46,6 +56,8 @@ struct SpinnersDemo: Program {
             components: spinners + [
                 OnKeyPress(.key_enter, { return Message.quit }),
                 OnKeyPress(.key_space, { return Message.toggle }),
+                OnKeyPress(.key_right, { return Message.advanceColor(1) }),
+                OnKeyPress(.key_left, { return Message.advanceColor(-1) }),
             ])
     }
 }

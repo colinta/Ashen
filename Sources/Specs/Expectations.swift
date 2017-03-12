@@ -40,6 +40,14 @@ class Expectations {
     }
 
     @discardableResult
+    func assertRenders(_ lhs: ComponentView, _ rhs: String, _ addlDescription: String = "") -> Self {
+        let viewSize = lhs.desiredSize().constrain(in: Size.max)
+        let buffer = lhs.render(size: viewSize)
+        let rendered = SpecsProgram.toString(buffer)
+        return assertEqual(rendered, rhs, addlDescription)
+    }
+
+    @discardableResult
     func assertEqual<T: Equatable>(_ lhs: T?, _ rhs: T?, _ addlDescription: String = "") -> Self {
         let isEqual: Bool
         if let lhs = lhs, let rhs = rhs {
@@ -50,8 +58,8 @@ class Expectations {
         }
 
         if let description = description, !isEqual {
-            let lhsDesc: String = lhs.map { "\($0)" } ?? "nil"
-            let rhsDesc: String = rhs.map { "\($0)" } ?? "nil"
+            let lhsDesc: String = (lhs.map { "\($0)" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
+            let rhsDesc: String = (rhs.map { "\($0)" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
             self.description = "\(description) (" + (addlDescription == "" ? "" : "\(addlDescription): ") + "\(lhsDesc) != \(rhsDesc))"
         }
         assert(isEqual)

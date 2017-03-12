@@ -12,23 +12,38 @@ class Buffer {
         self.size = size
     }
 
-    func push(offset nextOffset: Point, _ block: () -> Void) {
+    func push(offset nextOffset: Point, clip nextSize: Size, _ block: () -> Void) {
+        guard nextSize.width > 0 && nextSize.height > 0 else { return }
+
         let prevOffset = offset
+        let prevSize = size
         offset = Point(
             x: offset.x + nextOffset.x,
             y: offset.y + nextOffset.y
             )
+        size = nextSize
         block()
         offset = prevOffset
+        size = prevSize
     }
 
     func write(_ text: TextType, x localX: Int, y localY: Int) {
+        guard
+            localX >= 0 && localY >= 0 &&
+            localX < size.width && localY < size.height
+        else { return }
+
         let x = localX + offset.x
         let y = localY + offset.y
-        guard x >= 0 && y >= 0 && x < size.width && y < size.height else { return }
-
         var row = chars[y] ?? [:]
-        row[x] = text
+        if let prevText = row[x] {
+            if prevText.text == nil, text.text != nil {
+                row[x] = Text(text.text, attrs: prevText.attrs)
+            }
+        }
+        else {
+            row[x] = text
+        }
         chars[y] = row
     }
 }

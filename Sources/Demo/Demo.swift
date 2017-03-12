@@ -89,7 +89,6 @@ struct Demo: Program {
                 model.activeDemo = .canvas
             }
             model.spinnerModel = newModel
-            return (model, [], .continue)
         case let .canvasMessage(canvasMsg):
             let (newModel, _, state) =
                 canvasProgram.update(model: &model.canvasModel, message: canvasMsg)
@@ -98,7 +97,6 @@ struct Demo: Program {
                 model.activeDemo = .input
             }
             model.canvasModel = newModel
-            return (model, [], .continue)
         case let .inputMessage(inputMsg):
             let (newModel, _, state) =
                 inputProgram.update(model: &model.inputModel, message: inputMsg)
@@ -107,7 +105,6 @@ struct Demo: Program {
                 model.activeDemo = .flowLayout
             }
             model.inputModel = newModel
-            return (model, [], .continue)
         case let .flowLayoutMessage(flowLayoutMsg):
             let (newModel, _, state) =
                 flowLayoutProgram.update(model: &model.flowLayoutModel, message: flowLayoutMsg)
@@ -116,7 +113,6 @@ struct Demo: Program {
                 model.activeDemo = .gridLayout
             }
             model.flowLayoutModel = newModel
-            return (model, [], .continue)
         case let .gridLayoutMessage(gridLayoutMsg):
             let (newModel, _, state) =
                 gridLayoutProgram.update(model: &model.gridLayoutModel, message: gridLayoutMsg)
@@ -125,7 +121,6 @@ struct Demo: Program {
                 model.activeDemo = .httpCommand
             }
             model.gridLayoutModel = newModel
-            return (model, [], .continue)
         case let .httpCommandMessage(httpCommandMsg):
             let (newModel, httpCommandCommands, state) =
                 httpCommandProgram.update(model: &model.httpCommandModel, message: httpCommandMsg)
@@ -134,18 +129,15 @@ struct Demo: Program {
             }
             model.httpCommandModel = newModel
             let commands = httpCommandCommands.map { $0.map { Message.httpCommandMessage($0) } }
-            return (model, commands, .continue)
         }
 
         return (model, [], .continue)
     }
 
     func render(model: Model, in screenSize: Size) -> Component {
-        let logHeight = 10
+        let logHeight = max(0, min(10, screenSize.height - 30))
         let labelHeight = 1
         var components: [Component] = []
-        components.append(OnDebug(Message.appendLog))
-        components.append(LogView(y: screenSize.height - logHeight, entries: model.log, screenSize: screenSize))
 
         let title: String
         let demo: Component
@@ -202,6 +194,14 @@ struct Demo: Program {
         components.append(LabelView(.topCenter(y: 0), text: Text(title, attrs: [.underline])))
         components.append(OnKeyPress({ key in return Demo.Message.keypress(key) }, reject: [.signal_ctrl_k]))
         components.append(OnKeyPress({ _ in return Demo.Message.resetLog }, filter: [.signal_ctrl_k]))
+        components.append(OnDebug(Message.appendLog))
+        components.append(
+            Box(
+                .bottomLeft(x: 10), Size(width: screenSize.width - 20, height: logHeight),
+                border: .single,
+                components: [
+                    LogView(entries: model.log, screenSize: screenSize)
+                ]))
 
         return Window(components: components)
     }

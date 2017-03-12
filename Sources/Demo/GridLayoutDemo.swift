@@ -52,7 +52,7 @@ struct GridLayoutDemo: Program {
             GridLayout(.topLeft(y: 1), screenSize,
                 rows: model.rows.map { row in
                     return .row(weight: row.weight, row.columns.map { col in
-                        let box = Box(.tl(.zero), .zero, border: nil, background: col.bg, components: [])
+                        let box = Box(.tl(.zero), .zero, border: nil, background: col.bg)
                         return .column(weight: col.weight, box)
                     })
                 }),

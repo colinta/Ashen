@@ -6,8 +6,9 @@ import Foundation
 
 
 private let specs: [Spec] = [
-    InputViewSpecs(),
+    BoxSpecs(),
     HttpSpecs(),
+    InputViewSpecs(),
     LabelViewSpecs(),
     OnNextSpecs(),
     OnTickSpecs(),
@@ -134,7 +135,9 @@ extension SpecsProgram {
                     output += " "
                     prevX += 1
                 }
-                output += c.text
+                if let text = c.text {
+                    output += text
+                }
                 prevX += 1
             }
         }

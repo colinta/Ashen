@@ -67,7 +67,7 @@ class GridLayout: ComponentLayout {
 
                 let view = column.component
                 let viewSize = Size(width: colWidth, height: rowHeight)
-                buffer.push(offset: offset) {
+                buffer.push(offset: offset, clip: viewSize) {
                     view.render(in: buffer, size: viewSize)
                 }
                 offset.x += colWidth

@@ -5,7 +5,7 @@
 class LogView: ComponentLayout {
     let size: Size
 
-    init(y startY: Int, entries: [String], screenSize: Size) {
+    init(y startY: Int = 0, entries: [String], screenSize: Size) {
         let maxEntries = max(0, screenSize.height - startY)
         size = Size(width: screenSize.width, height: screenSize.height - startY)
         let trimmedEntries: [String]

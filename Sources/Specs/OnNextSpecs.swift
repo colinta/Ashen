@@ -8,7 +8,7 @@ struct OnNextSpecs: Spec {
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let screen = MockScreen()
-        let program = MockProgram()
+        var program = MockProgram()
         let app = App(program: program, screen: screen)
         var ticked = false
         program.component = OnNext({

@@ -2,7 +2,7 @@
 ///  Mocks.swift
 //
 
-class MockProgram: Program {
+struct MockProgram: Program {
     var mockModel: Any
     var component: Component?
 
@@ -10,7 +10,7 @@ class MockProgram: Program {
     struct Quit {}
     struct Continue {}
 
-    convenience init() {
+    init() {
         self.init(model: MockModel())
     }
 
@@ -33,8 +33,6 @@ class MockProgram: Program {
 
     func render(model: Any, in screenSize: Size) -> Component {
         if let component = component {
-            self.component = nil
-
             return Window(components: [component, OnNext({ return Continue() })])
         }
 

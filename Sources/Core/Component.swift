@@ -40,6 +40,7 @@ class ComponentView: Component {
 
 class ComponentLayout: ComponentView {
     var components: [Component] = []
+    var views: [ComponentView] { return components.flatMap { $0 as? ComponentView } }
 
     override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
@@ -54,7 +55,7 @@ class ComponentLayout: ComponentView {
         case let .key(key):
             var keyboardHandled = false
             var messages: [AnyMessage] = []
-            for component in components.reversed() {
+            for component in components {
                 if let keyboardComponent = component as? KeyboardTrapComponent {
                     if !keyboardHandled && keyboardComponent.shouldAccept(key: key) {
                         messages += component.messages(for: event)
@@ -73,7 +74,7 @@ class ComponentLayout: ComponentView {
     }
 
     override func render(in buffer: Buffer, size screenSize: Size) {
-        Window.render(components: components, in: buffer, size: screenSize)
+        Window.render(views: views, in: buffer, size: screenSize)
     }
 
     override func merge(with prevComponent: Component) {
