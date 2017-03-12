@@ -55,6 +55,7 @@
 		1DAF7C621E5E3258003365BA /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DAF7C601E5E3258003365BA /* main.swift */; };
 		1DEB7C781E6E5557000BA381 /* HttpSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */; };
 		1DEB7C7C1E70A26F000BA381 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7B1E70A26F000BA381 /* Buffer.swift */; };
+		1DEB7C7E1E71C807000BA381 /* BoxSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7D1E71C807000BA381 /* BoxSpecs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -119,6 +120,7 @@
 		1DAF7C601E5E3258003365BA /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpSpecs.swift; sourceTree = "<group>"; };
 		1DEB7C7B1E70A26F000BA381 /* Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buffer.swift; sourceTree = "<group>"; };
+		1DEB7C7D1E71C807000BA381 /* BoxSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoxSpecs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +185,7 @@
 		1D9CF0841E612425003D2A48 /* Specs */ = {
 			isa = PBXGroup;
 			children = (
+				1DEB7C7D1E71C807000BA381 /* BoxSpecs.swift */,
 				1D9CF0931E61F7A0003D2A48 /* Expectations.swift */,
 				1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */,
 				1D9CF0941E61F7A0003D2A48 /* InputViewSpecs.swift */,
@@ -336,6 +339,7 @@
 				1D9CF0891E61CABA003D2A48 /* OnTickSpecs.swift in Sources */,
 				1D3B292E1E6E1B3800673F6D /* SizeDescription.swift in Sources */,
 				1D1EB4041E656F7C003A2174 /* SpinnersDemo.swift in Sources */,
+				1DEB7C7E1E71C807000BA381 /* BoxSpecs.swift in Sources */,
 				1D3B292A1E6CDDC300673F6D /* HttpCommandDemo.swift in Sources */,
 				1D9CF09E1E6222CF003D2A48 /* SpecsScreen.swift in Sources */,
 				1D9CF0A41E628B99003D2A48 /* SpinnerViewSpecs.swift in Sources */,
