@@ -24,6 +24,10 @@ if cmd.hasPrefix("specs") {
     let app = App(program: SpecsProgram(verbose: verbose, onEnd: onEnd), screen: screen)
     state = app.run()
 }
+else if cmd == "blackbox" {
+    let app = App(program: BlackBoxGame(), screen: Screen())
+    state = app.run()
+}
 else {
     let app = App(program: Demo(), screen: Screen())
     state = app.run()

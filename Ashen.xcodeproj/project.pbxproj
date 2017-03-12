@@ -56,6 +56,7 @@
 		1DEB7C781E6E5557000BA381 /* HttpSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */; };
 		1DEB7C7C1E70A26F000BA381 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7B1E70A26F000BA381 /* Buffer.swift */; };
 		1DEB7C7E1E71C807000BA381 /* BoxSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7D1E71C807000BA381 /* BoxSpecs.swift */; };
+		1DEB7C801E71E9AC000BA381 /* BlackBoxGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DEB7C7F1E71E9AC000BA381 /* BlackBoxGame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -121,6 +122,7 @@
 		1DEB7C771E6E5557000BA381 /* HttpSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpSpecs.swift; sourceTree = "<group>"; };
 		1DEB7C7B1E70A26F000BA381 /* Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buffer.swift; sourceTree = "<group>"; };
 		1DEB7C7D1E71C807000BA381 /* BoxSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoxSpecs.swift; sourceTree = "<group>"; };
+		1DEB7C7F1E71E9AC000BA381 /* BlackBoxGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlackBoxGame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 		1D1EB3FE1E656F70003A2174 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				1DEB7C7F1E71E9AC000BA381 /* BlackBoxGame.swift */,
 				1D1EB40E1E681C1B003A2174 /* CanvasDemo.swift */,
 				1D1EB3FF1E656F7C003A2174 /* Demo.swift */,
 				1D3B29201E6C8D5D00673F6D /* FlowLayoutDemo.swift */,
@@ -367,6 +370,7 @@
 				1D9CF07A1E6123F5003D2A48 /* MouseEvent.swift in Sources */,
 				1D9CF0801E612418003D2A48 /* App.swift in Sources */,
 				1D1EB4031E656F7C003A2174 /* InputDemo.swift in Sources */,
+				1DEB7C801E71E9AC000BA381 /* BlackBoxGame.swift in Sources */,
 				1D1EB40F1E681C1B003A2174 /* CanvasDemo.swift in Sources */,
 				1D9CF0AD1E629CAC003D2A48 /* InputView.swift in Sources */,
 				1D9CF07B1E6123F5003D2A48 /* WindowEvent.swift in Sources */,
