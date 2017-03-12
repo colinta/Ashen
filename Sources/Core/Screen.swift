@@ -17,7 +17,7 @@ enum Attr: Equatable {
         case .underline: return 0x020000
         case .reverse:   return 0x040000
         case .bold:      return 0x200000
-        case let .color(color): return COLOR_PAIR(color)
+        case let .color(color): return COLOR_PAIR(Int32(color))
         }
     }
 
