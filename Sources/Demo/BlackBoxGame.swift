@@ -79,6 +79,11 @@ struct BlackBoxGame: Program {
         var showAtomLocations: Bool
     }
 
+    func setup(screen: ScreenType) {
+        screen.initColor(1, fg: (0, 1000, 0), bg: nil)
+        screen.initColor(2, fg: nil, bg: (0, 1000, 0))
+    }
+
     func initial() -> (Model, [Command]) {
         return (Model(
             board: Board(width: 10, height: 5, atomsCount: rand(min: 3, lessThan: 7)),
@@ -196,21 +201,28 @@ struct BlackBoxGame: Program {
 
         let rayLabels: [Component] = model.board.rays.enumerated().flatMap { (index, cursors) -> [LabelView] in
             let (startCursor, destCursor) = cursors
+            let attrs: [Attr]
+            if startCursor == model.cursor || destCursor == model.cursor {
+                attrs = [.color(2)]
+            }
+            else {
+                attrs = [.color(1)]
+            }
             if startCursor == destCursor {
                 let location = model.board.location(of: startCursor)
                 let text = startCursor.text(.rayInOut)
-                return [LabelView(location, text: Text(text, attrs: [.color(index)]))]
+                return [LabelView(location, text: Text(text, attrs: attrs))]
             }
             else if let destCursor = destCursor {
                 return [
-                    LabelView(model.board.location(of: startCursor), text: Text(startCursor.text(.rayIn), attrs: [.color(index)])),
-                    LabelView(model.board.location(of: destCursor), text: Text(destCursor.text(.rayOut), attrs: [.color(index)])),
+                    LabelView(model.board.location(of: startCursor), text: Text(startCursor.text(.rayIn), attrs: attrs)),
+                    LabelView(model.board.location(of: destCursor), text: Text(destCursor.text(.rayOut), attrs: attrs)),
                 ]
             }
             else {
                 let location = model.board.location(of: startCursor)
                 let text = startCursor.text(.rayIn)
-                return [LabelView(location, text: Text(text, attrs: [.color(index)]))]
+                return [LabelView(location, text: Text(text, attrs: attrs))]
             }
         }
         let guessLabels: [Component] = model.board.guesses.map { guess in

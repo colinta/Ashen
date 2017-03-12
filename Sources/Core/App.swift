@@ -66,6 +66,7 @@ struct App<T: Program> {
     func run() -> AppState {
         runningApps += 1
         screen.setup()
+        program.setup(screen: screen)
         let state = main()
         screen.teardown()
         runningApps -= 1

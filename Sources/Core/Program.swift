@@ -14,7 +14,12 @@ protocol Program {
     associatedtype ModelType
     associatedtype MessageType
 
+    func setup(screen: ScreenType)
     func initial() -> (ModelType, [Command])
     func update(model: inout ModelType, message: MessageType) -> (ModelType, [Command], LoopState)
     func render(model: ModelType, in screenSize: Size) -> Component
+}
+
+extension Program {
+    func setup(screen: ScreenType) {}
 }

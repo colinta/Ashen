@@ -55,6 +55,7 @@ protocol ScreenType {
     func teardown()
     func nextEvent() -> Event?
     func resized(height: Int, width: Int)
+    func initColor(_: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?)
 }
 
 func ncurses_refresh() {
@@ -65,6 +66,7 @@ func ncurses_refresh() {
 class Screen: ScreenType {
     var size: Size { return Size(width: Int(getmaxx(stdscr)), height: Int(getmaxy(stdscr))) }
     var prevBuffer: Buffer
+    var colorIndex: Int = 1
 
     init() {
         prevBuffer = Buffer(size: .zero)
@@ -144,6 +146,31 @@ class Screen: ScreenType {
         mousemask(0xFFFFFFF, nil)
 
         clear()
+    }
+
+    func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {
+        let colorIndex1: Int16
+        let colorIndex2: Int16
+
+        if let fg = fg {
+            colorIndex1 = Int16(colorIndex)
+            colorIndex += 1
+            init_color(colorIndex1, Int16(fg.0), Int16(fg.1), Int16(fg.2))
+        }
+        else {
+            colorIndex1 = -1
+        }
+
+        if let bg = bg {
+            colorIndex2 = Int16(colorIndex)
+            colorIndex += 1
+            init_color(colorIndex2, Int16(bg.0), Int16(bg.1), Int16(bg.2))
+        }
+        else {
+            colorIndex2 = -1
+        }
+
+        init_pair(Int16(index), colorIndex1, colorIndex2)
     }
 
     func teardown() {

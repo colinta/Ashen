@@ -19,6 +19,9 @@ class SpecsScreen: ScreenType {
     func setup() {
     }
 
+    func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {
+    }
+
     func teardown() {
         guard let buffer = buffer else { return }
         let output = SpecsProgram.toString(buffer)
