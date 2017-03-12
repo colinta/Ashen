@@ -134,11 +134,15 @@ class Screen: ScreenType {
         keypad(stdscr, true)        // Enable function and arrow keys
         curs_set(0)                 // Set cursor to invisible
         nodelay(stdscr, true)       // Don't block getch()
+        use_default_colors()
 
-        init_pair(1, Int16(COLOR_BLACK), Int16(COLOR_GREEN))
-        clear()
+        for i: Int16 in Int16(0) ..< Int16(COLOR_PAIRS) {
+            init_pair(i, -1, -1)
+        }
 
         mousemask(0xFFFFFFF, nil)
+
+        clear()
     }
 
     func teardown() {
