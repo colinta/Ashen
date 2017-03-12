@@ -6,6 +6,7 @@ import Darwin
 
 
 enum SystemMessage {
+    case quit
     case rerender
 }
 
@@ -147,6 +148,8 @@ struct App<T: Program> {
                             switch message {
                             case .rerender:
                                 rerender = true
+                            case .quit:
+                                return .quit
                             }
                         }
                     }

@@ -129,6 +129,7 @@ struct Demo: Program {
             }
             model.httpCommandModel = newModel
             let commands = httpCommandCommands.map { $0.map { Message.httpCommandMessage($0) } }
+            return (model, commands, .continue)
         }
 
         return (model, [], .continue)
