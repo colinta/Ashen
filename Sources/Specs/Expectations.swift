@@ -80,6 +80,7 @@ class Expectations {
         return self
     }
 
+    @discardableResult
     func refute(_ values: Bool...) -> Self {
         for value in values {
             assert(!value)
