@@ -6,6 +6,7 @@ import Foundation
 
 
 struct Demo: Program {
+    let initialDemo: ActiveDemo
     let spinnerProgram = SpinnersDemo()
     let canvasProgram = CanvasDemo()
     let inputProgram = InputDemo()
@@ -46,6 +47,10 @@ struct Demo: Program {
         case httpCommandMessage(HttpCommandDemo.Message)
     }
 
+    init(demo: ActiveDemo = .spinner) {
+        initialDemo = demo
+    }
+
     func initial() -> (Model, [Command]) {
         let (spinnerModel, _) = spinnerProgram.initial()
         let (canvasModel, _) = canvasProgram.initial()
@@ -55,7 +60,7 @@ struct Demo: Program {
         let (httpCommandModel, httpCommands) = httpCommandProgram.initial()
 
         return (Model(
-            activeDemo: .spinner,
+            activeDemo: initialDemo,
             spinnerModel: spinnerModel,
             canvasModel: canvasModel,
             inputModel: inputModel,
