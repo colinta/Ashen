@@ -39,6 +39,59 @@ class BashScreen: ScreenType {
         }
     }
 
+    private func bufferOutput(_ buffer: Buffer) -> [String] {
+        var output: [String] = []
+        typealias LineTuple = (x: Int, char: TextType)
+        let lines: [[LineTuple]] = buffer.chars
+            .map { (y: Int, line: [Int: TextType]) -> (y: Int, line: [LineTuple]) in
+                let lineTuple = line.map { (x: Int, char: TextType) -> LineTuple in
+                        return (x: x, char: char)
+                    }
+                    .sorted { a, b in return a.x < b.x }
+                return (y: y, line: lineTuple)
+            }
+            .sorted { (a, b) in return a.y < b.y }
+            .map { (y, line) in return line }
+        for line in lines {
+            var lineOutput = ""
+            if lineOutput != "" {
+                lineOutput += "\n"
+            }
+
+            var prevX = (line.min(by: { a, b in return a.x < b.x })?.x) ?? 0
+            var prevAttr = ""
+            for (x, char) in line {
+                while prevX < x {
+                    if prevAttr != "" {
+                        lineOutput += "\u{1b}[0m"
+                        prevAttr = ""
+                    }
+                    lineOutput += " "
+                    prevX += 1
+                }
+
+                let text = char.text ?? " "
+                let attr = attrValue(char.attrs)
+                if prevAttr != attr {
+                    if prevAttr != "" {
+                        lineOutput += "\u{1b}[0m"
+                    }
+                    lineOutput += attr
+                    prevAttr = attr
+                }
+                lineOutput += text
+                prevX += 1
+            }
+
+            if prevAttr != "" {
+                lineOutput += "\u{1b}[0m"
+            }
+            output.append(lineOutput)
+        }
+
+        return output
+    }
+
     func render(_ component: Component) -> Buffer {
         let buffer = component.render(size: size)
         render(buffer: buffer)

@@ -2,8 +2,6 @@
 ///  SpinnersDemo.swift
 //
 
-import Darwin.ncurses
-
 
 struct SpinnersDemo: Program {
     enum Message {
@@ -15,8 +13,7 @@ struct SpinnersDemo: Program {
     struct Model {
         var spinners: [SpinnerView.Model]
         var animating: Bool
-        var color: Int
-        static var numColors: Int { return Int(COLORS) }
+        var color: Int?
     }
 
     func initial() -> (Model, [Command]) {
@@ -25,7 +22,7 @@ struct SpinnersDemo: Program {
                 return SpinnerView.Model(spinner: i)
             },
             animating: true,
-            color: -1
+            color: nil
             ), [])
     }
 
@@ -36,7 +33,7 @@ struct SpinnersDemo: Program {
         case .toggle:
             model.animating = !model.animating
         case let .advanceColor(delta):
-            model.color = model.color + delta
+            model.color = (model.color ?? -1) + delta
         case .quit:
             return (model, [], .quit)
         }

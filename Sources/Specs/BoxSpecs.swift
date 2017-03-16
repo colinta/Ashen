@@ -15,7 +15,7 @@ struct BoxSpecs: Spec {
             )
         let borderDefaults = Box.Border(
             tlCorner: "!", trCorner: "@", blCorner: "#", brCorner: "$",
-            tbSide: "-", lrSide: ">"
+            tbSide: "-", lrSide: "|"
             )
         expect("outputs nothing")
             .assertRenders(Box(.topLeft(), Size(width: 0, height: 0), border: border, background: "x"), "", "when width,height == 0")

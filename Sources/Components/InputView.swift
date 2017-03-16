@@ -107,10 +107,10 @@ class InputView: ComponentView {
         var calcWidth = 0
         var calcHeight = 0
         for line in model.textLines {
-            calcWidth = max(calcWidth, line.characters.count)
+            calcWidth = max(calcWidth, line.characters.count + 1)
             calcHeight += 1
         }
-        return DesiredSize(width: calcWidth, height: calcHeight)
+        return DesiredSize(width: calcWidth, height: max(1, calcHeight))
     }
 
     override func render(in buffer: Buffer, size: Size) {
@@ -148,9 +148,7 @@ class InputView: ComponentView {
                 printableChar = String(char)
             }
 
-            if xOffset < size.width {
-                buffer.write(Text(printableChar, attrs: attrs), x: xOffset, y: yOffset)
-            }
+            buffer.write(Text(printableChar, attrs: attrs), x: xOffset, y: yOffset)
 
             if char == "\n" {
                 yOffset += 1

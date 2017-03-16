@@ -104,24 +104,6 @@ class Box: ComponentLayout {
             size = Size(width: max(0, screenSize.width - 2), height: max(0, screenSize.height - 2))
         }
 
-        buffer.push(offset: borderOffset, clip: size) {
-            if let background = background {
-                for y in 0 ..< size.height {
-                    for x in 0 ..< size.width {
-                        buffer.write(background, x: x, y: y)
-                    }
-                }
-            }
-
-            for view in views.reversed() {
-                let viewSize = view.desiredSize().constrain(in: size)
-                let offset = view.location.origin(for: viewSize, in: size)
-                buffer.push(offset: offset, clip: viewSize) {
-                    view.render(in: buffer, size: viewSize)
-                }
-            }
-        }
-
         if let border = border {
             let minX = 0, maxX = screenSize.width - 1
             let minY = 0, maxY = screenSize.height - 1
@@ -159,6 +141,24 @@ class Box: ComponentLayout {
                     for y in 1 ..< maxY {
                         buffer.write(border.leftSide, x: minX, y: y)
                         buffer.write(border.rightSide, x: maxX, y: y)
+                    }
+                }
+            }
+        }
+
+        buffer.push(offset: borderOffset, clip: size) {
+            for view in views.reversed() {
+                let viewSize = view.desiredSize().constrain(in: size)
+                let offset = view.location.origin(for: viewSize, in: size)
+                buffer.push(offset: offset, clip: viewSize) {
+                    view.render(in: buffer, size: viewSize)
+                }
+            }
+
+            if let background = background {
+                for y in 0 ..< size.height {
+                    for x in 0 ..< size.width {
+                        buffer.write(background, x: x, y: y)
                     }
                 }
             }
