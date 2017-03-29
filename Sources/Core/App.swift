@@ -2,7 +2,7 @@
 ///  App.swift
 //
 
-import Darwin
+import Foundation
 
 
 enum SystemMessage {
@@ -83,22 +83,33 @@ struct App<T: Program> {
     func main() -> AppState {
         var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
-        var prevState: [(T.ModelType, Component, Buffer)] = []
+        var prevState: [(T.ModelType, Buffer?)] = []
         var inThePast: Int?
         var (model, commands) = program.initial()
 
         var window = program.render(model: model, in: screen.size)
         let buffer = screen.render(window)
-        prevState.append((model, window, buffer))
+        prevState.append((model, buffer))
 
         var messageQueue: [T.MessageType] = []
+        var commandMessageQueue: [T.MessageType] = []
+        let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
+        let commandMessageThread = DispatchQueue(label: "commandMessageThread")
         while state == .continue {
             for command in commands {
-                command.start() { msg in
-                    if let msg = msg as? T.MessageType {
-                        messageQueue.append(msg)
+                commandBackgroundThread.async {
+                    command.start() { msg in
+                        if let msg = msg as? T.MessageType {
+                            commandMessageThread.sync {
+                                messageQueue.append(msg)
+                            }
+                        }
                     }
                 }
+            }
+            commandMessageThread.sync {
+                messageQueue += commandMessageQueue
+                commandMessageQueue = []
             }
             commands = []
 
@@ -121,12 +132,18 @@ struct App<T: Program> {
                     inThePast = max(0, (inThePast ?? prevState.count) - 1)
                 }
                 else if case let .key(key) = event, key == .signal_ctrl_x {
-                    inThePast = min(prevState.count - 1, (inThePast ?? prevState.count) + 1)
+                    let nextState = (inThePast ?? prevState.count) + 1
+                    if nextState >= prevState.count {
+                        inThePast = nil
+                    }
+                    else {
+                        inThePast = nextState
+                    }
                 }
                 else if case let .key(key) = event, key == .key_space, let pastIndex = inThePast {
-                    let (newModel, newWindow, _) = prevState[pastIndex]
+                    let (newModel, _) = prevState[pastIndex]
                     model = newModel
-                    window = newWindow
+                    window = program.render(model: model, in: screen.size)
                     rerender = true
                     prevState = Array(prevState[0 ..< pastIndex])
                     inThePast = nil
@@ -134,7 +151,15 @@ struct App<T: Program> {
             }
 
             if let pastIndex = inThePast {
-                let (_, _, buffer) = prevState[pastIndex]
+                let (model, storedBuffer) = prevState[pastIndex]
+                let buffer: Buffer
+                if let storedBuffer = storedBuffer {
+                    buffer = storedBuffer
+                }
+                else {
+                    let newWindow = program.render(model: model, in: screen.size)
+                    buffer = screen.render(newWindow)
+                }
                 screen.render(buffer: buffer)
                 messageQueue = []
                 continue
@@ -156,13 +181,19 @@ struct App<T: Program> {
                     }
                 }
 
+                var first = true
                 while messageQueue.count > 0 {
+                    if !first {
+                        prevState.append((model, nil))
+                    }
+                    first = false
+
                     let message = messageQueue.removeFirst()
                     let (newModel, newCommands, newState) = program.update(model: &model, message: message)
                     if newState != .continue { return newState.appState }
                     state = newState
                     model = newModel
-                    commands = newCommands
+                    commands.append(newCommands)
 
                     updateAndRender = true
                 }
@@ -176,7 +207,7 @@ struct App<T: Program> {
 
             if updateAndRender || rerender {
                 let buffer = screen.render(window)
-                prevState.append((model, window, buffer))
+                prevState.append((model, buffer))
             }
         }
 
