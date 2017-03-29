@@ -24,6 +24,10 @@ if cmd.hasPrefix("specs") {
     let app = App(program: SpecsProgram(verbose: verbose, onEnd: onEnd), screen: screen)
     state = app.run()
 }
+else if cmd == "diff" {
+    let app = App(program: AlgorithmDemo(), screen: NcursesScreen())
+    state = app.run()
+}
 else if cmd == "http" {
     let app = App(program: Demo(demo: .httpCommand), screen: NcursesScreen())
     state = app.run()
