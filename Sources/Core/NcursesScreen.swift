@@ -137,4 +137,8 @@ class NcursesScreen: ScreenType {
     func teardown() {
         endwin()
     }
+
+    static func end() {
+        endwin()
+    }
 }
