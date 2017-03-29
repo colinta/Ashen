@@ -10,33 +10,40 @@ struct HttpCommandDemo: Program {
 
     enum Message {
         case quit
+        case sendRequest
         case abort
         case received(Http.HttpResult)
     }
 
     struct Model {
+        var requestSent: Bool
         var http: Http?
         var result: Result<String>?
     }
 
     func initial() -> (Model, [Command]) {
-        let cmd = Http(url: URL(string: "http://www.gutenberg.org/cache/epub/1661/pg1661.txt")!) { result in
-            return Message.received(result)
-        }
-        return (Model(http: cmd, result: nil), [
-            cmd,
-        ])
+        return (Model(requestSent: false, http: nil, result: nil), [])
     }
 
     func update(model: inout Model, message: Message)
         -> (Model, [Command], LoopState)
     {
         switch message {
+        case .sendRequest:
+            let cmd = Http.get(
+                url: URL(string: "http://www.gutenberg.org/cache/epub/1661/pg1661.txt")!
+                )
+            { result in
+                return Message.received(result)
+            }
+            model.http = cmd
+            model.requestSent = true
+            return (model, [cmd], .continue)
         case .quit:
             return (model, [], .quit)
         case let .received(result):
             model.http = nil
-            model.result = result.map { (data, _) in
+            model.result = result.map { data in
                 if let str = String(data: data, encoding: .utf8) {
                     return str
                 }
@@ -52,6 +59,9 @@ struct HttpCommandDemo: Program {
     }
 
     func render(model: Model, in screenSize: Size) -> Component {
+        guard model.requestSent
+        else { return OnNext({ return Message.sendRequest }) }
+
         let content: Component
         if case let .some(.ok(string)) = model.result {
             content = LabelView(.topLeft(), text: string)

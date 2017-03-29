@@ -57,7 +57,7 @@ struct Demo: Program {
         let (inputModel, _) = inputProgram.initial()
         let (flowLayoutModel, _) = flowLayoutProgram.initial()
         let (gridLayoutModel, _) = gridLayoutProgram.initial()
-        let (httpCommandModel, httpCommands) = httpCommandProgram.initial()
+        let (httpCommandModel, _) = httpCommandProgram.initial()
 
         return (Model(
             activeDemo: initialDemo,
@@ -68,10 +68,7 @@ struct Demo: Program {
             gridLayoutModel: gridLayoutModel,
             httpCommandModel: httpCommandModel,
             log: []
-            ), httpCommands.map { command in
-                return command.map { (msg: HttpCommandDemo.Message) -> Message in
-                    return Message.httpCommandMessage(msg) }
-            })
+            ), [])
     }
 
     func update(model: inout Model, message: Message)

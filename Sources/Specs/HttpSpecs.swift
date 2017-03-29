@@ -7,23 +7,23 @@ import Foundation
 
 struct HttpSpecs: Spec {
     var name: String { return "HttpSpecs" }
+
     class MockSession: URLSessionProtocol {
         var cancelled = 0
         var request: URLRequest?
-        var completionHandler: URLSessionCompletionHandler?
 
-        func ashen_dataTask(with request: URLRequest, completionHandler: @escaping URLSessionCompletionHandler) -> URLSessionTaskProtocol {
+        func ashen_dataTask(with request: URLRequest) -> URLSessionTaskProtocol {
             self.request = request
-            self.completionHandler = completionHandler
+            return MockSessionTask()
+        }
+
+        func ashen_downloadTask(with request: URLRequest) -> URLSessionTaskProtocol {
+            self.request = request
             return MockSessionTask()
         }
 
         func ashen_cancel() {
             cancelled += 1
-        }
-
-        func mockCompleted(_ data: Data? = nil, _ response: URLResponse? = nil, error: Error? = nil) {
-            completionHandler?(data, response, error)
         }
     }
 
@@ -36,31 +36,21 @@ struct HttpSpecs: Spec {
     }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
-        var data: Data?
-        var response: URLResponse?
-        var error: Error?
         var config: URLSessionConfiguration?
 
         let mockSession = MockSession()
         let url = URL(string: "https://github.com")!
-        let method: HttpMethod = .post
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
         let subject = Http(
-            url: url,
-            method: method,
+            request: request,
             options: [.timeout(1), .header("Bearer-Token", "abcdef")],
             urlSessionHandler: .mock({ newConfig in
                 config = newConfig
                 return mockSession
             }),
-            onReceived: { result in
-                switch result {
-                case let .ok(newData, newResponse):
-                    data = newData
-                    response = newResponse
-                case let .fail(newError):
-                    error = newError
-                }
-                return nil
+            onReceived: { _ in
+                return "message!"
             })
         expect("configures timeout")
             .assert(config != nil)
@@ -68,18 +58,14 @@ struct HttpSpecs: Spec {
         expect("configures headers")
             .assertEqual(config?.httpAdditionalHeaders?["Bearer-Token"] as? String, "abcdef" as String?)
 
-        var messages: [AnyMessage] = []
+        var messages: [String] = []
         subject.start() { msg in
-            messages.append(msg)
+            (msg as? String).map { messages.append($0) }
         }
+
         expect("receives request")
             .assert(mockSession.request != nil)
-            .assertEqual(mockSession.request?.httpMethod, method.rawValue)
-
-        mockSession.mockCompleted(Data(), URLResponse(url: url, mimeType: "x-mock/testing", expectedContentLength: 0, textEncodingName: nil))
-        expect("receives data").assert(data != nil)
-        expect("receives response").assert(response != nil)
-        expect("receives error").assert(error == nil)
+            .assertEqual(mockSession.request?.httpMethod, "POST")
         done()
     }
 }
