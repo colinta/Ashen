@@ -3,33 +3,12 @@
 //
 
 class InputView: ComponentView {
-    typealias OnChangeHandler = ((Model) -> AnyMessage)
+    typealias OnChangeHandler = ((String) -> AnyMessage)
     typealias OnEnterHandler = (() -> AnyMessage)
 
-    struct Model {
-        static let `default` = Model(text: "")
-
-        let text: String
-        var textLines: [String] {
-            var line = ""
-            var lines: [String] = []
-            for c in text.characters {
-                if c == "\n" {
-                    lines.append(line)
-                    line = ""
-                }
-                else {
-                    line += String(c)
-                }
-            }
-            lines.append(line)
-            return lines
-        }
-    }
-
     struct Cursor {
-        static func `default`(for model: InputView.Model) -> Cursor {
-            return Cursor(at: model.text.characters.count, length: 0)
+        static func `default`(for text: String) -> Cursor {
+            return Cursor(at: text.characters.count, length: 0)
         }
 
         let at: Int
@@ -46,7 +25,7 @@ class InputView: ComponentView {
     }
 
     let size: DesiredSize
-    let model: Model
+    let text: String
     var cursor: Cursor
     /// If `forceCursor` is assigned, it will overide the auto-updating cursor
     let forceCursor: Cursor?
@@ -55,9 +34,25 @@ class InputView: ComponentView {
     var onChange: OnChangeHandler
     var onEnter: OnEnterHandler?
 
+    var textLines: [String] {
+        var line = ""
+        var lines: [String] = []
+        for c in text.characters {
+            if c == "\n" {
+                lines.append(line)
+                line = ""
+            }
+            else {
+                line += String(c)
+            }
+        }
+        lines.append(line)
+        return lines
+    }
+
     init(_ location: Location,
         _ size: DesiredSize = DesiredSize(),
-        model: Model = Model.default,
+        text: String = "",
         isFirstResponder: Bool = false,
         multiline: Bool = false,
         cursor: Cursor? = nil,
@@ -65,13 +60,13 @@ class InputView: ComponentView {
         onEnter: OnEnterHandler? = nil
         ) {
         self.size = size
-        self.model = model
+        self.text = text
         self.onChange = onChange
         self.onEnter = onEnter
         self.isFirstResponder = isFirstResponder
         self.multiline = multiline
         self.forceCursor = cursor
-        self.cursor = cursor ?? Cursor.default(for: model)
+        self.cursor = cursor ?? Cursor.default(for: text)
         super.init()
         self.location = location
     }
@@ -79,8 +74,8 @@ class InputView: ComponentView {
     override func map<T, U>(_ mapper: @escaping (T) -> U) -> InputView {
         let component = self
         let myChange = self.onChange
-        let onChange: OnChangeHandler = { model in
-            return mapper(myChange(model) as! T)
+        let onChange: OnChangeHandler = { text in
+            return mapper(myChange(text) as! T)
         }
         component.onChange = onChange
         if let onEnter = onEnter {
@@ -106,7 +101,7 @@ class InputView: ComponentView {
 
         var calcWidth = 0
         var calcHeight = 0
-        for line in model.textLines {
+        for line in textLines {
             calcWidth = max(calcWidth, line.characters.count + 1)
             calcHeight += 1
         }
@@ -118,7 +113,7 @@ class InputView: ComponentView {
         var yOffset = 0
         var xOffset = 0
         var cOffset = 0
-        for char in model.text.characters {
+        for char in text.characters {
             guard yOffset < size.height else { break }
 
             let attrs: [Attr]
@@ -161,7 +156,7 @@ class InputView: ComponentView {
             cOffset += 1
         }
 
-        if isFirstResponder && normalCursor.at == model.text.characters.count && yOffset < size.height {
+        if isFirstResponder && normalCursor.at == text.characters.count && yOffset < size.height {
             buffer.write(Text(" ", attrs: [.underline]), x: xOffset, y: yOffset)
         }
     }
@@ -218,11 +213,10 @@ class InputView: ComponentView {
 
     private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage] {
         let offset = insert.characters.count
-        let text = model.text
         if cursor.at == text.characters.count && cursor.length == 0 {
             let nextText = text + insert
             cursor = Cursor(at: cursor.at + offset, length: 0)
-            return [onChange(Model(text: nextText))]
+            return [onChange(nextText)]
         }
 
         let normalCursor = cursor.normal
@@ -230,13 +224,12 @@ class InputView: ComponentView {
         let end = text.index(cursorStart, offsetBy: normalCursor.length)
         let nextText = text.replacingCharacters(in: cursorStart..<end, with: insert)
         self.cursor = Cursor(at: normalCursor.at + offset, length: 0)
-        return [onChange(Model(text: nextText))]
+        return [onChange(nextText)]
     }
 
     private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage] {
         if cursor.at == 0 && cursor.length == 0 { return [] }
 
-        let text = model.text
         let normalCursor = cursor.normal
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let range: Range<String.Index>
@@ -251,7 +244,7 @@ class InputView: ComponentView {
             cursor = Cursor(at: normalCursor.at, length: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
-        return [onChange(Model(text: nextText))]
+        return [onChange(nextText)]
     }
 
     private func moveLeft(_ onChange: OnChangeHandler) -> [AnyMessage] {
@@ -268,7 +261,6 @@ class InputView: ComponentView {
 
     private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
         let normalCursor = cursor.normal
-        let text = model.text
         if cursor.length == 0 {
             let maxCursor = text.characters.count
             cursor = Cursor(at: min(cursor.at + 1, maxCursor), length: 0)
@@ -287,7 +279,6 @@ class InputView: ComponentView {
     }
 
     private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
-        let text = model.text
         let maxCursor = text.characters.count
         if cursor.at + cursor.length == maxCursor { return [] }
         cursor = Cursor(at: cursor.at, length: cursor.length + 1)
@@ -295,7 +286,7 @@ class InputView: ComponentView {
     }
 
     private func moveUp(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage] {
-        let lines = model.textLines
+        let lines = textLines
         var x = 0
         var prevX = 0
         var prevLength = 0
@@ -330,8 +321,7 @@ class InputView: ComponentView {
     }
 
     private func moveDown(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage] {
-        let text = model.text
-        let lines = model.textLines
+        let lines = textLines
         var x = 0
         var prevX = 0
         let maxX = cursor.at + cursor.length
@@ -369,7 +359,7 @@ class InputView: ComponentView {
     }
 
     private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage] {
-        cursor = Cursor(at: model.text.characters.count, length: 0)
+        cursor = Cursor(at: text.characters.count, length: 0)
         return [SystemMessage.rerender]
     }
 }

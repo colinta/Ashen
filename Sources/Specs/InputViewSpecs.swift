@@ -45,20 +45,20 @@ struct InputViewSpecs: Spec {
         goesTo finalCursor: (Int, Int),
         _ finalText: String? = nil)
     {
-        let model = InputView.Model(text: startingText)
-        var changedModel: InputView.Model!
+        let text = startingText
+        var changedText: String?
         let subject = InputView(
             .topLeft(),
-            model: model,
+            text: text,
             isFirstResponder: true,
-            onChange: { model in
-                changedModel = model
+            onChange: { text in
+                changedText = text
                 return ""
             })
         subject.cursor = InputView.Cursor(at: startingCursor.0, length: startingCursor.1)
 
         _ = subject.messages(for: Event.key(keyEvent))
-        let newModel = changedModel ?? model
+        let newText = changedText ?? text
         var description =
             "with text \"\(startingText.replacingOccurrences(of: "\n", with: "\\n"))\" at \(startingCursor)," +
             " pressing \(keyEvent.toString)" +
@@ -70,7 +70,7 @@ struct InputViewSpecs: Spec {
             .assertEqual(subject.cursor.at, finalCursor.0, "cursor.at")
             .assertEqual(subject.cursor.length, finalCursor.1, "cursor.length")
         if let finalText = finalText {
-            expectation.assertEqual(newModel.text, finalText, "text")
+            expectation.assertEqual(newText, finalText, "text")
         }
     }
 

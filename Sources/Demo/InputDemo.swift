@@ -4,7 +4,7 @@
 
 struct InputDemo: Program {
     enum Message {
-        case onChange(Int, InputView.Model)
+        case onChange(Int, String)
         case quit
         case nextInput
         case prevInput
@@ -12,15 +12,15 @@ struct InputDemo: Program {
 
     struct Model {
         var activeInput: Int
-        var firstInput: InputView.Model
-        var secondInput: InputView.Model
+        var firstInput: String
+        var secondInput: String
     }
 
     func initial() -> (Model, [Command]) {
         return (Model(
             activeInput: 0,
-            firstInput: InputView.Model(text: "Press enter to exit, tab to switch inputs"),
-            secondInput: InputView.Model.default
+            firstInput: "Press enter to exit, tab to switch inputs",
+            secondInput: ""
             ), [])
     }
 
@@ -32,12 +32,12 @@ struct InputDemo: Program {
             model.activeInput = (model.activeInput + 1) % 2
         case .prevInput:
             model.activeInput = (model.activeInput - 1) % 2
-        case let .onChange(index, inputModel):
+        case let .onChange(index, text):
             if index == 0 {
-                model.firstInput = inputModel
+                model.firstInput = text
             }
             else {
-                model.secondInput = inputModel
+                model.secondInput = text
             }
         case .quit:
             return (model, [], .quit)
@@ -48,7 +48,7 @@ struct InputDemo: Program {
     func render(model: Model, in screenSize: Size) -> Component {
         let firstInput = InputView(
             .topLeft(x: 1, y: 1),
-            model: model.firstInput,
+            text: model.firstInput,
             isFirstResponder: model.activeInput == 0,
             onChange: { model in
                 return Message.onChange(0, model)
@@ -58,7 +58,7 @@ struct InputDemo: Program {
             })
         let secondInput = InputView(
             .topLeft(x: 1, y: 3),
-            model: model.secondInput,
+            text: model.secondInput,
             isFirstResponder: model.activeInput == 1,
             multiline: true,
             onChange: { model in
