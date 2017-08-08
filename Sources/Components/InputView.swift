@@ -52,7 +52,7 @@ class InputView: ComponentView {
         return lines
     }
 
-    init(_ location: Location,
+    init(_ location: Location = .tl(.zero),
         _ size: DesiredSize = DesiredSize(),
         text: String = "",
         isFirstResponder: Bool = false,
@@ -158,7 +158,7 @@ class InputView: ComponentView {
                 printableChar = String(char)
             }
 
-            buffer.write(Text(printableChar, attrs: attrs), x: xOffset, y: yOffset)
+            buffer.write(AttrChar(printableChar, attrs), x: xOffset, y: yOffset)
 
             if char == "\n" {
                 yOffset += 1
@@ -172,7 +172,7 @@ class InputView: ComponentView {
         }
 
         if isFirstResponder && normalCursor.at == text.characters.count && yOffset < size.height {
-            buffer.write(Text(" ", attrs: [.underline]), x: xOffset, y: yOffset)
+            buffer.write(AttrChar(" ", [.underline]), x: xOffset, y: yOffset)
         }
     }
 
@@ -379,14 +379,14 @@ class InputView: ComponentView {
     }
 
     private func moveToBeginning(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != 0 && cursor.length != 0 else { return [] }
+        guard cursor.at != 0 || cursor.length != 0 else { return [] }
 
         cursor = Cursor(at: 0, length: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
     private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != text.characters.count && cursor.length != 0 else { return [] }
+        guard cursor.at != text.characters.count || cursor.length != 0 else { return [] }
 
         cursor = Cursor(at: text.characters.count, length: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]

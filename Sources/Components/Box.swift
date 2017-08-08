@@ -77,12 +77,12 @@ class Box: ComponentLayout {
 
     let size: Size
     let border: Border?
-    let background: TextType?
+    let background: AttrChar?
 
     init(_ location: Location, _ size: Size, border: Border? = nil, background: TextType? = nil, components: [Component] = []) {
         self.size = size
         self.border = border
-        self.background = background
+        self.background = background.flatMap { $0.chars.first }
         super.init()
         self.components = components
         self.location = location
@@ -95,13 +95,49 @@ class Box: ComponentLayout {
     override func render(in buffer: Buffer, size screenSize: Size) {
         let size: Size
         let borderOffset: Point
-        if border == nil {
-            borderOffset = .zero
-            size = screenSize
+        if let border = border {
+            let widthClip: Int, borderX: Int
+            if border.leftSide == "" && border.rightSide == "" {
+                widthClip = 0
+                borderX = 0
+            }
+            else if border.leftSide == "" {
+                widthClip = 1
+                borderX = 0
+            }
+            else if border.rightSide == "" {
+                widthClip = 1
+                borderX = 1
+            }
+            else {
+                widthClip = 2
+                borderX = 1
+            }
+
+            let heightClip: Int, borderY: Int
+            if border.topSide == "" && border.bottomSide == "" {
+                heightClip = 0
+                borderY = 0
+            }
+            else if border.topSide == "" {
+                heightClip = 1
+                borderY = 0
+            }
+            else if border.bottomSide == "" {
+                heightClip = 1
+                borderY = 1
+            }
+            else {
+                heightClip = 2
+                borderY = 1
+            }
+
+            borderOffset = Point(x: borderX, y: borderY)
+            size = Size(width: max(0, screenSize.width - widthClip), height: max(0, screenSize.height - heightClip))
         }
         else {
-            borderOffset = Point(x: 1, y: 1)
-            size = Size(width: max(0, screenSize.width - 2), height: max(0, screenSize.height - 2))
+            borderOffset = .zero
+            size = screenSize
         }
 
         if let border = border {
@@ -109,38 +145,38 @@ class Box: ComponentLayout {
             let minY = 0, maxY = screenSize.height - 1
             switch (screenSize.width, screenSize.height) {
             case (1, 1):
-                buffer.write(border.dot, x: minX, y: minY)
+                buffer.write(AttrChar(border.dot), x: minX, y: minY)
             case (_, 1):
-                buffer.write(border.leftCap, x: minX, y: minY)
-                buffer.write(border.rightCap, x: maxX, y: minY)
+                buffer.write(AttrChar(border.leftCap), x: minX, y: minY)
+                buffer.write(AttrChar(border.rightCap), x: maxX, y: minY)
                 if screenSize.width > 2 {
                     for x in 1 ..< maxX {
-                        buffer.write(border.tbSide, x: x, y: minY)
+                        buffer.write(AttrChar(border.tbSide), x: x, y: minY)
                     }
                 }
             case (1, _):
-                buffer.write(border.topCap, x: minX, y: minY)
-                buffer.write(border.bottomCap, x: minX, y: maxY)
+                buffer.write(AttrChar(border.topCap), x: minX, y: minY)
+                buffer.write(AttrChar(border.bottomCap), x: minX, y: maxY)
                 if screenSize.height > 2 {
                     for y in 1 ..< maxY {
-                        buffer.write(border.lrSide, x: minX, y: y)
+                        buffer.write(AttrChar(border.lrSide), x: minX, y: y)
                     }
                 }
             default:
-                buffer.write(border.tlCorner, x: minX, y: minY)
-                buffer.write(border.trCorner, x: maxX, y: minY)
-                buffer.write(border.blCorner, x: minX, y: maxY)
-                buffer.write(border.brCorner, x: maxX, y: maxY)
+                buffer.write(AttrChar(border.tlCorner), x: minX, y: minY)
+                buffer.write(AttrChar(border.trCorner), x: maxX, y: minY)
+                buffer.write(AttrChar(border.blCorner), x: minX, y: maxY)
+                buffer.write(AttrChar(border.brCorner), x: maxX, y: maxY)
                 if screenSize.width > 2 {
                     for x in 1 ..< maxX {
-                        buffer.write(border.topSide, x: x, y: minY)
-                        buffer.write(border.bottomSide, x: x, y: maxY)
+                        buffer.write(AttrChar(border.topSide), x: x, y: minY)
+                        buffer.write(AttrChar(border.bottomSide), x: x, y: maxY)
                     }
                 }
                 if screenSize.height > 2 {
                     for y in 1 ..< maxY {
-                        buffer.write(border.leftSide, x: minX, y: y)
-                        buffer.write(border.rightSide, x: maxX, y: y)
+                        buffer.write(AttrChar(border.leftSide), x: minX, y: y)
+                        buffer.write(AttrChar(border.rightSide), x: maxX, y: y)
                     }
                 }
             }

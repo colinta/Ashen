@@ -162,7 +162,7 @@ class CanvasView: ComponentView {
                     if unicode > 0,
                         let char = UnicodeScalar(0x2800 + unicode).map({ String(describing: $0) })
                     {
-                        buffer.write(char, x: sx, y: sy)
+                        buffer.write(AttrChar(char), x: sx, y: sy)
                     }
 
                     px += dx

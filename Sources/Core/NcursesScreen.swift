@@ -62,13 +62,13 @@ class NcursesScreen: ScreenType {
                 guard x >= 0 && x < size.width else { continue }
 
                 let prevRow = prevChars[y] ?? [:]
-                let prevChar = prevRow[x] ?? ""
-                if prevChar.text != char.text || attrValue(prevChar.attrs) != attrValue(char.attrs) {
+                let prevChar = prevRow[x] ?? AttrChar("")
+                if prevChar.string != char.string || attrValue(prevChar.attrs) != attrValue(char.attrs) {
                     move(Int32(y), Int32(x))
                     for attr in char.attrs {
                         attron(attrValue(attr))
                     }
-                    addstr(char.text)
+                    addstr(char.string)
                     for attr in char.attrs {
                         attroff(attrValue(attr))
                     }

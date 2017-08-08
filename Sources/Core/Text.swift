@@ -4,13 +4,49 @@
 
 
 protocol TextType {
-    var text: String? { get }
-    var attrs: [Attr] { get }
+    var chars: [AttrChar] { get }
+}
+
+struct AttrChar: TextType {
+    var string: String?
+    var attrs: [Attr]
+    var chars: [AttrChar] { return [self] }
+
+    init(_ string: String?, _ attrs: [Attr] = []) {
+        self.string = string
+        self.attrs = attrs
+    }
+
+    init(_ string: Character, _ attrs: [Attr] = []) {
+        self.string = String(string)
+        self.attrs = attrs
+    }
+}
+
+struct AttrText: TextType {
+    private var content: [TextType]
+
+    var chars: [AttrChar] {
+        return content.flatMap { $0.chars }
+    }
+
+    init(_ content: [TextType] = []) {
+        self.content = content
+    }
+
+    mutating func append(_ text: TextType) {
+        self.content.append(text)
+    }
 }
 
 struct Text: TextType {
     let text: String?
     let attrs: [Attr]
+
+    var chars: [AttrChar] {
+        guard let text = text else { return [AttrChar(nil, attrs)] }
+        return text.characters.map { AttrChar($0, attrs) }
+    }
 
     init(_ text: String?, attrs: [Attr] = []) {
         self.text = text
@@ -19,6 +55,8 @@ struct Text: TextType {
 }
 
 extension String: TextType {
-    var text: String? { return self }
-    var attrs: [Attr] { return [] }
+    var chars: [AttrChar] {
+        let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        return text.characters.map { AttrChar($0, []) }
+    }
 }

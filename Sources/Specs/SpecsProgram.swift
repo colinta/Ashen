@@ -135,8 +135,8 @@ extension SpecsProgram {
                     output += " "
                     prevX += 1
                 }
-                if let text = c.text {
-                    output += text
+                if let string = c.string {
+                    output += string
                 }
                 prevX += 1
             }

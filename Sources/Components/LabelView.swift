@@ -5,49 +5,33 @@
 
 class LabelView: ComponentView {
     let size: DesiredSize
-    let lines: [[Text]]
+    let lines: [TextType]
 
     var linesHeight: Int { return lines.count }
     var linesWidth: Int { return lines.reduce(0) { length, line in
-            return max(length, line.count)
+            return max(length, line.chars.count)
         } }
 
     override func desiredSize() -> DesiredSize {
         return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
     }
 
-    convenience init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: String) {
-        self.init(location, size, text: Text(text))
-    }
-
-    init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text textString: Text) {
+    init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: TextType) {
         self.size = size
-        if let textStringText = textString.text {
-            let text = textStringText
-                .replacingOccurrences(of: "\r\n", with: "\n")
-                .replacingOccurrences(of: "\r", with: "\n")
 
-            var line: [String] = []
-            var lines: [[String]] = []
-            for c in text.characters {
-                if c == "\n" {
-                    lines.append(line)
-                    line = []
-                }
-                else {
-                    line.append(String(c))
-                }
+        var line = AttrText()
+        var lines: [TextType] = []
+        for attrChar in text.chars {
+            if attrChar.string == "\n" {
+                lines.append(line)
+                line = AttrText()
             }
-            lines.append(line)
-
-            self.lines = lines.map {
-                $0.map { Text($0, attrs: textString.attrs) }
+            else {
+                line.append(attrChar)
             }
         }
-        else {
-            self.lines = [[textString]]
-        }
-
+        lines.append(line)
+        self.lines = lines
         super.init()
         self.location = location
     }
@@ -58,7 +42,7 @@ class LabelView: ComponentView {
             if yOffset > size.height { break }
 
             var xOffset = 0
-            for char in line {
+            for char in line.chars {
                 if xOffset > size.width { break }
                 buffer.write(char, x: xOffset, y: yOffset)
                 xOffset += 1

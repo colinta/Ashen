@@ -63,7 +63,7 @@ class SpinnerView: ComponentView {
         else {
             attrs = []
         }
-        buffer.write(Text(chr, attrs: attrs), x: 0, y: 0)
+        buffer.write(AttrChar(chr, attrs), x: 0, y: 0)
     }
 
     override func messages(for event: Event) -> [AnyMessage] {
