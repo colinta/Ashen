@@ -4,6 +4,7 @@
 
 class InputView: ComponentView {
     typealias OnChangeHandler = ((String) -> AnyMessage)
+    typealias OnCursorChangeHandler = ((Cursor) -> AnyMessage)
     typealias OnEnterHandler = (() -> AnyMessage)
 
     struct Cursor {
@@ -32,6 +33,7 @@ class InputView: ComponentView {
     let isFirstResponder: Bool
     let multiline: Bool
     var onChange: OnChangeHandler
+    var onCursorChange: OnCursorChangeHandler?
     var onEnter: OnEnterHandler?
 
     var textLines: [String] {
@@ -57,11 +59,13 @@ class InputView: ComponentView {
         multiline: Bool = false,
         cursor: Cursor? = nil,
         onChange: @escaping OnChangeHandler,
+        onCursorChange: OnCursorChangeHandler? = nil,
         onEnter: OnEnterHandler? = nil
         ) {
         self.size = size
         self.text = text
         self.onChange = onChange
+        self.onCursorChange = onCursorChange
         self.onEnter = onEnter
         self.isFirstResponder = isFirstResponder
         self.multiline = multiline
@@ -78,6 +82,15 @@ class InputView: ComponentView {
             return mapper(myChange(text) as! T)
         }
         component.onChange = onChange
+
+        if let onCursorChange = onCursorChange {
+            let myCursorChange = onCursorChange
+            let onCursorChange: OnCursorChangeHandler = { cursor in
+                return mapper(myCursorChange(cursor) as! T)
+            }
+            component.onCursorChange = onCursorChange
+        }
+
         if let onEnter = onEnter {
             let myEnter = onEnter
             let onEnter: OnEnterHandler = {
@@ -85,6 +98,7 @@ class InputView: ComponentView {
             }
             component.onEnter = onEnter
         }
+
         return component
     }
 
@@ -105,6 +119,7 @@ class InputView: ComponentView {
             calcWidth = max(calcWidth, line.characters.count + 1)
             calcHeight += 1
         }
+
         return DesiredSize(width: calcWidth, height: max(1, calcHeight))
     }
 
@@ -168,13 +183,13 @@ class InputView: ComponentView {
 
         switch event {
         case let .key(key):
-            return keyEvent(onChange, key: key)
+            return keyEvent(onChange, key: key).flatMap { $0 }
         default:
             return []
         }
     }
 
-    private func keyEvent(_ onChange: OnChangeHandler, key: KeyEvent) -> [AnyMessage] {
+    private func keyEvent(_ onChange: OnChangeHandler, key: KeyEvent) -> [AnyMessage?] {
         if key.isPrintable || (key == .key_enter && multiline) {
             return insert(onChange, string: key.toString)
         }
@@ -211,23 +226,23 @@ class InputView: ComponentView {
         return []
     }
 
-    private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage] {
+    private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage?] {
         let offset = insert.characters.count
         if cursor.at == text.characters.count && cursor.length == 0 {
             let nextText = text + insert
             cursor = Cursor(at: cursor.at + offset, length: 0)
-            return [onChange(nextText)]
+            return [onCursorChange?(cursor), onChange(nextText)]
         }
 
         let normalCursor = cursor.normal
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let end = text.index(cursorStart, offsetBy: normalCursor.length)
         let nextText = text.replacingCharacters(in: cursorStart..<end, with: insert)
-        self.cursor = Cursor(at: normalCursor.at + offset, length: 0)
-        return [onChange(nextText)]
+        cursor = Cursor(at: normalCursor.at + offset, length: 0)
+        return [onCursorChange?(cursor), onChange(nextText)]
     }
 
-    private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         if cursor.at == 0 && cursor.length == 0 { return [] }
 
         let normalCursor = cursor.normal
@@ -244,48 +259,48 @@ class InputView: ComponentView {
             cursor = Cursor(at: normalCursor.at, length: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
-        return [onChange(nextText)]
+        return [onCursorChange?(cursor), onChange(nextText)]
     }
 
-    private func moveLeft(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func moveLeft(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         let normalCursor = cursor.normal
         if cursor.length == 0 {
             cursor = Cursor(at: max(cursor.at - 1, 0), length: 0)
-            return [SystemMessage.rerender]
+            return [onCursorChange?(cursor), SystemMessage.rerender]
         }
         else {
             cursor = Cursor(at: normalCursor.at, length: 0)
-            return [SystemMessage.rerender]
+            return [onCursorChange?(cursor), SystemMessage.rerender]
         }
     }
 
-    private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         let normalCursor = cursor.normal
         if cursor.length == 0 {
             let maxCursor = text.characters.count
             cursor = Cursor(at: min(cursor.at + 1, maxCursor), length: 0)
-            return [SystemMessage.rerender]
+            return [onCursorChange?(cursor), SystemMessage.rerender]
         }
         else {
             cursor = Cursor(at: normalCursor.at + normalCursor.length, length: 0)
-            return [SystemMessage.rerender]
+            return [onCursorChange?(cursor), SystemMessage.rerender]
         }
     }
 
-    private func extendLeft(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func extendLeft(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         if cursor.at + cursor.length == 0 { return [] }
         cursor = Cursor(at: cursor.at, length: cursor.length - 1)
-        return [SystemMessage.rerender]
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         let maxCursor = text.characters.count
         if cursor.at + cursor.length == maxCursor { return [] }
         cursor = Cursor(at: cursor.at, length: cursor.length + 1)
-        return [SystemMessage.rerender]
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveUp(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage] {
+    private func moveUp(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage?] {
         let lines = textLines
         var x = 0
         var prevX = 0
@@ -303,6 +318,7 @@ class InputView: ComponentView {
             x += length
         }
 
+        let prevCursor = cursor
         if extend {
             if x == 0 {
                 cursor = Cursor(at: cursor.at, length: extend ? -cursor.at : 0)
@@ -317,10 +333,14 @@ class InputView: ComponentView {
         else {
             cursor = Cursor(at: x, length: 0)
         }
-        return [SystemMessage.rerender]
+
+        if prevCursor.at == cursor.at && prevCursor.length == cursor.length {
+            return []
+        }
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveDown(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage] {
+    private func moveDown(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage?] {
         let lines = textLines
         var x = 0
         var prevX = 0
@@ -336,6 +356,7 @@ class InputView: ComponentView {
             x += length + 1
         }
 
+        let prevCursor = cursor
         if extend {
             if x > text.characters.count {
                 cursor = Cursor(at: cursor.at, length: text.characters.count - cursor.at)
@@ -350,17 +371,25 @@ class InputView: ComponentView {
         else {
             cursor = Cursor(at: x, length: 0)
         }
-        return [SystemMessage.rerender]
+
+        if prevCursor.at == cursor.at && prevCursor.length == cursor.length {
+            return []
+        }
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToBeginning(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func moveToBeginning(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+        guard cursor.at != 0 && cursor.length != 0 else { return [] }
+
         cursor = Cursor(at: 0, length: 0)
-        return [SystemMessage.rerender]
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage] {
+    private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+        guard cursor.at != text.characters.count && cursor.length != 0 else { return [] }
+
         cursor = Cursor(at: text.characters.count, length: 0)
-        return [SystemMessage.rerender]
+        return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 }
 
@@ -385,7 +414,7 @@ extension InputView: KeyboardTrapComponent {
             key == .signal_ctrl_a ||
             key == .signal_ctrl_e
         {
-                return true
+            return true
         }
 
         return false
