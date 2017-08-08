@@ -24,7 +24,7 @@ struct AttrChar: TextType {
 }
 
 struct AttrText: TextType {
-    private var content: [TextType]
+    private(set) var content: [TextType]
 
     var chars: [AttrChar] {
         return content.flatMap { $0.chars }
@@ -59,4 +59,16 @@ extension String: TextType {
         let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
         return text.characters.map { AttrChar($0, []) }
     }
+}
+
+func + (lhs: AttrText, rhs: TextType) -> AttrText {
+    return AttrText(lhs.content + [rhs])
+}
+
+func + (lhs: AttrText, rhs: AttrText) -> AttrText {
+    return AttrText(lhs.content + rhs.content)
+}
+
+func + (lhs: TextType, rhs: TextType) -> TextType {
+    return AttrText([lhs, rhs])
 }
