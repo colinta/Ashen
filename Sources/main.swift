@@ -36,6 +36,10 @@ else if cmd == "blackbox" {
     let app = App(program: BlackBoxGame(), screen: NcursesScreen())
     state = app.run()
 }
+else if cmd == "suss" {
+    let app = App(program: Suss(), screen: NcursesScreen())
+    state = app.run()
+}
 else {
     let app = App(program: Demo(), screen: NcursesScreen())
     state = app.run()

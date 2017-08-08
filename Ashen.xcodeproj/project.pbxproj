@@ -26,6 +26,7 @@
 		1D3B292A1E6CDDC300673F6D /* HttpCommandDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B29291E6CDDC300673F6D /* HttpCommandDemo.swift */; };
 		1D3B292C1E6DBE0100673F6D /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B292B1E6DBE0100673F6D /* Command.swift */; };
 		1D3B292E1E6E1B3800673F6D /* SizeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D3B292D1E6E1B3800673F6D /* SizeDescription.swift */; };
+		1D447E841F3A3C8100013384 /* Suss.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D447E831F3A3C8100013384 /* Suss.swift */; };
 		1D51AEC41E81BF9F002AE4D3 /* AlgorithmDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51AEC31E81BF9F002AE4D3 /* AlgorithmDemo.swift */; };
 		1D51C9DF1E77348000D445BE /* Attr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9DC1E77348000D445BE /* Attr.swift */; };
 		1D51C9E01E77348000D445BE /* NcursesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9DD1E77348000D445BE /* NcursesScreen.swift */; };
@@ -95,6 +96,7 @@
 		1D3B29291E6CDDC300673F6D /* HttpCommandDemo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpCommandDemo.swift; sourceTree = "<group>"; };
 		1D3B292B1E6DBE0100673F6D /* Command.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 		1D3B292D1E6E1B3800673F6D /* SizeDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeDescription.swift; sourceTree = "<group>"; };
+		1D447E831F3A3C8100013384 /* Suss.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Suss.swift; sourceTree = "<group>"; };
 		1D51AEC31E81BF9F002AE4D3 /* AlgorithmDemo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlgorithmDemo.swift; sourceTree = "<group>"; };
 		1D51C9DC1E77348000D445BE /* Attr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Attr.swift; sourceTree = "<group>"; };
 		1D51C9DD1E77348000D445BE /* NcursesScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NcursesScreen.swift; sourceTree = "<group>"; };
@@ -157,6 +159,7 @@
 				1D3B29291E6CDDC300673F6D /* HttpCommandDemo.swift */,
 				1D1EB4001E656F7C003A2174 /* InputDemo.swift */,
 				1D1EB4011E656F7C003A2174 /* SpinnersDemo.swift */,
+				1D447E831F3A3C8100013384 /* Suss.swift */,
 			);
 			path = Demo;
 			sourceTree = "<group>";
@@ -382,6 +385,7 @@
 				1D1EB4111E68E0D7003A2174 /* WindowSpecs.swift in Sources */,
 				1D9CF0821E612418003D2A48 /* Program.swift in Sources */,
 				1D1EB4151E690021003A2174 /* Event.swift in Sources */,
+				1D447E841F3A3C8100013384 /* Suss.swift in Sources */,
 				1DEB7C781E6E5557000BA381 /* HttpSpecs.swift in Sources */,
 				1D9CF07A1E6123F5003D2A48 /* MouseEvent.swift in Sources */,
 				1D9CF0801E612418003D2A48 /* App.swift in Sources */,
