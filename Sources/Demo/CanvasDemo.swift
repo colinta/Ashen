@@ -63,22 +63,22 @@ struct CanvasDemo: Program {
         let totalSeconds = (hour * 3600 + minute * 60 + second)
 
         let hourRadius: Float = 0.6
-        let hourAngle = hour * 2 * Float(M_PI) / 12
+        let hourAngle = hour * 2 * Float.pi / 12
         let hourPt = FloatPoint(
-            x: hourRadius * cos(Float(M_PI) / 2 - hourAngle),
-            y: hourRadius * sin(Float(M_PI) / 2 - hourAngle)
+            x: hourRadius * cos(Float.pi / 2 - hourAngle),
+            y: hourRadius * sin(Float.pi / 2 - hourAngle)
             )
         let minuteRadius: Float = 0.8
-        let minuteAngle = minute * 2 * Float(M_PI) / 60
+        let minuteAngle = minute * 2 * Float.pi / 60
         let minutePt = FloatPoint(
-            x: minuteRadius * cos(Float(M_PI) / 2 - minuteAngle),
-            y: minuteRadius * sin(Float(M_PI) / 2 - minuteAngle)
+            x: minuteRadius * cos(Float.pi / 2 - minuteAngle),
+            y: minuteRadius * sin(Float.pi / 2 - minuteAngle)
             )
         let secondRadius: Float = 1
-        let secondAngle = second * 2 * Float(M_PI) / 60
+        let secondAngle = second * 2 * Float.pi / 60
         let secondPt = FloatPoint(
-            x: secondRadius * cos(Float(M_PI) / 2 - secondAngle),
-            y: secondRadius * sin(Float(M_PI) / 2 - secondAngle)
+            x: secondRadius * cos(Float.pi / 2 - secondAngle),
+            y: secondRadius * sin(Float.pi / 2 - secondAngle)
             )
 
         let canvasSize = min((screenSize.width - 2) / 2, screenSize.height - 13)
@@ -100,7 +100,25 @@ struct CanvasDemo: Program {
 
         let timeChars = ["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘",]
         let timeChr = timeChars[Int(totalSeconds * Float(timeChars.count) / 86400)]
-        return Window(components: [
+
+        let sinWaveFn: (Float) -> Float = { x in
+            return 0.5 - cos((totalSeconds + x) / 86_400 * 2 * Float.pi) / 2
+        }
+        let sinWave = CanvasView(.bottomLeft(), DesiredSize(width: screenSize.width, height: 10),
+            viewport: FloatFrame(x: -43_200, y: -1, width: 86_400, height: 2),
+            drawables: [
+                .line(FloatPoint(x: 0, y: -1), FloatPoint(x: 0, y: 1)),
+                .fn(sinWaveFn),
+            ])
+        let clock = CanvasView(.middleCenter(y: -4), DesiredSize(width: 2 * canvasSize, height: canvasSize),
+            viewport: watchFrame,
+            drawables: watchDecorations + [
+                .border,
+                .line(FloatPoint.zero, minutePt),
+                .line(FloatPoint.zero, hourPt),
+                .line(FloatPoint.zero, secondPt),
+            ])
+        let components: [Component] = [
             OnKeyPress(.key_up, { return Message.offset(3600) }),
             OnKeyPress(.key_down, { return Message.offset(-3600) }),
             OnKeyPress(.key_backspace, { return Message.offsetReset }),
@@ -108,23 +126,10 @@ struct CanvasDemo: Program {
             OnKeyPress(.key_space, { return Message.toggleAnimation }),
             timingComponent,
             LabelView(.topLeft(x: 2), text: "\(lpad(Int(hour), as: .hour)):\(lpad(Int(minute), as: .minute)):\(lpad(Int(second), as: .second))\(hour >= 12 && hour < 24 ? "pm" : "am")"),
-            CanvasView(.bottomLeft(), DesiredSize(width: screenSize.width, height: 10),
-                viewport: FloatFrame(x: -43_200, y: -1, width: 86_400, height: 2),
-                drawables: [
-                    .line(FloatPoint(x: 0, y: -1), FloatPoint(x: 0, y: 1)),
-                    .fn({ x in
-                        return 0.5 - cos((totalSeconds + x) / 86_400 * 2 * Float(M_PI)) / 2
-                    }),
-                ]),
-            CanvasView(.middleCenter(y: -4), DesiredSize(width: 2 * canvasSize, height: canvasSize),
-                viewport: watchFrame,
-                drawables: watchDecorations + [
-                    .border,
-                    .line(FloatPoint.zero, minutePt),
-                    .line(FloatPoint.zero, hourPt),
-                    .line(FloatPoint.zero, secondPt),
-                ]),
+            sinWave,
+            clock,
             LabelView(.middleCenter(x: canvasSize / 2, y: canvasSize / 4 - 4), text: timeChr),
-        ])
+        ]
+        return Window(components: components)
     }
 }

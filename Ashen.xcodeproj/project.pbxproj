@@ -30,7 +30,6 @@
 		1D51C9DF1E77348000D445BE /* Attr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9DC1E77348000D445BE /* Attr.swift */; };
 		1D51C9E01E77348000D445BE /* NcursesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9DD1E77348000D445BE /* NcursesScreen.swift */; };
 		1D51C9E11E77348000D445BE /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9DE1E77348000D445BE /* Text.swift */; };
-		1D51C9E31E773A7200D445BE /* BashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D51C9E21E773A7200D445BE /* BashScreen.swift */; };
 		1D94E8441E6C2EFF008D9D99 /* SizeDescriptionSpecs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D94E8431E6C2EFF008D9D99 /* SizeDescriptionSpecs.swift */; };
 		1D9CF0791E6123F5003D2A48 /* KeyEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9CF0751E6123F5003D2A48 /* KeyEvent.swift */; };
 		1D9CF07A1E6123F5003D2A48 /* MouseEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D9CF0761E6123F5003D2A48 /* MouseEvent.swift */; };
@@ -100,7 +99,6 @@
 		1D51C9DC1E77348000D445BE /* Attr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Attr.swift; sourceTree = "<group>"; };
 		1D51C9DD1E77348000D445BE /* NcursesScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NcursesScreen.swift; sourceTree = "<group>"; };
 		1D51C9DE1E77348000D445BE /* Text.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
-		1D51C9E21E773A7200D445BE /* BashScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BashScreen.swift; sourceTree = "<group>"; };
 		1D94E8431E6C2EFF008D9D99 /* SizeDescriptionSpecs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeDescriptionSpecs.swift; sourceTree = "<group>"; };
 		1D9CF0751E6123F5003D2A48 /* KeyEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyEvent.swift; sourceTree = "<group>"; };
 		1D9CF0761E6123F5003D2A48 /* MouseEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseEvent.swift; sourceTree = "<group>"; };
@@ -188,7 +186,6 @@
 			children = (
 				1D9CF07C1E612418003D2A48 /* App.swift */,
 				1D51C9DC1E77348000D445BE /* Attr.swift */,
-				1D51C9E21E773A7200D445BE /* BashScreen.swift */,
 				1DEB7C7B1E70A26F000BA381 /* Buffer.swift */,
 				1D1EB4071E670593003A2174 /* Component.swift */,
 				1D1EB4131E690021003A2174 /* Event.swift */,
@@ -371,7 +368,6 @@
 				1D9CF0791E6123F5003D2A48 /* KeyEvent.swift in Sources */,
 				1D9CF0B71E62B8A7003D2A48 /* Window.swift in Sources */,
 				1D9CF0901E61F2AB003D2A48 /* OnNextSpecs.swift in Sources */,
-				1D51C9E31E773A7200D445BE /* BashScreen.swift in Sources */,
 				1D9CF08A1E61CABA003D2A48 /* Mocks.swift in Sources */,
 				1D51AEC41E81BF9F002AE4D3 /* AlgorithmDemo.swift in Sources */,
 				1D9CF0AF1E629CAC003D2A48 /* LogView.swift in Sources */,

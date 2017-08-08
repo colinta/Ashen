@@ -193,7 +193,7 @@ struct App<T: Program> {
                     if newState != .continue { return newState.appState }
                     state = newState
                     model = newModel
-                    commands.append(newCommands)
+                    commands += newCommands
 
                     updateAndRender = true
                 }
