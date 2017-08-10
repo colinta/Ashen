@@ -92,7 +92,6 @@ struct App<T: Program> {
         prevState.append((model, buffer))
 
         var messageQueue: [T.MessageType] = []
-        var commandMessageQueue: [T.MessageType] = []
         let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
         let commandMessageThread = DispatchQueue(label: "commandMessageThread")
         while state == .continue {
@@ -106,10 +105,6 @@ struct App<T: Program> {
                         }
                     }
                 }
-            }
-            commandMessageThread.sync {
-                messageQueue += commandMessageQueue
-                commandMessageQueue = []
             }
             commands = []
 
