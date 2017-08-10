@@ -124,13 +124,56 @@ class InputView: ComponentView {
     }
 
     override func render(in buffer: Buffer, size: Size) {
+        guard size.width > 0 && size.height > 0 else { return }
+
         let normalCursor = self.cursor.normal
+
         var yOffset = 0
         var xOffset = 0
         var cOffset = 0
-        for char in text.characters {
-            guard yOffset < size.height else { break }
 
+        var cursorPoint: Point = .zero
+        var setCursorPoint = false
+        for char in text.characters {
+            if cOffset == normalCursor.at {
+                setCursorPoint = true
+                cursorPoint = Point(x: xOffset, y: yOffset)
+                break
+            }
+
+            if char == "\n" {
+                yOffset += 1
+                xOffset = 0
+            }
+            else {
+                xOffset += 1
+            }
+
+            cOffset += 1
+        }
+        if !setCursorPoint {
+            cursorPoint = Point(x: xOffset, y: yOffset)
+        }
+
+        let xClip: Int, yClip: Int
+        if cursorPoint.x >= size.width {
+            xClip = size.width - cursorPoint.x - 1
+        }
+        else {
+            xClip = 0
+        }
+        if cursorPoint.y >= size.height {
+            yClip = size.height - cursorPoint.y - 1
+        }
+        else {
+            yClip = 0
+        }
+
+        yOffset = 0
+        xOffset = 0
+        cOffset = 0
+
+        for char in text.characters {
             let attrs: [Attr]
             if normalCursor.length > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.length {
                 attrs = [.reverse]
@@ -158,7 +201,7 @@ class InputView: ComponentView {
                 printableChar = String(char)
             }
 
-            buffer.write(AttrChar(printableChar, attrs), x: xOffset, y: yOffset)
+            buffer.write(AttrChar(printableChar, attrs), x: xClip + xOffset, y: yClip + yOffset)
 
             if char == "\n" {
                 yOffset += 1
@@ -171,8 +214,8 @@ class InputView: ComponentView {
             cOffset += 1
         }
 
-        if isFirstResponder && normalCursor.at == text.characters.count && yOffset < size.height {
-            buffer.write(AttrChar(" ", [.underline]), x: xOffset, y: yOffset)
+        if isFirstResponder && normalCursor.at == text.characters.count {
+            buffer.write(AttrChar(" ", [.underline]), x: xOffset + xClip, y: yOffset + yClip)
         }
     }
 
@@ -198,6 +241,9 @@ class InputView: ComponentView {
         }
         else if key == .key_backspace {
             return backspace(onChange)
+        }
+        else if key == .signal_eot { // ctrl+d == delete
+            return delete(onChange)
         }
         else if key == .key_left {
             return moveLeft(onChange)
@@ -252,6 +298,26 @@ class InputView: ComponentView {
             let prev = text.index(cursorStart, offsetBy: -1)
             range = prev ..< cursorStart
             cursor = Cursor(at: normalCursor.at - 1, length: 0)
+        }
+        else {
+            let end = text.index(cursorStart, offsetBy: normalCursor.length)
+            range = cursorStart ..< end
+            cursor = Cursor(at: normalCursor.at, length: 0)
+        }
+        let nextText = text.replacingCharacters(in: range, with: "")
+        return [onCursorChange?(cursor), onChange(nextText)]
+    }
+
+    private func delete(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+        if cursor.at == text.characters.count && cursor.length == 0 { return [] }
+
+        let normalCursor = cursor.normal
+        let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
+        let range: Range<String.Index>
+        if normalCursor.length == 0 {
+            let next = text.index(cursorStart, offsetBy: 1)
+            range = cursorStart ..< next
+            cursor = Cursor(at: normalCursor.at, length: 0)
         }
         else {
             let end = text.index(cursorStart, offsetBy: normalCursor.length)
@@ -400,6 +466,7 @@ extension InputView: KeyboardTrapComponent {
         if key.isPrintable ||
             isMultiline && key == .key_enter ||
             key == .key_backspace ||
+            key == .signal_eot ||
             key == .key_left ||
             key == .key_right ||
             key == .key_shift_left ||
