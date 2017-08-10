@@ -139,7 +139,7 @@ class OnDebug: Component {
 
     override func messages(for event: Event) -> [AnyMessage] {
         switch event {
-        case let .debug(entry): return [onLogEntry(entry)]
+        case let .log(entry): return [onLogEntry(entry)]
         default: return []
         }
     }

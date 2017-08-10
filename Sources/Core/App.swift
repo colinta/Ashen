@@ -35,18 +35,18 @@ enum LoopState {
 // debugging log to output when the "outermost" application exits.
 private var runningApps: Int = 0
 
-private var logEntries: [String] = []
+private var debugEntries: [String] = []
 // prints to stdout when application exits
-func log(_ entry: Any) {
-    logEntries.append("\(entry)")
+func debug(_ entry: Any) {
+    debugEntries.append("\(entry)")
 }
 
-private var debugEntries: [String] = []
-// prints to internal debug log, using .debug system event
-func debug(_ entry: Any) {
-    if case Event.debug(_) = entry { return log(entry) }
+private var logEntries: [String] = []
+// prints to internal log, using .log system event
+func log(_ entry: Any) {
+    if case Event.log(_) = entry { return debug(entry) }
 
-    debugEntries.append("\(entry)")
+    logEntries.append("\(entry)")
 }
 
 struct App<T: Program> {
@@ -72,8 +72,8 @@ struct App<T: Program> {
         runningApps -= 1
 
         if runningApps == 0 {
-            while logEntries.count > 0 {
-                print(logEntries.removeFirst())
+            while debugEntries.count > 0 {
+                print(debugEntries.removeFirst())
             }
         }
 
@@ -223,8 +223,8 @@ struct App<T: Program> {
             }
         }
 
-        while debugEntries.count > 0 {
-            events.append(.debug(debugEntries.removeFirst()))
+        while logEntries.count > 0 {
+            events.append(.log(logEntries.removeFirst()))
         }
 
         let currentTime = mach_absolute_time()

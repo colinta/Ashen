@@ -11,7 +11,7 @@ enum Event {
     case mouse(MouseEvent, MouseInfo)
     case window(width: Int, height: Int)
     case tick(Float)
-    case debug(String)
+    case log(String)
     case unknown(Int32)
 
     var code: Int32? {
@@ -20,7 +20,7 @@ enum Event {
         case let .mouse(event, _): return event.rawValue
         case .window: return WindowEvent.resize.rawValue
         case .tick: return -1
-        case .debug: return -2
+        case .log: return -2
         case .unknown: return -3
         }
     }
