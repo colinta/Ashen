@@ -78,11 +78,13 @@ class Box: ComponentLayout {
     let size: Size
     let border: Border?
     let background: AttrChar?
+    let label: TextType?
 
-    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, components: [Component] = []) {
+    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = []) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }
+        self.label = label
         super.init()
         self.components = components
         self.location = location
@@ -93,7 +95,17 @@ class Box: ComponentLayout {
     }
 
     override func render(in buffer: Buffer, size screenSize: Size) {
-        let size: Size
+        if let label = label {
+            var xOffset = 2
+            for char in label.chars {
+                if xOffset > screenSize.width - 4 { break }
+                buffer.write(char, x: xOffset, y: 0)
+                xOffset += 1
+            }
+        }
+
+        // calculate size and offset for the inside of the box
+        let innerSize: Size
         let borderOffset: Point
         if let border = border {
             let widthClip: Int, borderX: Int
@@ -133,14 +145,9 @@ class Box: ComponentLayout {
             }
 
             borderOffset = Point(x: borderX, y: borderY)
-            size = Size(width: max(0, screenSize.width - widthClip), height: max(0, screenSize.height - heightClip))
-        }
-        else {
-            borderOffset = .zero
-            size = screenSize
-        }
+            innerSize = Size(width: max(0, screenSize.width - widthClip), height: max(0, screenSize.height - heightClip))
 
-        if let border = border {
+            // draw the border
             let minX = 0, maxX = screenSize.width - 1
             let minY = 0, maxY = screenSize.height - 1
             switch (screenSize.width, screenSize.height) {
@@ -181,11 +188,15 @@ class Box: ComponentLayout {
                 }
             }
         }
+        else {
+            borderOffset = .zero
+            innerSize = screenSize
+        }
 
-        buffer.push(offset: borderOffset, clip: size) {
+        buffer.push(offset: borderOffset, clip: innerSize) {
             for view in views.reversed() {
-                let viewSize = view.desiredSize().constrain(in: size)
-                let offset = view.location.origin(for: viewSize, in: size)
+                let viewSize = view.desiredSize().constrain(in: innerSize)
+                let offset = view.location.origin(for: viewSize, in: innerSize)
                 buffer.push(offset: offset, clip: viewSize) {
                     view.render(in: buffer, size: viewSize)
                 }
