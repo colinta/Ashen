@@ -45,6 +45,15 @@ struct BoxSpecs: Spec {
             .assertRenders(Box(.topLeft(), Size(width: 5, height: 5), border: .single, background: "_", components: [
                 LabelView(.middleCenter(), text: "hi!")
                 ]), "┌───┐\n│___│\n│hi!│\n│___│\n└───┘")
+        expect("outputs scrolled components, with border")
+            .assertRenders(Box(.topLeft(), Size(width: 5, height: 5), background: "_", components: [
+                LabelView(.topLeft(x: 0, y: 0), text: "abcdeABCDE"),
+                LabelView(.topLeft(x: 0, y: 1), text: "ABCDEabcde"),
+                LabelView(.topLeft(x: 0, y: 2), text: "1234567890"),
+                LabelView(.topLeft(x: 0, y: 3), text: "ABCDEabcde"),
+                LabelView(.topLeft(x: 0, y: 4), text: "abcdeABCDE"),
+                LabelView(.topLeft(x: 0, y: 5), text: "1234567890"),
+                ], scrollOffset: Point(x: 1, y: 1)), "BCDEa\n23456\nBCDEa\nbcdeA\n23456")
         done()
     }
 }

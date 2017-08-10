@@ -3,12 +3,28 @@
 //
 
 
-struct Size {
+struct Size: Equatable {
     var width: Int
     var height: Int
 
     static let zero = Size(width: 0, height: 0)
     static let max = Size(width: Int.max, height: Int.max)
+
+    static func == (lhs: Size, rhs: Size) -> Bool {
+        return lhs.width == rhs.width && lhs.height == rhs.height
+    }
+    static func + (lhs: Size, rhs: Size) -> Size {
+        return Size(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
+    static func - (lhs: Size, rhs: Size) -> Size {
+        return Size(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
+    }
+    static func + (lhs: Size, rhs: Point) -> Size {
+        return Size(width: lhs.width + rhs.x, height: lhs.height + rhs.y)
+    }
+    static func - (lhs: Size, rhs: Point) -> Size {
+        return Size(width: lhs.width - rhs.x, height: lhs.height - rhs.y)
+    }
 }
 
 struct DesiredSize {
@@ -25,7 +41,7 @@ struct DesiredSize {
         self.height = size.height
     }
 
-    func constrain(in size: Size) -> Size {
+    func constrain(in size: Size, scrollOffset: Point = .zero) -> Size {
         return Size(
             width: min(width ?? 0, size.width),
             height: min(height ?? 0, size.height)
@@ -40,6 +56,12 @@ struct Point: Equatable {
     static let zero = Point(x: 0, y: 0)
     static func == (lhs: Point, rhs: Point) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
+    }
+    static func + (lhs: Point, rhs: Point) -> Point {
+        return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
+    }
+    static func - (lhs: Point, rhs: Point) -> Point {
+        return Point(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }
 }
 

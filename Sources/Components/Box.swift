@@ -79,12 +79,14 @@ class Box: ComponentLayout {
     let border: Border?
     let background: AttrChar?
     let label: TextType?
+    let scrollOffset: Point
 
-    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = []) {
+    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }
         self.label = label
+        self.scrollOffset = scrollOffset
         super.init()
         self.components = components
         self.location = location
@@ -195,8 +197,8 @@ class Box: ComponentLayout {
 
         buffer.push(offset: borderOffset, clip: innerSize) {
             for view in views.reversed() {
-                let viewSize = view.desiredSize().constrain(in: innerSize)
-                let offset = view.location.origin(for: viewSize, in: innerSize)
+                let viewSize = view.desiredSize().constrain(in: innerSize) + scrollOffset
+                let offset = view.location.origin(for: viewSize, in: innerSize) - scrollOffset
                 buffer.push(offset: offset, clip: viewSize) {
                     view.render(in: buffer, size: viewSize)
                 }

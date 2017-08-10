@@ -12,7 +12,10 @@ class Buffer {
         self.size = size
     }
 
-    func push(offset nextOffset: Point, clip nextSize: Size, _ block: () -> Void) {
+    func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {
+        guard nextOffset.x < size.width && nextOffset.y < size.height else { return }
+        let nextSize = Size(width: min(size.width - nextOffset.x, nextDesiredSize.width), height: min(size.height - nextOffset.y, nextDesiredSize.height))
+        guard nextOffset.x + nextSize.width >= 0 && nextOffset.y + nextSize.height >= 0 else { return }
         guard nextSize.width > 0 && nextSize.height > 0 else { return }
 
         let prevOffset = offset
@@ -36,6 +39,10 @@ class Buffer {
 
         let x = localX + offset.x
         let y = localY + offset.y
+        guard
+            x >= 0 && y >= 0
+        else { return }
+
         var row = chars[y] ?? [:]
         if let prevText = row[x] {
             if prevText.string == nil, char.string != nil {
