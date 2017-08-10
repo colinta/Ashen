@@ -31,7 +31,7 @@ class InputView: ComponentView {
     /// If `forceCursor` is assigned, it will overide the auto-updating cursor
     let forceCursor: Cursor?
     let isFirstResponder: Bool
-    let multiline: Bool
+    let isMultiline: Bool
     var onChange: OnChangeHandler
     var onCursorChange: OnCursorChangeHandler?
     var onEnter: OnEnterHandler?
@@ -56,7 +56,7 @@ class InputView: ComponentView {
         _ size: DesiredSize = DesiredSize(),
         text: String = "",
         isFirstResponder: Bool = false,
-        multiline: Bool = false,
+        isMultiline: Bool = false,
         cursor: Cursor? = nil,
         onChange: @escaping OnChangeHandler,
         onCursorChange: OnCursorChangeHandler? = nil,
@@ -68,7 +68,7 @@ class InputView: ComponentView {
         self.onCursorChange = onCursorChange
         self.onEnter = onEnter
         self.isFirstResponder = isFirstResponder
-        self.multiline = multiline
+        self.isMultiline = isMultiline
         self.forceCursor = cursor
         self.cursor = cursor ?? Cursor.default(for: text)
         super.init()
@@ -190,7 +190,7 @@ class InputView: ComponentView {
     }
 
     private func keyEvent(_ onChange: OnChangeHandler, key: KeyEvent) -> [AnyMessage?] {
-        if key.isPrintable || (key == .key_enter && multiline) {
+        if key.isPrintable || (key == .key_enter && isMultiline) {
             return insert(onChange, string: key.toString)
         }
         else if key == .key_enter, let onEnter = onEnter {
@@ -398,7 +398,7 @@ extension InputView: KeyboardTrapComponent {
         guard isFirstResponder else { return false }
 
         if key.isPrintable ||
-            multiline && key == .key_enter ||
+            isMultiline && key == .key_enter ||
             key == .key_backspace ||
             key == .key_left ||
             key == .key_right ||

@@ -60,7 +60,7 @@ struct InputDemo: Program {
             .topLeft(x: 1, y: 3),
             text: model.secondInput,
             isFirstResponder: model.activeInput == 1,
-            multiline: true,
+            isMultiline: true,
             onChange: { model in
                 return Message.onChange(1, model)
             })
