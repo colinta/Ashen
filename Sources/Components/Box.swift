@@ -205,8 +205,8 @@ class Box: ComponentLayout {
             }
 
             if let background = background {
-                for y in 0 ..< size.height {
-                    for x in 0 ..< size.width {
+                for y in 0 ..< innerSize.height {
+                    for x in 0 ..< innerSize.width {
                         buffer.write(background, x: x, y: y)
                     }
                 }
