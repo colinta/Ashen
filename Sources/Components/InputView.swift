@@ -281,6 +281,9 @@ class InputView: ComponentView {
         }
 
         let normalCursor = cursor.normal
+        // weird escape sequences can cause this:
+        guard normalCursor.at < text.characters.count else { return [] }
+
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let end = text.index(cursorStart, offsetBy: normalCursor.length)
         let nextText = text.replacingCharacters(in: cursorStart..<end, with: insert)
