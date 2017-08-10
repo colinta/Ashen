@@ -108,6 +108,14 @@ class NcursesScreen: ScreenType {
         mousemask(0xFFFFFFF, nil)
 
         clear()
+
+        let handleWinch: @convention(c) (Int32) -> Void = { signal in
+            endwin()
+            sync {
+                windowEvent = .window(width: Int(getmaxx(stdscr)), height: Int(getmaxy(stdscr)))
+            }
+        }
+        signal(SIGWINCH, handleWinch)
     }
 
     func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {

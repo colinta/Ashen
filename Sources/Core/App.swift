@@ -49,6 +49,12 @@ func log(_ entry: Any) {
     logEntries.append("\(entry)")
 }
 
+let messageThread = DispatchQueue(label: "messageThread")
+
+func sync(_ block: @escaping () -> Void) {
+    messageThread.sync { block() }
+}
+
 struct App<T: Program> {
     let screen: ScreenType
     let program: T
@@ -93,13 +99,14 @@ struct App<T: Program> {
 
         var messageQueue: [T.MessageType] = []
         let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
-        let commandMessageThread = DispatchQueue(label: "commandMessageThread")
         while state == .continue {
+            messageThread.sync {}
+
             for command in commands {
                 commandBackgroundThread.async {
                     command.start() { msg in
                         if let msg = msg as? T.MessageType {
-                            commandMessageThread.sync {
+                            messageThread.sync {
                                 messageQueue.append(msg)
                             }
                         }
@@ -156,14 +163,18 @@ struct App<T: Program> {
                     buffer = screen.render(newWindow)
                 }
                 screen.render(buffer: buffer)
-                messageQueue = []
+                messageThread.sync {
+                    messageQueue = []
+                }
                 continue
             }
             else {
                 for event in events {
                     for message in window.messages(for: event) {
                         if let message = message as? T.MessageType {
-                            messageQueue.append(message)
+                            messageThread.sync {
+                                messageQueue.append(message)
+                            }
                         }
                         else if let message = message as? SystemMessage, inThePast == nil {
                             switch message {
@@ -183,7 +194,10 @@ struct App<T: Program> {
                     }
                     first = false
 
-                    let message = messageQueue.removeFirst()
+                    var message: T.MessageType!
+                    messageThread.sync {
+                        message = messageQueue.removeFirst()
+                    }
                     let (newModel, newCommands, newState) = program.update(model: &model, message: message)
                     if newState != .continue { return newState.appState }
                     state = newState
