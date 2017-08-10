@@ -46,15 +46,22 @@ struct GridLayoutDemo: Program {
     }
 
     func render(model: Model, in screenSize: Size) -> Component {
+        let gridSize = Size(width: screenSize.width, height: screenSize.height - 1)
         return Window(components: [
             OnKeyPress(.key_enter, { return Message.quit }),
             OnKeyPress(.key_tab, { return Message.randomize }),
-            GridLayout(.topLeft(y: 1), screenSize,
-                rows: model.rows.map { row in
-                    return .row(weight: row.weight, row.columns.map { col in
-                        let box = Box(.tl(.zero), .zero, border: nil, background: col.bg)
-                        return .column(weight: col.weight, box)
-                    })
+            GridLayout(.topLeft(y: 1), gridSize,
+                rows: model.rows.flatMap { row -> [GridLayout.Row] in
+                    let b = Box(background: "-")
+                    return [
+                        .row(weight: .relative(row.weight), row.columns.flatMap { col -> [GridLayout.Column] in
+                            return [
+                                .column(weight: .relative(col.weight), Box(background: col.bg)),
+                                .column(weight: .fixed(1), Box(background: "|"))
+                            ]
+                        }),
+                        .row(weight: .fixed(1), [b]),
+                    ]
                 }),
             ])
     }

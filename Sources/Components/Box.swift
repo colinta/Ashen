@@ -79,7 +79,7 @@ class Box: ComponentLayout {
     let border: Border?
     let background: AttrChar?
 
-    init(_ location: Location, _ size: Size, border: Border? = nil, background: TextType? = nil, components: [Component] = []) {
+    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, components: [Component] = []) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }
