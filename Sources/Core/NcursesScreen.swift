@@ -80,11 +80,12 @@ class NcursesScreen: ScreenType {
     }
 
     func nextEvent() -> Event? {
+        if let event = windowEvent {
+            windowEvent = nil
+            return event
+        }
         let e = getch()
         return Event(e)
-    }
-
-    func resized(height: Int, width: Int) {
     }
 
     func setup() {
@@ -107,6 +108,12 @@ class NcursesScreen: ScreenType {
         mousemask(0xFFFFFFF, nil)
 
         clear()
+
+        let handleWinch: @convention(c) (Int32) -> Void = { signal in
+            endwin()
+            windowEvent = .window(width: Int(getmaxx(stdscr)), height: Int(getmaxy(stdscr)))
+        }
+        signal(SIGWINCH, handleWinch)
     }
 
     func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {
@@ -142,3 +149,5 @@ class NcursesScreen: ScreenType {
         endwin()
     }
 }
+
+private var windowEvent: Event?

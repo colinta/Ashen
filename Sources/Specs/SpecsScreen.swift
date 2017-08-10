@@ -32,8 +32,4 @@ class SpecsScreen: ScreenType {
         return nil
     }
 
-    func resized(height: Int, width: Int) {
-        size = Size(width: width, height: height)
-    }
-
 }

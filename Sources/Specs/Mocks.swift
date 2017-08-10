@@ -48,7 +48,6 @@ class MockScreen: ScreenType {
     var renderedBuffer: Buffer?
     var setupCalled = 0
     var teardownCalled = 0
-    var resizedCalled = 0
 
     convenience init() {
         self.init(size: .zero)
@@ -83,10 +82,5 @@ class MockScreen: ScreenType {
     func nextEvent() -> Event? {
         guard events.count > 0 else { return nil }
         return events.removeFirst()
-    }
-
-    func resized(height: Int, width: Int) {
-        resizedCalled += 1
-        size = Size(width: width, height: height)
     }
 }

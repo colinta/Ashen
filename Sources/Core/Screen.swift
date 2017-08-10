@@ -10,6 +10,5 @@ protocol ScreenType {
     func setup()
     func teardown()
     func nextEvent() -> Event?
-    func resized(height: Int, width: Int)
     func initColor(_: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?)
 }
