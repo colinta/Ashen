@@ -19,13 +19,15 @@ struct Suss: Program {
     struct Model {
         enum Input: Int {
             static let first: Input = .url
-            static let last: Input = .headers
+            static let last: Input = .respBody
 
             case url
             case httpMethod
             case parameters
             case body
             case headers
+            case respHeaders
+            case respBody
 
             var next: Input { return Input(rawValue: rawValue + 1) ?? .first }
             var prev: Input { return Input(rawValue: rawValue - 1) ?? .last }
@@ -34,7 +36,9 @@ struct Suss: Program {
         var active: Input = .url
         var url: String = "https://"
         var httpMethod: String = "GET"
-        var parameters: [String] = []
+        var parameters: String = ""
+        var body: String = ""
+        var headers: String = ""
 
         var status: String { return "[Suss v1.0.0]"}
 
@@ -100,6 +104,12 @@ struct Suss: Program {
             switch input {
             case .url:
                 model.url = value
+            case .body:
+                model.body = value
+            case .parameters:
+                model.parameters = value
+            case .headers:
+                model.headers = value
             default:
                 break
             }
@@ -151,27 +161,57 @@ struct Suss: Program {
         }
 
         let urlLabel = Text("URL", attrs: (model.active == .url ? [.reverse] : []))
+
         let methodLabel = Text("Method", attrs: (model.active == .httpMethod ? [.reverse] : []))
-        let bodyLabel = Text("POST Body", attrs: (model.active == .body ? [.reverse] : []))
-        let headersLabel = Text("Headers", attrs: (model.active == .headers ? [.reverse] : []))
 
-        let parametersLabel = Text("GET Parameters", attrs: (model.active == .parameters ? [.reverse] : []))
-        let parameters: [Component] = model.parameters.enumerated().map { yOffset, param in
-            return LabelView(.topLeft(x: 0, y: yOffset), text: param)
-        }
+        let requestBodyLabel = Text("POST Body", attrs: (model.active == .body ? [.reverse] : []))
+        let bodyInput = InputView(
+            text: model.body,
+            isFirstResponder: model.active == .body,
+            isMultiline: true,
+            onChange: { model in
+                return Message.onChange(.body, model)
+            })
 
-        let maxSideWidth = 30
+        let requestParametersLabel = Text("GET Parameters", attrs: (model.active == .parameters ? [.reverse] : []))
+        let parametersInput = InputView(
+            text: model.parameters,
+            isFirstResponder: model.active == .parameters,
+            isMultiline: true,
+            onChange: { model in
+                return Message.onChange(.parameters, model)
+            })
+
+        let requestHeadersLabel = Text("Headers", attrs: (model.active == .headers ? [.reverse] : []))
+        let headersInput = InputView(
+            text: model.headers,
+            isFirstResponder: model.active == .headers,
+            isMultiline: true,
+            onChange: { model in
+                return Message.onChange(.headers, model)
+            })
+
+        let responseHeadersLabel = Text("Response headers", attrs: (model.active == .respHeaders ? [.reverse] : []))
+        let responseBodyLabel = Text("Response body", attrs: (model.active == .respBody ? [.reverse] : []))
+
+        let maxSideWidth = 40
         let remainingHeight = max(screenSize.height - 8, 0)
+        let requestWidth = min(maxSideWidth, screenSize.width / 3)
+        let responseWidth = screenSize.width - requestWidth
         return Window(components: [
             OnKeyPress(.key_esc, { return Message.quit }),
             OnKeyPress(.key_tab, { return Message.nextInput }),
             OnKeyPress(.key_backtab, { return Message.prevInput }),
             Box(.topLeft(x: 0, y: 0), Size(width: screenSize.width, height: 2), border: fullBorder, label: urlLabel, components: [urlInput]),
-            Box(.topLeft(x: 0, y: 3), Size(width: 38, height: 2), border: sideBorder, label: methodLabel, components: httpMethodInputs),
-            GridLayout(.topLeft(x: 0, y: 6), Size(width: min(maxSideWidth, screenSize.width / 3), height: remainingHeight), rows: [
-                .row([Box(border: sideBorder, background: "-", label: parametersLabel, components: parameters, scrollOffset: Point.zero)]),
-                .row([Box(border: sideBorder, background: "=", label: bodyLabel)]),
-                .row([Box(border: sideBorder, background: "~", label: headersLabel)]),
+            Box(.topLeft(x: 0, y: 3), Size(width: maxSideWidth, height: 2), border: sideBorder, label: methodLabel, components: httpMethodInputs),
+            GridLayout(.topLeft(x: 0, y: 6), Size(width: requestWidth, height: remainingHeight), rows: [
+                .row([Box(border: sideBorder, label: requestParametersLabel, components: [parametersInput])]),
+                .row([Box(border: sideBorder, label: requestBodyLabel, components: [bodyInput])]),
+                .row([Box(border: sideBorder, label: requestHeadersLabel, components: [headersInput])]),
+            ]),
+            GridLayout(.topLeft(x: requestWidth, y: 6), Size(width: responseWidth, height: remainingHeight), rows: [
+                .row(weight: .fixed(10), [Box(border: sideBorder, label: responseHeadersLabel, components: [])]),
+                .row([Box(border: sideBorder, label: responseBodyLabel, components: [])]),
             ]),
             Box(.bottomRight(x: 0, y: -1), Size(width: screenSize.width, height: 1), background: Text(" ", attrs: [.reverse]), components: [LabelView(text: Text(model.status, attrs: [.reverse]))]),
         ])
