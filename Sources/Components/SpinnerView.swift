@@ -16,6 +16,8 @@ private let spinners = [
 class SpinnerView: ComponentView {
     struct Model {
         static var availableSpinners: Int { return spinners.count }
+        static let `default`: Model = Model(spinner: spinners.first!)
+
         func chr(index: Int) -> String { return spinner[index] }
         let spinner: [String]
 
@@ -23,8 +25,8 @@ class SpinnerView: ComponentView {
             self.init(spinner: spinners[spinnerIndex])
         }
 
-        init(spinner: [String]? = nil) {
-            self.spinner = spinner ?? spinners.last!
+        init(spinner: [String]) {
+            self.spinner = spinner
         }
     }
 
@@ -35,7 +37,7 @@ class SpinnerView: ComponentView {
     let color: Int?
     let animating: Bool
 
-    init(_ location: Location, model: Model = Model(), color: Int? = nil, animating: Bool = true) {
+    init(_ location: Location, model: Model = Model.default, color: Int? = nil, animating: Bool = true) {
         self.model = model
         self.index = nil
         self.color = color
