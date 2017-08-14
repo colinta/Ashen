@@ -12,12 +12,12 @@ struct HttpSpecs: Spec {
         var cancelled = 0
         var request: URLRequest?
 
-        func ashen_dataTask(with request: URLRequest) -> URLSessionTaskProtocol {
+        func ashen_dataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
 
-        func ashen_downloadTask(with request: URLRequest) -> URLSessionTaskProtocol {
+        func ashen_downloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
