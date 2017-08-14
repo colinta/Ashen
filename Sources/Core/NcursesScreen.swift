@@ -90,7 +90,7 @@ class NcursesScreen: ScreenType {
 
     func setup() {
         setlocale(LC_ALL, "")
-        initscr()
+        newterm(nil, stderr, stdin)
         start_color()               // Support init_pair,
         raw()                       // Handle C-c, C-z, C-d, etc
         noecho()                    // Don't echo user input
