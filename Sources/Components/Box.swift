@@ -77,7 +77,7 @@ class Box: ComponentLayout {
 
     let size: Size
     let border: Border?
-    let background: AttrChar?
+    let background: AttrCharType?
     let label: TextType?
     let scrollOffset: Point
 

@@ -3,7 +3,7 @@
 //
 
 class Buffer {
-    typealias Chars = [Int: [Int: AttrChar]]
+    typealias Chars = [Int: [Int: AttrCharType]]
     private(set) var chars: Chars = [:]
     private var offset: Point = .zero
     private var size: Size
@@ -30,7 +30,7 @@ class Buffer {
         size = prevSize
     }
 
-    func write(_ char: AttrChar, x localX: Int, y localY: Int) {
+    func write(_ char: AttrCharType, x localX: Int, y localY: Int) {
         guard
             localX >= 0 && localY >= 0 &&
             localX < size.width && localY < size.height &&
@@ -45,8 +45,8 @@ class Buffer {
 
         var row = chars[y] ?? [:]
         if let prevText = row[x] {
-            if prevText.string == nil, char.string != nil {
-                row[x] = AttrChar(char.string, prevText.attrs)
+            if prevText.string == nil, let string = char.string {
+                row[x] = AttrChar(string, prevText.attrs)
             }
         }
         else {

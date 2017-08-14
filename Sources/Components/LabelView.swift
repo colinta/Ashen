@@ -5,12 +5,10 @@
 
 class LabelView: ComponentView {
     let size: DesiredSize
-    let lines: [TextType]
+    let chars: [AttrCharType]
 
-    var linesHeight: Int { return lines.count }
-    var linesWidth: Int { return lines.reduce(0) { length, line in
-            return max(length, line.chars.count)
-        } }
+    let linesHeight: Int
+    let linesWidth: Int
 
     override func desiredSize() -> DesiredSize {
         return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
@@ -19,35 +17,41 @@ class LabelView: ComponentView {
     init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: TextType) {
         self.size = size
 
-        var line = AttrText()
-        var lines: [TextType] = []
-        for attrChar in text.chars {
+        let chars = text.chars
+        self.chars = chars
+
+        var linesHeight = 1
+        var linesWidth = 0
+        var currentWidth = 0
+        for attrChar in chars {
             if attrChar.string == "\n" {
-                lines.append(line)
-                line = AttrText()
+                linesHeight += 1
+                linesWidth = max(linesWidth, currentWidth)
+                currentWidth = 0
             }
             else {
-                line.append(attrChar)
+                currentWidth += 1
             }
         }
-        lines.append(line)
-        self.lines = lines
+        self.linesHeight = linesHeight
+        self.linesWidth = max(linesWidth, currentWidth)
+
         super.init()
         self.location = location
     }
 
     override func render(in buffer: Buffer, size: Size) {
-        var yOffset = 0
-        for line in lines {
-            if yOffset > size.height { break }
-
-            var xOffset = 0
-            for char in line.chars {
-                if xOffset > size.width { break }
-                buffer.write(char, x: xOffset, y: yOffset)
+        var yOffset = 0, xOffset = 0
+        for attrChar in chars {
+            if attrChar.string == "\n" {
+                yOffset += 1
+                xOffset = 0
+            }
+            else {
+                if xOffset > size.width { continue }
+                buffer.write(attrChar, x: xOffset, y: yOffset)
                 xOffset += 1
             }
-            yOffset += 1
         }
     }
 }

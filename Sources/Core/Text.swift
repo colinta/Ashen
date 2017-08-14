@@ -3,22 +3,26 @@
 //
 
 
-protocol TextType {
-    var chars: [AttrChar] { get }
+protocol AttrCharType {
+    var string: String? { get }
+    var attrs: [Attr] { get }
 }
 
-struct AttrChar: TextType {
+protocol TextType {
+    var chars: [AttrCharType] { get }
+}
+
+struct AttrChar: AttrCharType {
     var string: String?
     var attrs: [Attr]
-    var chars: [AttrChar] { return [self] }
 
     init(_ string: String?, _ attrs: [Attr] = []) {
         self.string = string
         self.attrs = attrs
     }
 
-    init(_ string: Character, _ attrs: [Attr] = []) {
-        self.string = String(string)
+    init(_ char: Character, _ attrs: [Attr] = []) {
+        self.string = String(char)
         self.attrs = attrs
     }
 }
@@ -26,7 +30,7 @@ struct AttrChar: TextType {
 struct AttrText: TextType {
     private(set) var content: [TextType]
 
-    var chars: [AttrChar] {
+    var chars: [AttrCharType] {
         return content.flatMap { $0.chars }
     }
 
@@ -43,7 +47,7 @@ struct Text: TextType {
     let text: String?
     let attrs: [Attr]
 
-    var chars: [AttrChar] {
+    var chars: [AttrCharType] {
         guard let text = text else { return [AttrChar(nil, attrs)] }
         return text.characters.map { AttrChar($0, attrs) }
     }
@@ -55,10 +59,15 @@ struct Text: TextType {
 }
 
 extension String: TextType {
-    var chars: [AttrChar] {
+    var chars: [AttrCharType] {
         let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
-        return text.characters.map { AttrChar($0, []) }
+        return Array(text.characters)
     }
+}
+
+extension Character: AttrCharType {
+    var string: String? { return String(self) }
+    var attrs: [Attr] { return [] }
 }
 
 func + (lhs: AttrText, rhs: TextType) -> AttrText {

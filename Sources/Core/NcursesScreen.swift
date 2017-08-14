@@ -68,7 +68,7 @@ class NcursesScreen: ScreenType {
                     for attr in char.attrs {
                         attron(attrValue(attr))
                     }
-                    addstr(char.string)
+                    addstr(char.string ?? " ")
                     for attr in char.attrs {
                         attroff(attrValue(attr))
                     }
