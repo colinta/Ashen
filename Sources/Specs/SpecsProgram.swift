@@ -79,7 +79,7 @@ struct SpecsProgram: Program {
             if model.specs.count == 0 {
                 model.done = true
                 model.specLog.append("")
-                model.specLog.append("Completed \(specs.count) runs in \(stopTimer())")
+                model.specLog.append("Completed \(specs.count) runs in \(stopTimer())ms")
                 model.specLog.append("\(model.passed) passed \(model.failed) failed")
             }
             else {
@@ -151,9 +151,9 @@ private func startTimer() {
     t0 = Int(mach_absolute_time())
 }
 
-private func stopTimer() -> String {
+private func stopTimer() -> Int {
     let start: Int = t0!
     let now = Int(mach_absolute_time())
 
-    return "\((now - start) / 1_000_000)ms"
+    return (now - start) / 1_000_000
 }
