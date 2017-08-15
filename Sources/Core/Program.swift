@@ -32,7 +32,6 @@ func defaultSetup(screen: ScreenType) {
 }
 
 extension Program {
-
     func setup(screen: ScreenType) {
         defaultSetup(screen: screen)
     }
