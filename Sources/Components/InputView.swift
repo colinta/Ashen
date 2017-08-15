@@ -26,7 +26,7 @@ class InputView: ComponentView {
     }
 
     let size: DesiredSize
-    let text: String
+    var text: String
     var cursor: Cursor
     /// If `forceCursor` is assigned, it will overide the auto-updating cursor
     let forceCursor: Cursor?
@@ -277,6 +277,7 @@ class InputView: ComponentView {
         if cursor.at == text.characters.count && cursor.length == 0 {
             let nextText = text + insert
             cursor = Cursor(at: cursor.at + offset, length: 0)
+            text = nextText
             return [onCursorChange?(cursor), onChange(nextText)]
         }
 
@@ -288,11 +289,12 @@ class InputView: ComponentView {
         let end = text.index(cursorStart, offsetBy: normalCursor.length)
         let nextText = text.replacingCharacters(in: cursorStart..<end, with: insert)
         cursor = Cursor(at: normalCursor.at + offset, length: 0)
+        text = nextText
         return [onCursorChange?(cursor), onChange(nextText)]
     }
 
     private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        if cursor.at == 0 && cursor.length == 0 { return [] }
+        guard cursor.at > 0 || cursor.length > 0 else { return [] }
 
         let normalCursor = cursor.normal
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
@@ -308,6 +310,7 @@ class InputView: ComponentView {
             cursor = Cursor(at: normalCursor.at, length: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
+        text = nextText
         return [onCursorChange?(cursor), onChange(nextText)]
     }
 
@@ -328,6 +331,7 @@ class InputView: ComponentView {
             cursor = Cursor(at: normalCursor.at, length: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
+        text = nextText
         return [onCursorChange?(cursor), onChange(nextText)]
     }
 
