@@ -84,6 +84,7 @@ class NcursesScreen: ScreenType {
             windowEvent = nil
             return event
         }
+
         let e = getch()
         return Event(e)
     }
