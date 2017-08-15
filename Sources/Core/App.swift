@@ -100,13 +100,13 @@ struct App<T: Program> {
         var messageQueue: [T.MessageType] = []
         let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
         while state == .continue {
-            messageThread.sync {}
+            sync {}
 
             for command in commands {
                 commandBackgroundThread.async {
                     command.start() { msg in
                         if let msg = msg as? T.MessageType {
-                            messageThread.sync {
+                            sync {
                                 messageQueue.append(msg)
                             }
                         }
@@ -163,7 +163,7 @@ struct App<T: Program> {
                     buffer = screen.render(newWindow)
                 }
                 screen.render(buffer: buffer)
-                messageThread.sync {
+                sync {
                     messageQueue = []
                 }
                 continue
@@ -172,7 +172,7 @@ struct App<T: Program> {
                 for event in events {
                     for message in window.messages(for: event) {
                         if let message = message as? T.MessageType {
-                            messageThread.sync {
+                            sync {
                                 messageQueue.append(message)
                             }
                         }
@@ -188,14 +188,18 @@ struct App<T: Program> {
                 }
 
                 var first = true
-                while messageQueue.count > 0 {
+                var count: Int!
+                sync {
+                    count = messageQueue.count
+                }
+                while count > 0 {
                     if !first {
                         prevState.append((model, nil))
                     }
                     first = false
 
                     var message: T.MessageType!
-                    messageThread.sync {
+                    sync {
                         message = messageQueue.removeFirst()
                     }
                     let (newModel, newCommands, newState) = program.update(model: &model, message: message)
@@ -205,6 +209,9 @@ struct App<T: Program> {
                     commands += newCommands
 
                     updateAndRender = true
+                    sync {
+                        count = messageQueue.count
+                    }
                 }
             }
 
