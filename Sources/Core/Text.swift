@@ -49,7 +49,7 @@ struct Text: TextType {
 
     var chars: [AttrCharType] {
         guard let text = text else { return [AttrChar(nil, attrs)] }
-        return text.characters.map { AttrChar($0, attrs) }
+        return text.map { AttrChar($0, attrs) }
     }
 
     init(_ text: String?, attrs: [Attr] = []) {
@@ -61,7 +61,7 @@ struct Text: TextType {
 extension String: TextType {
     var chars: [AttrCharType] {
         let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
-        return Array(text.characters)
+        return Array(text)
     }
 }
 

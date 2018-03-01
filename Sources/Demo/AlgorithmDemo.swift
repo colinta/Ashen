@@ -42,7 +42,7 @@ struct AlgorithmDemo: Program {
             let commands: [Command]
             if !model.started {
                 model.started = true
-                let cmd = AlgorithmCommand<String>(a: model.a.characters.map { String($0) }, b: model.b.characters.map { String($0) })
+                let cmd = AlgorithmCommand<String>(a: model.a.map { String($0) }, b: model.b.map { String($0) })
                 cmd.onIter = { desc in
                     return Message.progress(desc)
                 }

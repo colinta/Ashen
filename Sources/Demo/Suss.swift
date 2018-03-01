@@ -184,7 +184,7 @@ struct Suss: Program {
         let parameters = split(model.parameters, separator: "\n")
 
         if parameters.count > 0 {
-            if !urlString.characters.contains("?") {
+            if !urlString.contains("?") {
                 urlString += "?"
             }
             else if !urlString.hasSuffix("&") {
@@ -328,7 +328,7 @@ struct Suss: Program {
         if let error = model.error {
             topLevelComponents = [
                 OnKeyPress({ _ in return Message.clearError }),
-                Box(.middleCenter(), Size(width: error.characters.count + 4, height: 5), border: .single, label: "Error", components: [
+                Box(.middleCenter(), Size(width: error.count + 4, height: 5), border: .single, label: "Error", components: [
                     LabelView(.topCenter(), text: Text(error, attrs: [.color(Attr.systemRed)])),
                     LabelView(.bottomCenter(), text: Text("< OK >", attrs: [.reverse])),
                 ]),
@@ -413,7 +413,7 @@ private func split(_ string: String, separator: Character, limit: Int? = nil, tr
     guard limit != 0 else { return [] }
 
     var count = 1
-    return string.characters.split(whereSeparator: { c -> Bool in
+    return string.split(whereSeparator: { c -> Bool in
         guard c == separator else { return false }
         guard let limit = limit else { return true }
         guard count < limit else { return false }

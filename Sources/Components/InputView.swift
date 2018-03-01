@@ -9,7 +9,7 @@ class InputView: ComponentView {
 
     struct Cursor {
         static func `default`(for text: String) -> Cursor {
-            return Cursor(at: text.characters.count, length: 0)
+            return Cursor(at: text.count, length: 0)
         }
 
         let at: Int
@@ -39,7 +39,7 @@ class InputView: ComponentView {
     var textLines: [String] {
         var line = ""
         var lines: [String] = []
-        for c in text.characters {
+        for c in text {
             if c == "\n" {
                 lines.append(line)
                 line = ""
@@ -116,7 +116,7 @@ class InputView: ComponentView {
         var calcWidth = 0
         var calcHeight = 0
         for line in textLines {
-            calcWidth = max(calcWidth, line.characters.count + 1)
+            calcWidth = max(calcWidth, line.count + 1)
             calcHeight += 1
         }
 
@@ -134,7 +134,7 @@ class InputView: ComponentView {
 
         var cursorPoint: Point = .zero
         var setCursorPoint = false
-        for char in text.characters {
+        for char in text {
             if cOffset == normalCursor.at {
                 setCursorPoint = true
                 cursorPoint = Point(x: xOffset, y: yOffset)
@@ -173,7 +173,7 @@ class InputView: ComponentView {
         xOffset = 0
         cOffset = 0
 
-        for char in text.characters {
+        for char in text {
             let attrs: [Attr]
             if normalCursor.length > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.length {
                 attrs = [.reverse]
@@ -214,7 +214,7 @@ class InputView: ComponentView {
             cOffset += 1
         }
 
-        if isFirstResponder && normalCursor.at == text.characters.count {
+        if isFirstResponder && normalCursor.at == text.count {
             buffer.write(AttrChar(" ", [.underline]), x: xOffset + xClip, y: yOffset + yClip)
         }
     }
@@ -273,8 +273,8 @@ class InputView: ComponentView {
     }
 
     private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage?] {
-        let offset = insert.characters.count
-        if cursor.at == text.characters.count && cursor.length == 0 {
+        let offset = insert.count
+        if cursor.at == text.count && cursor.length == 0 {
             let nextText = text + insert
             cursor = Cursor(at: cursor.at + offset, length: 0)
             text = nextText
@@ -283,7 +283,7 @@ class InputView: ComponentView {
 
         let normalCursor = cursor.normal
         // weird escape sequences can cause this:
-        guard normalCursor.at < text.characters.count else { return [] }
+        guard normalCursor.at < text.count else { return [] }
 
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let end = text.index(cursorStart, offsetBy: normalCursor.length)
@@ -315,7 +315,7 @@ class InputView: ComponentView {
     }
 
     private func delete(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        if cursor.at == text.characters.count && cursor.length == 0 { return [] }
+        if cursor.at == text.count && cursor.length == 0 { return [] }
 
         let normalCursor = cursor.normal
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
@@ -350,7 +350,7 @@ class InputView: ComponentView {
     private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         let normalCursor = cursor.normal
         if cursor.length == 0 {
-            let maxCursor = text.characters.count
+            let maxCursor = text.count
             cursor = Cursor(at: min(cursor.at + 1, maxCursor), length: 0)
             return [onCursorChange?(cursor), SystemMessage.rerender]
         }
@@ -367,7 +367,7 @@ class InputView: ComponentView {
     }
 
     private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        let maxCursor = text.characters.count
+        let maxCursor = text.count
         if cursor.at + cursor.length == maxCursor { return [] }
         cursor = Cursor(at: cursor.at, length: cursor.length + 1)
         return [onCursorChange?(cursor), SystemMessage.rerender]
@@ -380,7 +380,7 @@ class InputView: ComponentView {
         var prevLength = 0
         let maxX = cursor.at + cursor.length
         for line in lines {
-            let length = line.characters.count + 1
+            let length = line.count + 1
             if x + length > maxX {
                 let lineOffset = maxX - x
                 x = prevX + min(lineOffset, prevLength)
@@ -419,7 +419,7 @@ class InputView: ComponentView {
         var prevX = 0
         let maxX = cursor.at + cursor.length
         for line in lines {
-            let length = line.characters.count
+            let length = line.count
             if x > maxX {
                 let lineOffset = maxX - prevX
                 x += min(lineOffset, length)
@@ -431,15 +431,15 @@ class InputView: ComponentView {
 
         let prevCursor = cursor
         if extend {
-            if x > text.characters.count {
-                cursor = Cursor(at: cursor.at, length: text.characters.count - cursor.at)
+            if x > text.count {
+                cursor = Cursor(at: cursor.at, length: text.count - cursor.at)
             }
             else {
                 cursor = Cursor(at: cursor.at, length: x - cursor.at)
             }
         }
-        else if x > text.characters.count {
-            cursor = Cursor(at: text.characters.count, length: 0)
+        else if x > text.count {
+            cursor = Cursor(at: text.count, length: 0)
         }
         else {
             cursor = Cursor(at: x, length: 0)
@@ -459,9 +459,9 @@ class InputView: ComponentView {
     }
 
     private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != text.characters.count || cursor.length != 0 else { return [] }
+        guard cursor.at != text.count || cursor.length != 0 else { return [] }
 
-        cursor = Cursor(at: text.characters.count, length: 0)
+        cursor = Cursor(at: text.count, length: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 }
