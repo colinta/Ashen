@@ -100,14 +100,18 @@ class NcursesScreen: ScreenType {
         keypad(stdscr, true)        // Enable function and arrow keys
         curs_set(0)                 // Set cursor to invisible
         nodelay(stdscr, true)       // Don't block getch()
-        // use_default_colors()
+        use_default_colors()
 
         if COLOR_PAIRS >= 256 {
             colorIndex = 17
         }
 
-        for i: Int16 in Int16(colorIndex) ..< Int16(COLOR_PAIRS) {
-            // init_pair(i, -1, -1)
+        var color: Int16 = 0
+        for bg: Int16 in -1 ..< 16 {
+            for fg: Int16 in -1 ..< 16 {
+                init_pair(color, fg, bg)
+                color += 1
+            }
         }
 
         mousemask(0xFFFFFFF, nil)
