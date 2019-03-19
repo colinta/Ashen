@@ -98,7 +98,7 @@ enum HttpOptions {
 func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
     let headers: Http.Headers
     if let response = response as? HTTPURLResponse {
-        headers = response.allHeaderFields.flatMap { key, value -> Http.Header? in
+        headers = response.allHeaderFields.compactMap { key, value -> Http.Header? in
             guard let key = key as? String, let value = value as? String else { return nil }
             return (key, value)
         }
@@ -291,7 +291,7 @@ class Http: Command {
         urlSessionDelegate.onReceived = { data, headers, error in
             let result: HttpResult
             if let data = data {
-                result = .ok(data, headers)
+                result = .ok((data, headers))
             }
             else if let error = error {
                 result = .fail(HttpError.system(error))

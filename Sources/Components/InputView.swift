@@ -226,7 +226,7 @@ class InputView: ComponentView {
 
         switch event {
         case let .key(key):
-            return keyEvent(onChange, key: key).flatMap { $0 }
+            return keyEvent(onChange, key: key).compactMap { $0 }
         default:
             return []
         }

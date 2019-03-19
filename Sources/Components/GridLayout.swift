@@ -86,7 +86,7 @@ class GridLayout: ComponentLayout {
         }
 
         if remaining != 0 {
-            let relativeWeights = weights.enumerated().flatMap { (offset, weight) -> (Int, Float)? in
+            let relativeWeights = weights.enumerated().compactMap { (offset, weight) -> (Int, Float)? in
                 if case let .relative(value) = weight { return (offset, value) }
                 return nil
             }

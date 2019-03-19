@@ -40,6 +40,15 @@ class Expectations {
     }
 
     @discardableResult
+    func log(_ values: CustomStringConvertible...) -> Self {
+        for val in values {
+            messages.append(val.description)
+        }
+
+        return self
+    }
+
+    @discardableResult
     func assertRenders(_ lhs: ComponentView, _ rhs: String, _ addlDescription: String = "") -> Self {
         let viewSize = lhs.desiredSize().constrain(in: Size.max)
         let buffer = lhs.render(size: viewSize)

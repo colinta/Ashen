@@ -198,7 +198,7 @@ struct Suss: Program {
             }.joined(separator: "&")
         }
 
-        let headers: Http.Headers = split(model.parameters, separator: "\n").flatMap({ entries -> Http.Header? in
+        let headers: Http.Headers = split(model.parameters, separator: "\n").compactMap({ entries -> Http.Header? in
             let kvp = split(entries, separator: ":", limit: 2, trim: true)
             guard kvp.count == 2 else { return nil }
             return (kvp[0], kvp[1])

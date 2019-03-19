@@ -40,7 +40,7 @@ class ComponentView: Component {
 
 class ComponentLayout: ComponentView {
     var components: [Component] = []
-    var views: [ComponentView] { return components.flatMap { $0 as? ComponentView } }
+    var views: [ComponentView] { return components.compactMap { $0 as? ComponentView } }
 
     override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self

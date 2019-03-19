@@ -40,11 +40,13 @@ struct HttpSpecs: Spec {
 
         let mockSession = MockSession()
         let url = URL(string: "https://github.com")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
         let subject = Http(
-            request: request,
-            options: [.timeout(1), .header("Bearer-Token", "abcdef")],
+            request: URLRequest(url: url),
+            options: [
+                .method(.post),
+                .timeout(1),
+                .header("Bearer-Token", "abcdef")
+                ],
             urlSessionHandler: .mock({ newConfig in
                 config = newConfig
                 return mockSession
@@ -52,11 +54,14 @@ struct HttpSpecs: Spec {
             onReceived: { _ in
                 return "message!"
             })
+        let request = subject.request
         expect("configures timeout")
             .assert(config != nil)
             .assertEqual(config?.timeoutIntervalForResource, 1)
+        expect("configures httpMethod")
+            .assertEqual(request.httpMethod, "POST")
         expect("configures headers")
-            .assertEqual(config?.httpAdditionalHeaders?["Bearer-Token"] as? String, "abcdef" as String?)
+            .assertEqual(request.allHTTPHeaderFields?["Bearer-Token"], "abcdef" as String?)
 
         var messages: [String] = []
         subject.start() { msg in

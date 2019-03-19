@@ -429,7 +429,7 @@ extension BlackBoxGame.Board {
 
     mutating func toggleGuess(_ nextGuess: Point) {
         var removed = false
-        guesses = guesses.flatMap { (guess: Point) -> Point? in
+        guesses = guesses.compactMap { (guess: Point) -> Point? in
             if !removed && guess.x == nextGuess.x && guess.y == nextGuess.y {
                 removed = true
                 return nil
