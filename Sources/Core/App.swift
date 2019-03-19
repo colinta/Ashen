@@ -20,6 +20,10 @@ enum LoopState {
     case error
     case `continue`
 
+    var shouldQuit: Bool {
+        return self != .continue
+    }
+
     var appState: AppState {
         switch self {
         case .error:
@@ -203,7 +207,10 @@ struct App<T: Program> {
                         message = messageQueue.removeFirst()
                     }
                     let (newModel, newCommands, newState) = program.update(model: &model, message: message)
-                    if newState != .continue { return newState.appState }
+                    if newState.shouldQuit {
+                        return newState.appState
+                    }
+
                     state = newState
                     model = newModel
                     commands += newCommands

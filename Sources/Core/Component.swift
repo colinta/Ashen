@@ -85,9 +85,7 @@ class ComponentLayout: ComponentView {
         for component in components {
             guard windowIndex < prevComponents.count else { break }
 
-            if windowIndex < prevComponents.count &&
-                component != prevComponents[windowIndex]
-            {
+            if component != prevComponents[windowIndex] {
                 let restoreIndex = windowIndex
                 while component != prevComponents[windowIndex] {
                     windowIndex += 1
