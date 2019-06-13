@@ -21,14 +21,6 @@ protocol Program {
 }
 
 func defaultSetup(screen: ScreenType) {
-    screen.initColor(Attr.black, fg: (0, 0, 0), bg: nil)
-    screen.initColor(Attr.red, fg: (1000, 0, 0), bg: nil)
-    screen.initColor(Attr.green, fg: (0, 1000, 0), bg: nil)
-    screen.initColor(Attr.yellow, fg: (1000, 1000, 0), bg: nil)
-    screen.initColor(Attr.blue, fg: (0, 0, 1000), bg: nil)
-    screen.initColor(Attr.magenta, fg: (1000, 0, 1000), bg: nil)
-    screen.initColor(Attr.cyan, fg: (0, 1000, 1000), bg: nil)
-    screen.initColor(Attr.white, fg: (1000, 1000, 1000), bg: nil)
 }
 
 extension Program {

@@ -68,11 +68,8 @@ class MockScreen: ScreenType {
         self.renderedBuffer = buffer
     }
 
-    func setup() {
+    func setup() throws {
         setupCalled += 1
-    }
-
-    func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {
     }
 
     func teardown() {

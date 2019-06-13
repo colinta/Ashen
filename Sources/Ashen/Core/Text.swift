@@ -52,6 +52,10 @@ struct Text: TextType {
         return text.map { AttrChar($0, attrs) }
     }
 
+    var description: String {
+        return text ?? ""
+    }
+
     init(_ text: String?, attrs: [Attr] = []) {
         self.text = text
         self.attrs = attrs

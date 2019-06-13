@@ -24,7 +24,7 @@ class OnTick: Component {
         prevComponent.timeout = timeout
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> OnTick {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onTick
         let onTick: OnTickHandler = { dt in
@@ -59,7 +59,7 @@ class OnNext: Component {
         self.onNext = onNext
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> OnNext {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onNext
         let onNext: OnNextHandler = {
@@ -94,7 +94,7 @@ class OnKeyPress: Component {
         self.reject = reject
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> OnKeyPress {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onKey
         let onKey: OnKeyHandler = { key in
@@ -127,7 +127,7 @@ class OnDebug: Component {
         self.onLogEntry = onLogEntry
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> OnDebug {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onLogEntry
         let onLogEntry: LogHandler = { entry in
@@ -153,7 +153,7 @@ class OnResize: Component {
         self.onResize = onResize
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> OnResize {
+    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onResize
         let onResize: ResizeHandler = { size in

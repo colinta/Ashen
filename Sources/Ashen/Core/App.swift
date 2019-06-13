@@ -75,7 +75,13 @@ struct App<T: Program> {
 
     func run() -> AppState {
         runningApps += 1
-        screen.setup()
+        do {
+            try screen.setup()
+        }
+        catch {
+            return .error
+        }
+
         program.setup(screen: screen)
         let state = main()
         screen.teardown()
@@ -108,7 +114,7 @@ struct App<T: Program> {
 
             for command in commands {
                 commandBackgroundThread.async {
-                    command.start() { msg in
+                    command.start { msg in
                         if let msg = msg as? T.MessageType {
                             sync {
                                 messageQueue.append(msg)

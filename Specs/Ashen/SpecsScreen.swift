@@ -16,10 +16,7 @@ class SpecsScreen: ScreenType {
         self.buffer = buffer
     }
 
-    func setup() {
-    }
-
-    func initColor(_ index: Int, fg: (Int, Int, Int)?, bg: (Int, Int, Int)?) {
+    func setup() throws {
     }
 
     func teardown() {
