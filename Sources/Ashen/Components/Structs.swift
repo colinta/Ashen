@@ -75,7 +75,7 @@ public struct Point: Equatable {
     }
 }
 
-public struct Frame {
+public struct Rect {
     var origin: Point
     var size: Size
 }
