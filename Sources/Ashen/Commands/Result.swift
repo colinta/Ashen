@@ -2,11 +2,11 @@
 ///  Result.swift
 //
 
-enum Result<T> {
+public enum Result<T> {
     case ok(T)
     case fail(Error)
 
-    func map<U>(_ mapper: (T) throws -> U) -> Result<U> {
+    public func map<U>(_ mapper: (T) throws -> U) -> Result<U> {
         switch self {
         case let .ok(value):
             let result: Result<U>
@@ -22,7 +22,7 @@ enum Result<T> {
         }
     }
 
-    func unwrap() throws -> T {
+    public func unwrap() throws -> T {
         switch self {
         case let .ok(value):
             return value

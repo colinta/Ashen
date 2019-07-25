@@ -2,15 +2,13 @@
 ///  Program.swift
 //
 
-import Darwin.ncurses
+public typealias AnyMessage = Any
+public class AnyInstance { fileprivate init() {} }
+public let NoMessage = AnyInstance()
 
-typealias AnyMessage = Any
-struct AnyInstance {}
-let NoMessage = AnyInstance()
+public typealias AnyCommand = Any
 
-typealias AnyCommand = Any
-
-protocol Program {
+public protocol Program {
     associatedtype ModelType
     associatedtype MessageType
 
@@ -20,11 +18,7 @@ protocol Program {
     func render(model: ModelType, in screenSize: Size) -> Component
 }
 
-func defaultSetup(screen: ScreenType) {
-}
-
-extension Program {
+public extension Program {
     func setup(screen: ScreenType) {
-        defaultSetup(screen: screen)
     }
 }

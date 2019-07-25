@@ -14,25 +14,25 @@
 ///             .column(ComponentView),
 ///         ]),
 ///     ])
-class GridLayout: ComponentLayout {
-    enum Weight {
+public class GridLayout: ComponentLayout {
+    public enum Weight {
         case fixed(Int)
         case relative(Float)
     }
 
-    struct Row {
-        static func row(weight: Weight = .relative(1), _ columns: [Column] = []) -> Row {
+    public struct Row {
+        public static func row(weight: Weight = .relative(1), _ columns: [Column] = []) -> Row {
             return Row(weight: weight, columns: columns)
         }
-        static func row(weight: Weight = .relative(1), _ components: [ComponentView] = []) -> Row {
+        public static func row(weight: Weight = .relative(1), _ components: [ComponentView] = []) -> Row {
             return Row(weight: weight, columns: components.map { .column($0) })
         }
         let weight: Weight
         let columns: [Column]
     }
 
-    struct Column {
-        static func column(weight: Weight = .relative(1), _ component: ComponentView) -> Column {
+    public struct Column {
+        public static func column(weight: Weight = .relative(1), _ component: ComponentView) -> Column {
             return Column(weight: weight, component: component)
         }
         let weight: Weight
@@ -51,7 +51,7 @@ class GridLayout: ComponentLayout {
         }
     }
 
-    init(_ location: Location = .tl(.zero), _ size: Size, rows: [Row]) {
+    public init(_ location: Location = .tl(.zero), _ size: Size, rows: [Row]) {
         self.size = size
         self.rows = rows
         super.init()

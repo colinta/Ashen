@@ -3,36 +3,41 @@
 //
 
 
-struct FloatSize {
-    var width: Float
-    var height: Float
+public struct FloatSize {
+    public var width: Float
+    public var height: Float
 
-    static let zero = FloatSize(width: 0, height: 0)
+    public static let zero = FloatSize(width: 0, height: 0)
 
-    init(width: Float, height: Float) {
+    public init(width: Float, height: Float) {
         self.width = width
         self.height = height
     }
 
-    init(_ size: Size) {
+    public init(_ size: Size) {
         self.width = Float(size.width)
         self.height = Float(size.height)
     }
 
 }
 
-struct FloatPoint {
-    var x: Float
-    var y: Float
+public struct FloatPoint {
+    public var x: Float
+    public var y: Float
 
-    var round: Point {
+    public var round: Point {
         return Point(
             x: Int(0.5 + x),
             y: Int(0.5 + y)
             )
     }
 
-    static let zero = FloatPoint(x: 0, y: 0)
+    public static let zero = FloatPoint(x: 0, y: 0)
+
+    public init(x: Float, y: Float) {
+        self.x = x
+        self.y = y
+    }
 
     func map(to canvasSize: FloatSize) -> FloatPoint? {
         guard canvasSize.width > 0 && canvasSize.height > 0 else { return nil }
@@ -53,15 +58,15 @@ struct FloatPoint {
     }
 }
 
-struct FloatFrame {
-    var origin: FloatPoint
-    var size: FloatSize
+public struct FloatFrame {
+    public var origin: FloatPoint
+    public var size: FloatSize
 
-    init(x: Float, y: Float, width: Float, height: Float) {
+    public init(x: Float, y: Float, width: Float, height: Float) {
         self.init(origin: FloatPoint(x: x, y: y), size: FloatSize(width: width, height: height))
     }
 
-    init(origin: FloatPoint, size: FloatSize) {
+    public init(origin: FloatPoint, size: FloatSize) {
         self.origin = origin
         self.size = size
     }
@@ -78,10 +83,10 @@ struct FloatFrame {
         return normalize(point)?.map(to: pixelSize)
     }
 
-    var minX: Float { return min(origin.x, origin.x + size.width) }
-    var maxX: Float { return max(origin.x, origin.x + size.width) }
-    var minY: Float { return min(origin.y, origin.y + size.height) }
-    var maxY: Float { return max(origin.y, origin.y + size.height) }
-    var width: Float { return max(size.width, -size.width) }
-    var height: Float { return max(size.height, -size.height) }
+    public var minX: Float { return min(origin.x, origin.x + size.width) }
+    public var maxX: Float { return max(origin.x, origin.x + size.width) }
+    public var minY: Float { return min(origin.y, origin.y + size.height) }
+    public var maxY: Float { return max(origin.y, origin.y + size.height) }
+    public var width: Float { return max(size.width, -size.width) }
+    public var height: Float { return max(size.height, -size.height) }
 }

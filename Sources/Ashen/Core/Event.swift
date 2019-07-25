@@ -5,7 +5,7 @@
 import Darwin.ncurses
 import Termbox
 
-enum Event {
+public enum Event {
     case key(KeyEvent)
     case mouse(Int, Int)
     case window(width: Int, height: Int)

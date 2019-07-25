@@ -1,3 +1,0 @@
-enum WindowEvent {
-    case resize
-}

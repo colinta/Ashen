@@ -3,18 +3,14 @@
 //
 
 
-class LabelView: ComponentView {
+public class LabelView: ComponentView {
     let size: DesiredSize
     let chars: [AttrCharType]
 
     let linesHeight: Int
     let linesWidth: Int
 
-    override func desiredSize() -> DesiredSize {
-        return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
-    }
-
-    init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: TextType) {
+    public init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: TextType) {
         self.size = size
 
         let chars = text.chars
@@ -38,6 +34,10 @@ class LabelView: ComponentView {
 
         super.init()
         self.location = location
+    }
+
+    override func desiredSize() -> DesiredSize {
+        return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
     }
 
     override func render(in buffer: Buffer, size: Size) {

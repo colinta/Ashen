@@ -3,7 +3,7 @@
 //
 
 
-class Component: Equatable {
+public class Component: Equatable {
     var id: String = ""
 
     func messages(for _: Event) -> [AnyMessage] {
@@ -19,30 +19,30 @@ class Component: Equatable {
     func render(in _: Buffer, size _: Size) {
     }
 
-    func map<T, U>(_: @escaping (T) -> U) -> Self {
+    public func map<T, U>(_: @escaping (T) -> U) -> Self {
         return self
     }
 
     func merge(with _: Component) {
     }
 
-    static func == (lhs: Component, rhs: Component) -> Bool {
+    public static func == (lhs: Component, rhs: Component) -> Bool {
         return type(of: lhs) == type(of: rhs) && lhs.id == rhs.id
     }
 }
 
-class ComponentView: Component {
+public class ComponentView: Component {
     var location: Location = .topLeft()
     func desiredSize() -> DesiredSize {
         return DesiredSize()
     }
 }
 
-class ComponentLayout: ComponentView {
+public class ComponentLayout: ComponentView {
     var components: [Component] = []
     var views: [ComponentView] { return components.compactMap { $0 as? ComponentView } }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
         window.components = components.map { comp in
             return comp.map(mapper)

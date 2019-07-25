@@ -5,13 +5,13 @@
 import Foundation
 
 
-enum HttpError: Error {
+public enum HttpError: Error {
     case system(Error)
     case noDataAtUrl(URL)
     case unknown
 }
 
-enum HttpOptions {
+public enum HttpOptions {
     // mixing concerns here, but it's easy & handy to have these as "options"
     // rather than additional arguments.  background & ephemeral control what
     // type of URLSessionConfiguration object is created.
@@ -51,7 +51,7 @@ enum HttpOptions {
      * shouldUseExtendedBackgroundIdleMode(Bool)
      */
 
-    func apply(toConfig config: URLSessionConfiguration) {
+    public func apply(toConfig config: URLSessionConfiguration) {
         switch self {
         case let .timeout(value):
             config.timeoutIntervalForRequest = value
@@ -72,10 +72,7 @@ enum HttpOptions {
         }
     }
 
-    func apply(toSession session: URLSessionProtocol) {
-    }
-
-    func apply(toRequest request: inout URLRequest) {
+    public func apply(toRequest request: inout URLRequest) {
         switch self {
         case let .method(method):
             request.httpMethod = method.rawValue
@@ -93,6 +90,9 @@ enum HttpOptions {
             break
         }
     }
+
+    public func apply(toSession session: URLSessionProtocol) {
+    }
 }
 
 func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
@@ -109,19 +109,19 @@ func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
     return headers
 }
 
-protocol URLSessionProtocol: class {
+public protocol URLSessionProtocol: class {
     func ashen_dataTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
     func ashen_downloadTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
     func ashen_cancel()
 }
 extension URLSession: URLSessionProtocol {
-    func ashen_dataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+    public func ashen_dataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
         return dataTask(with: request) { data, response, error in
             completionHandler?(data, responseToHeaders(response), error)
         }
     }
 
-    func ashen_downloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+    public func ashen_downloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
         return downloadTask(with: request) { url, response, error in
             if let url = url,
                 let data = try? Data(contentsOf: url, options: [])
@@ -134,23 +134,23 @@ extension URLSession: URLSessionProtocol {
         }
     }
 
-    func ashen_cancel() {
+    public func ashen_cancel() {
         invalidateAndCancel()
     }
 }
 
 
-protocol URLSessionTaskProtocol: class {
+public protocol URLSessionTaskProtocol: class {
     func ashen_start()
 }
 extension URLSessionTask: URLSessionTaskProtocol {
-    func ashen_start() {
+    public func ashen_start() {
         resume()
     }
 }
 
 
-enum URLSessionHandler {
+public enum URLSessionHandler {
     case system
     case mock((URLSessionConfiguration) -> URLSessionProtocol)
 
@@ -165,8 +165,8 @@ enum URLSessionHandler {
 }
 
 
-class Http: Command {
-    enum Method: String {
+public class Http: Command {
+    public enum Method: String {
         case get = "GET"
         case post = "POST"
         case put = "PUT"
@@ -176,20 +176,20 @@ class Http: Command {
         case options = "OPTIONS"
     }
 
-    class Delegate: NSObject {
-        typealias OnProgressHandler = ((Float) -> Void)
-        typealias OnReceivedHandler = ((Data?, Http.Headers, Error?) -> Void)
+    public class Delegate: NSObject {
+        public typealias OnProgressHandler = ((Float) -> Void)
+        public typealias OnReceivedHandler = ((Data?, Http.Headers, Error?) -> Void)
 
         var lastSentProgress = Date()
         var onReceived: OnReceivedHandler?
         var onProgress: OnProgressHandler?
     }
 
-    typealias Header = (String, String)
-    typealias Headers = [Header]
-    typealias HttpResult = Result<(Data, Headers)>
-    typealias OnProgressHandler = (Float) -> AnyMessage?
-    typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
+    public typealias Header = (String, String)
+    public typealias Headers = [Header]
+    public typealias HttpResult = Result<(Data, Headers)>
+    public typealias OnProgressHandler = (Float) -> AnyMessage?
+    public typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
 
     let urlSessionDelegate = Delegate()
     let request: URLRequest
@@ -197,33 +197,33 @@ class Http: Command {
     var onProgress: OnProgressHandler?
     var onReceived: OnReceivedHandler
 
-    static func get(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func get(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.get)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func post(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func post(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.post)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func put(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func put(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.put)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func patch(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func patch(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.patch)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func delete(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func delete(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.delete)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func head(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func head(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.head)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    static func options(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func options(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.options)] + options, onProgress: onProgress, onReceived: onReceived)
     }
 
-    convenience init(url: URL, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
+    public convenience init(url: URL, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
         self.init(request: URLRequest(url: url), options: [.method(.options)] + options, onProgress: onProgress, onReceived: onReceived)
     }
 
-    init(request _request: URLRequest, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
+    public init(request _request: URLRequest, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
         var request = _request
 
         var isEphemeral = false
@@ -265,7 +265,7 @@ class Http: Command {
         }
     }
 
-    func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+    public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let command = self
         let myReceived = self.onReceived
         let onReceived: (HttpResult) -> U? = { result in
@@ -283,11 +283,11 @@ class Http: Command {
         return command
     }
 
-    func cancel() {
+    public func cancel() {
         session.ashen_cancel()
     }
 
-    func start(_ done: @escaping (AnyMessage) -> Void) {
+    public func start(_ done: @escaping (AnyMessage) -> Void) {
         urlSessionDelegate.onReceived = { data, headers, error in
             let result: HttpResult
             if let data = data {
@@ -341,7 +341,7 @@ extension Http.Delegate: URLSessionDataDelegate {
 }
 extension Http.Delegate: URLSessionDownloadDelegate {
     @available(OSX 10.9, *)
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo url: URL) {
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo url: URL) {
         // guard let onReceived = onReceived else { return }
         // if let data = try? Data(contentsOf: url, options: []) {
         //     onReceived(data, nil)
@@ -351,7 +351,7 @@ extension Http.Delegate: URLSessionDownloadDelegate {
         // }
     }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten totalWritten: Int64, totalBytesExpectedToWrite expected: Int64) {
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten totalWritten: Int64, totalBytesExpectedToWrite expected: Int64) {
         guard expected > 0, Date().timeIntervalSince(lastSentProgress) > 0.1 else { return }
         onProgress?(Float(totalWritten) / Float(expected))
         lastSentProgress = Date()

@@ -3,9 +3,9 @@
 //
 
 
-class Window: ComponentLayout {
+public class Window: ComponentLayout {
 
-    convenience init(components: [Component]) {
+    public convenience init(components: [Component]) {
         self.init()
         self.components = components
     }

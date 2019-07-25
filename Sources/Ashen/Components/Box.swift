@@ -2,8 +2,8 @@
 ///  Box.swift
 //
 
-class Box: ComponentLayout {
-    struct Border {
+public class Box: ComponentLayout {
+    public struct Border {
         let dot: String
         let topCap: String
         let bottomCap: String
@@ -20,7 +20,7 @@ class Box: ComponentLayout {
         let rightSide: String
         let lrSide: String
 
-        init(
+        public init(
             dot: String? = nil, topCap: String? = nil, bottomCap: String? = nil, leftCap: String? = nil, rightCap: String? = nil,
             tlCorner: String, trCorner: String, blCorner: String, brCorner: String,
             tbSide: String, topSide: String? = nil, bottomSide: String? = nil,
@@ -46,27 +46,27 @@ class Box: ComponentLayout {
 
         }
 
-        static let lame = Border(
+        public static let lame = Border(
             tlCorner: "+", trCorner: "+", blCorner: "+", brCorner: "+",
             tbSide: "-",
             lrSide: "|"
             )
-        static let single = Border(
+        public static let single = Border(
             dot: "◻︎", topCap: "┬", bottomCap: "┴", leftCap: "├", rightCap: "┤",
             tlCorner: "┌", trCorner: "┐", blCorner: "└", brCorner: "┘",
             tbSide: "─", lrSide: "│"
             )
-        static let double = Border(
+        public static let double = Border(
             dot: "◻︎", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
             tlCorner: "╔", trCorner: "╗", blCorner: "╚", brCorner: "╝",
             tbSide: "═", lrSide: "║"
             )
-        static let rounded = Border(
+        public static let rounded = Border(
             dot: "▢", topCap: "╷", bottomCap: "╵", leftCap: "╶", rightCap: "╴",
             tlCorner: "╭", trCorner: "╮", blCorner: "╰", brCorner: "╯",
             tbSide: "─", lrSide: "│"
             )
-        static let bold = Border(
+        public static let bold = Border(
             dot: "◼︎", topCap: "┳", bottomCap: "┻", leftCap: "┣", rightCap: "┫",
             tlCorner: "┏", trCorner: "┓", blCorner: "┗", brCorner: "┛",
             tbSide: "━", lrSide: "┃"
@@ -81,7 +81,7 @@ class Box: ComponentLayout {
     let label: TextType?
     let scrollOffset: Point
 
-    init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
+    public init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }

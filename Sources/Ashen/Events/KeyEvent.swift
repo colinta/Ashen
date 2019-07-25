@@ -1,4 +1,4 @@
-enum KeyEvent: Int32 {
+public enum KeyEvent: UInt16 {
     case signal_ctrl_at = 0        // @
     case signal_ctrl_a = 1         // a
     case signal_ctrl_b = 2         // b
@@ -167,44 +167,49 @@ enum KeyEvent: Int32 {
     case key_pageup = 339
     case key_end = 360
 
+    case key_delete
+    case key_insert
+
+    case unrecognized = 0xffff
+
     // any signals that have common unix meaning are
     // named after that signal
     // (eg C-c int, C-t info, C-z suspend, C-\ quit)
     //
     // the rest are named after ASCII codes from http://www.ascii-code.com
-    static var signal_nul: KeyEvent { return signal_ctrl_at }
-    static var signal_soh: KeyEvent { return signal_ctrl_a }
-    static var signal_stx: KeyEvent { return signal_ctrl_b }
-    static var signal_int: KeyEvent { return signal_ctrl_c }
-    static var signal_eot: KeyEvent { return signal_ctrl_d }
-    static var signal_enq: KeyEvent { return signal_ctrl_e }
-    static var signal_ack: KeyEvent { return signal_ctrl_f }
-    static var signal_bel: KeyEvent { return signal_ctrl_g }
-    static var signal_bs: KeyEvent { return signal_ctrl_h_broken }
-    static var signal_lf: KeyEvent { return signal_ctrl_j }
-    static var signal_vt: KeyEvent { return signal_ctrl_k }
-    static var signal_ff: KeyEvent { return signal_ctrl_l }
-    static var signal_so: KeyEvent { return signal_ctrl_n }
-    static var signal_discard: KeyEvent { return signal_ctrl_o }
-    static var signal_dle: KeyEvent { return signal_ctrl_p }
-    static var signal_start: KeyEvent { return signal_ctrl_q }
-    static var signal_reprint: KeyEvent { return signal_ctrl_r }
-    static var signal_stop: KeyEvent { return signal_ctrl_s }
-    static var signal_info: KeyEvent { return signal_ctrl_t }
-    static var signal_kill: KeyEvent { return signal_ctrl_u }
-    static var signal_next: KeyEvent { return signal_ctrl_v }
-    static var signal_etb: KeyEvent { return signal_ctrl_w }
-    static var signal_cancel: KeyEvent { return signal_ctrl_x }
-    static var signal_dsusp: KeyEvent { return signal_ctrl_y }
-    static var signal_suspend: KeyEvent { return signal_ctrl_z }
-    static var signal_quit: KeyEvent { return signal_ctrl_bslash }
-    static var signal_gs: KeyEvent { return signal_ctrl_rbracket }
-    static var signal_rs: KeyEvent { return signal_ctrl_caret }
-    static var signal_us: KeyEvent { return signal_ctrl_fslash }
-    static var signal_h: KeyEvent { return signal_ctrl_h }
+    public static let signal_nul: KeyEvent = .signal_ctrl_at
+    public static let signal_soh: KeyEvent = .signal_ctrl_a
+    public static let signal_stx: KeyEvent = .signal_ctrl_b
+    public static let signal_int: KeyEvent = .signal_ctrl_c
+    public static let signal_eot: KeyEvent = .signal_ctrl_d
+    public static let signal_enq: KeyEvent = .signal_ctrl_e
+    public static let signal_ack: KeyEvent = .signal_ctrl_f
+    public static let signal_bel: KeyEvent = .signal_ctrl_g
+    public static let signal_bs: KeyEvent = .signal_ctrl_h_broken
+    public static let signal_lf: KeyEvent = .signal_ctrl_j
+    public static let signal_vt: KeyEvent = .signal_ctrl_k
+    public static let signal_ff: KeyEvent = .signal_ctrl_l
+    public static let signal_so: KeyEvent = .signal_ctrl_n
+    public static let signal_discard: KeyEvent = .signal_ctrl_o
+    public static let signal_dle: KeyEvent = .signal_ctrl_p
+    public static let signal_start: KeyEvent = .signal_ctrl_q
+    public static let signal_reprint: KeyEvent = .signal_ctrl_r
+    public static let signal_stop: KeyEvent = .signal_ctrl_s
+    public static let signal_info: KeyEvent = .signal_ctrl_t
+    public static let signal_kill: KeyEvent = .signal_ctrl_u
+    public static let signal_next: KeyEvent = .signal_ctrl_v
+    public static let signal_etb: KeyEvent = .signal_ctrl_w
+    public static let signal_cancel: KeyEvent = .signal_ctrl_x
+    public static let signal_dsusp: KeyEvent = .signal_ctrl_y
+    public static let signal_suspend: KeyEvent = .signal_ctrl_z
+    public static let signal_quit: KeyEvent = .signal_ctrl_bslash
+    public static let signal_gs: KeyEvent = .signal_ctrl_rbracket
+    public static let signal_rs: KeyEvent = .signal_ctrl_caret
+    public static let signal_us: KeyEvent = .signal_ctrl_fslash
+    public static let signal_h: KeyEvent = .signal_ctrl_h
 }
 
-extension KeyEvent {
+public extension KeyEvent {
     var isPrintable: Bool {
         return self.rawValue >= 32 && self.rawValue < 127
     }
@@ -246,6 +251,8 @@ extension KeyEvent {
         case .key_esc: return "\\["
 
         case .key_backspace: return "⌫"
+        case .key_delete: return "⌦"
+        case .key_insert: return "⌅"
 
         case .key_down: return "↓"
         case .key_up: return "↑"
@@ -381,6 +388,8 @@ extension KeyEvent {
         case .letter_x: return "x"
         case .letter_y: return "y"
         case .letter_z: return "z"
+
+        case .unrecognized: return "<?>"
         }
     }
 }

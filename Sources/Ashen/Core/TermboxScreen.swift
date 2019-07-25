@@ -6,13 +6,10 @@
 import Termbox
 
 
-class TermboxScreen: ScreenType {
-    var size: Size { return Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
-    var colorIndex: Int = 1
+public class TermboxScreen: ScreenType {
+    public var size: Size { return Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
 
-    private var windowEvent: Event?
-
-    init() {
+    public init() {
     }
 
     private func attrValue(_ attrs: [Attr]) -> Int32 {
@@ -30,13 +27,13 @@ class TermboxScreen: ScreenType {
         return 0
     }
 
-    func render(_ component: Component) -> Buffer {
-        let buffer = component.render(size: size)
+    public func render(window: Component) -> Buffer {
+        let buffer = window.render(size: size)
         render(buffer: buffer)
         return buffer
     }
 
-    func render(buffer: Buffer) {
+    public func render(buffer: Buffer) {
         let chars = buffer.chars
 
         Termbox.clear()
@@ -49,7 +46,7 @@ class TermboxScreen: ScreenType {
                 // for attr in char.attrs {
                 //     attron(attrValue(attr))
                 // }
-                // Termbox.put(x: Int32(x), y: Int32(y), character: (char.string ?? " ") as UnicodeScalar)
+                Termbox.puts(x: Int32(x), y: Int32(y), string: char.string ?? "")
                 // for attr in char.attrs {
                 //     attroff(attrValue(attr))
                 // }
@@ -59,18 +56,13 @@ class TermboxScreen: ScreenType {
         Termbox.present()
     }
 
-    func nextEvent() -> Event? {
-        if let event = windowEvent {
-            windowEvent = nil
-            return event
-        }
-
+    public func nextEvent() -> Event? {
         let e = Termbox.peekEvent(timeoutInMilliseconds: 15)  // 15ms ~= 1/60s
         switch e {
-        case let .key(modifier, value):
-            return .key(.signal_ctrl_c)
-        case let .character(modifier, value):
-            return .key(.signal_ctrl_c)
+        case let .key(_, value):
+            return .key(termBoxKey(value))
+        case let .character(_, value):
+            return .key(termBoxCharacter(value))
         case let .resize(width, height):
             return .window(width: Int(width), height: Int(height))
         case let .mouse(x, y):
@@ -82,12 +74,138 @@ class TermboxScreen: ScreenType {
         }
     }
 
-    func setup() throws {
+    public func setup() throws {
         try Termbox.initialize()
         Termbox.present()
     }
 
-    func teardown() {
+    public func teardown() {
         Termbox.shutdown()
+    }
+
+    private func termBoxKey(_ key: Key) -> KeyEvent {
+        debug("=============== \(#file) line \(#line) ===============")
+        debug("key: \(key)")
+        switch key {
+        case .ctrl2:
+            return .signal_ctrl_at
+        case .ctrlA:
+            return .signal_ctrl_a
+        case .ctrlB:
+            return .signal_ctrl_b
+        case .ctrlC:
+            return .signal_ctrl_c
+        case .ctrlD:
+            return .signal_ctrl_d
+        case .ctrlE:
+            return .signal_ctrl_e
+        case .ctrlF:
+            return .signal_ctrl_f
+        case .ctrlG:
+            return .signal_ctrl_g
+        case .backspace:
+            return .key_backspace
+        case .tab:
+            return .key_tab
+        case .ctrlJ:
+            return .signal_ctrl_j
+        case .ctrlK:
+            return .signal_ctrl_k
+        case .ctrlL:
+            return .signal_ctrl_l
+        case .enter:
+            return .key_enter
+        case .ctrlN:
+            return .signal_ctrl_n
+        case .ctrlO:
+            return .signal_ctrl_o
+        case .ctrlP:
+            return .signal_ctrl_p
+        case .ctrlQ:
+            return .signal_ctrl_q
+        case .ctrlR:
+            return .signal_ctrl_r
+        case .ctrlS:
+            return .signal_ctrl_s
+        case .ctrlT:
+            return .signal_ctrl_t
+        case .ctrlU:
+            return .signal_ctrl_u
+        case .ctrlV:
+            return .signal_ctrl_v
+        case .ctrlW:
+            return .signal_ctrl_w
+        case .ctrlX:
+            return .signal_ctrl_x
+        case .ctrlY:
+            return .signal_ctrl_y
+        case .ctrlZ:
+            return .signal_ctrl_z
+        case .esc:
+            return .key_esc
+        case .ctrlBackslash:
+            return .signal_ctrl_bslash
+        case .ctrlRightBracket:
+            return .signal_ctrl_rbracket
+        case .ctrl6:
+            fatalError("here")
+            // return .unrecognized
+        case .ctrlSlash:
+            return .signal_ctrl_fslash
+        case .space:
+            return .key_space
+        case .f1:
+            return .key_f1
+        case .f2:
+            return .key_f2
+        case .f3:
+            return .key_f3
+        case .f4:
+            return .key_f4
+        case .f5:
+            return .key_f5
+        case .f6:
+            return .key_f6
+        case .f7:
+            return .key_f7
+        case .f8:
+            return .key_f8
+        case .f9:
+            return .key_f9
+        case .f10:
+            return .key_f10
+        case .f11:
+            return .key_f11
+        case .f12:
+            return .key_f12
+        case .insert:
+            return .key_insert
+        case .delete:
+            return .key_delete
+        case .home:
+            return .key_home
+        case .end:
+            return .key_end
+        case .pageUp:
+            return .key_pageup
+        case .pageDown:
+            return .key_pagedown
+        case .arrowUp:
+            return .key_up
+        case .arrowDown:
+            return .key_down
+        case .arrowLeft:
+            return .key_left
+        case .arrowRight:
+            return .key_right
+        default:
+            return .unrecognized
+        }
+    }
+
+    private func termBoxCharacter(_ character: UnicodeScalar) -> KeyEvent {
+        debug("=============== \(#file) line \(#line) ===============")
+        debug("character: \(character)")
+        return KeyEvent(rawValue: UInt16(character.value)) ?? .unrecognized
     }
 }

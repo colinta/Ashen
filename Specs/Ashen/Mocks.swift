@@ -44,7 +44,7 @@ struct MockProgram: Program {
 class MockScreen: ScreenType {
     var size: Size
     var events: [Event] = []
-    var renderedComponent: Component?
+    var renderedWindow: Window?
     var renderedBuffer: Buffer?
     var setupCalled = 0
     var teardownCalled = 0
@@ -57,9 +57,9 @@ class MockScreen: ScreenType {
         self.size = size
     }
 
-    func render(_ component: Component) -> Buffer {
-        renderedComponent = component
-        let buffer = component.render(size: size)
+    func render(window: Component) -> Buffer {
+        renderedWindow = window
+        let buffer = window.render(size: size)
         render(buffer: buffer)
         return buffer
     }

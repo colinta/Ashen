@@ -5,17 +5,17 @@
 import Foundation
 
 
-enum SystemMessage {
+public enum SystemMessage {
     case quit
     case rerender
 }
 
-enum AppState {
+public enum AppState {
     case quit
     case error
 }
 
-enum LoopState {
+public enum LoopState {
     case quit
     case error
     case `continue`
@@ -41,13 +41,13 @@ private var runningApps: Int = 0
 
 private var debugEntries: [String] = []
 // prints to stdout when application exits
-func debug(_ entry: Any) {
+public func debug(_ entry: Any) {
     debugEntries.append("\(entry)")
 }
 
 private var logEntries: [String] = []
 // prints to internal log, using .log system event
-func log(_ entry: Any) {
+public func log(_ entry: Any) {
     if case Event.log(_) = entry { return debug(entry) }
 
     logEntries.append("\(entry)")
@@ -59,12 +59,12 @@ func sync(_ block: @escaping () -> Void) {
     messageThread.sync { block() }
 }
 
-struct App<T: Program> {
+public struct App<T: Program> {
     let screen: ScreenType
     let program: T
     private let timeFactor: Float
 
-    init(program: T, screen: ScreenType) {
+    public init(program: T, screen: ScreenType) {
         self.program = program
         self.screen = screen
 
@@ -73,7 +73,7 @@ struct App<T: Program> {
         timeFactor = Float(info.numer) / Float(info.denom) / 1_000_000_000
     }
 
-    func run() -> AppState {
+    public func run() -> AppState {
         runningApps += 1
         do {
             try screen.setup()
@@ -96,7 +96,7 @@ struct App<T: Program> {
         return state
     }
 
-    func main() -> AppState {
+    private func main() -> AppState {
         var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
         var prevState: [(T.ModelType, Buffer?)] = []
@@ -104,7 +104,7 @@ struct App<T: Program> {
         var (model, commands) = program.initial()
 
         var window = program.render(model: model, in: screen.size)
-        let buffer = screen.render(window)
+        let buffer = screen.render(window: window)
         prevState.append((model, buffer))
 
         var messageQueue: [T.MessageType] = []
@@ -170,7 +170,7 @@ struct App<T: Program> {
                 }
                 else {
                     let newWindow = program.render(model: model, in: screen.size)
-                    buffer = screen.render(newWindow)
+                    buffer = screen.render(window: newWindow)
                 }
                 screen.render(buffer: buffer)
                 sync {
@@ -235,7 +235,7 @@ struct App<T: Program> {
             }
 
             if updateAndRender || rerender {
-                let buffer = screen.render(window)
+                let buffer = screen.render(window: window)
                 prevState.append((model, buffer))
             }
         }

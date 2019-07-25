@@ -3,15 +3,15 @@
 //
 
 
-class OnTick: Component {
-    typealias OnTickHandler = (Float) -> AnyMessage
+public class OnTick: Component {
+    public typealias OnTickHandler = (Float) -> AnyMessage
     var onTick: OnTickHandler
     var every: Float
     var timeout: Float
     /// Restart the onTick timer
     var reset: Bool
 
-    init(_ onTick: @escaping OnTickHandler, every: Float = 0.001, reset: Bool = false) {
+    public init(_ onTick: @escaping OnTickHandler, every: Float = 0.001, reset: Bool = false) {
         self.onTick = onTick
         self.every = every
         self.timeout = every
@@ -24,7 +24,7 @@ class OnTick: Component {
         prevComponent.timeout = timeout
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onTick
         let onTick: OnTickHandler = { dt in
@@ -51,15 +51,15 @@ class OnTick: Component {
     }
 }
 
-class OnNext: Component {
-    typealias OnNextHandler = () -> AnyMessage
+public class OnNext: Component {
+    public typealias OnNextHandler = () -> AnyMessage
     var onNext: OnNextHandler
 
-    init(_ onNext: @escaping OnNextHandler) {
+    public init(_ onNext: @escaping OnNextHandler) {
         self.onNext = onNext
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onNext
         let onNext: OnNextHandler = {
@@ -77,24 +77,24 @@ class OnNext: Component {
     }
 }
 
-class OnKeyPress: Component {
-    typealias OnKeyHandler = (KeyEvent) -> AnyMessage
-    typealias EmptyKeyHandler = () -> AnyMessage
+public class OnKeyPress: Component {
+    public typealias OnKeyHandler = (KeyEvent) -> AnyMessage
+    public typealias EmptyKeyHandler = () -> AnyMessage
     var onKey: OnKeyHandler
     var filter: [KeyEvent]
     var reject: [KeyEvent]
 
-    convenience init(_ key: KeyEvent, _ onKey: @escaping EmptyKeyHandler) {
+    public convenience init(_ key: KeyEvent, _ onKey: @escaping EmptyKeyHandler) {
         self.init({ _ in return onKey() }, filter: [key])
     }
 
-    init(_ onKey: @escaping OnKeyHandler, filter: [KeyEvent] = [], reject: [KeyEvent] = []) {
+    public init(_ onKey: @escaping OnKeyHandler, filter: [KeyEvent] = [], reject: [KeyEvent] = []) {
         self.onKey = onKey
         self.filter = filter
         self.reject = reject
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onKey
         let onKey: OnKeyHandler = { key in
@@ -119,15 +119,15 @@ class OnKeyPress: Component {
     }
 }
 
-class OnDebug: Component {
-    typealias LogHandler = (String) -> AnyMessage
+public class OnDebug: Component {
+    public typealias LogHandler = (String) -> AnyMessage
     var onLogEntry: LogHandler
 
-    init(_ onLogEntry: @escaping LogHandler) {
+    public init(_ onLogEntry: @escaping LogHandler) {
         self.onLogEntry = onLogEntry
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onLogEntry
         let onLogEntry: LogHandler = { entry in
@@ -145,15 +145,15 @@ class OnDebug: Component {
     }
 }
 
-class OnResize: Component {
-    typealias ResizeHandler = (Size) -> AnyMessage
+public class OnResize: Component {
+    public typealias ResizeHandler = (Size) -> AnyMessage
     var onResize: ResizeHandler
 
-    init(_ onResize: @escaping ResizeHandler) {
+    public init(_ onResize: @escaping ResizeHandler) {
         self.onResize = onResize
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onResize
         let onResize: ResizeHandler = { size in

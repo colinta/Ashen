@@ -13,19 +13,24 @@ private let spinners = [
     ["⠉", "⠑", "⠃", "⠊", "⠒", "⠢", "⠆", "⠔", "⠤", "⢄", "⡄", "⡠", "⣀", "⢄", "⢠", "⡠", "⠤", "⠢", "⠰", "⠔", "⠒", "⠑", "⠘", "⠊"],
 ]
 
-class SpinnerView: ComponentView {
-    struct Model {
-        static var availableSpinners: Int { return spinners.count }
-        static let `default`: Model = Model(spinner: spinners.first!)
+public class SpinnerView: ComponentView {
+    public struct Model {
+        public static var availableSpinners: Int { return spinners.count }
+        public static let heroku: Model = Model(spinner: spinners[0])
+        public static let dot: Model = Model(spinner: spinners[1])
+        public static let snake: Model = Model(spinner: spinners[2])
+        public static let ladder: Model = Model(spinner: spinners[3])
+        public static let bounce: Model = Model(spinner: spinners[4])
+        public static let `default`: Model = .heroku
 
         func chr(index: Int) -> String { return spinner[index] }
         let spinner: [String]
 
-        init(spinner spinnerIndex: Int) {
+        public init(spinner spinnerIndex: Int) {
             self.init(spinner: spinners[spinnerIndex])
         }
 
-        init(spinner: [String]) {
+        public init(spinner: [String]) {
             self.spinner = spinner
         }
     }
@@ -37,7 +42,7 @@ class SpinnerView: ComponentView {
     let color: Int?
     let animating: Bool
 
-    init(_ location: Location, model: Model = Model.default, color: Int? = nil, animating: Bool = true) {
+    public init(_ location: Location, model: Model = Model.default, color: Int? = nil, animating: Bool = true) {
         self.model = model
         self.index = nil
         self.color = color

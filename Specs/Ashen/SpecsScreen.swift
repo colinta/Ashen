@@ -6,8 +6,8 @@ class SpecsScreen: ScreenType {
     var size: Size = Size.max
     var buffer: Buffer?
 
-    func render(_ component: Component) -> Buffer {
-        let buffer = component.render(size: size)
+    func render(window: Component) -> Buffer {
+        let buffer = window.render(size: size)
         render(buffer: buffer)
         return buffer
     }

@@ -3,40 +3,45 @@
 //
 
 
-struct Size: Equatable {
-    var width: Int
-    var height: Int
+public struct Size: Equatable {
+    public var width: Int
+    public var height: Int
 
-    static let zero = Size(width: 0, height: 0)
-    static let max = Size(width: Int.max, height: Int.max)
-
-    static func == (lhs: Size, rhs: Size) -> Bool {
-        return lhs.width == rhs.width && lhs.height == rhs.height
-    }
-    static func + (lhs: Size, rhs: Size) -> Size {
-        return Size(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
-    }
-    static func - (lhs: Size, rhs: Size) -> Size {
-        return Size(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
-    }
-    static func + (lhs: Size, rhs: Point) -> Size {
-        return Size(width: lhs.width + rhs.x, height: lhs.height + rhs.y)
-    }
-    static func - (lhs: Size, rhs: Point) -> Size {
-        return Size(width: lhs.width - rhs.x, height: lhs.height - rhs.y)
-    }
-}
-
-struct DesiredSize {
-    var width: Int?
-    var height: Int?
-
-    init(width: Int? = nil, height: Int? = nil) {
+    public init(width: Int, height: Int) {
         self.width = width
         self.height = height
     }
 
-    init(_ size: Size) {
+    public static let zero = Size(width: 0, height: 0)
+    public static let max = Size(width: Int.max, height: Int.max)
+
+    public static func == (lhs: Size, rhs: Size) -> Bool {
+        return lhs.width == rhs.width && lhs.height == rhs.height
+    }
+    public static func + (lhs: Size, rhs: Size) -> Size {
+        return Size(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
+    public static func - (lhs: Size, rhs: Size) -> Size {
+        return Size(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
+    }
+    public static func + (lhs: Size, rhs: Point) -> Size {
+        return Size(width: lhs.width + rhs.x, height: lhs.height + rhs.y)
+    }
+    public static func - (lhs: Size, rhs: Point) -> Size {
+        return Size(width: lhs.width - rhs.x, height: lhs.height - rhs.y)
+    }
+}
+
+public struct DesiredSize {
+    public var width: Int?
+    public var height: Int?
+
+    public init(width: Int? = nil, height: Int? = nil) {
+        self.width = width
+        self.height = height
+    }
+
+    public init(_ size: Size) {
         self.width = size.width
         self.height = size.height
     }
@@ -49,48 +54,53 @@ struct DesiredSize {
     }
 }
 
-struct Point: Equatable {
-    var x: Int
-    var y: Int
+public struct Point: Equatable {
+    public var x: Int
+    public var y: Int
 
-    static let zero = Point(x: 0, y: 0)
-    static func == (lhs: Point, rhs: Point) -> Bool {
+    public init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
+
+    public static let zero = Point(x: 0, y: 0)
+    public static func == (lhs: Point, rhs: Point) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
-    static func + (lhs: Point, rhs: Point) -> Point {
+    public static func + (lhs: Point, rhs: Point) -> Point {
         return Point(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
     }
-    static func - (lhs: Point, rhs: Point) -> Point {
+    public static func - (lhs: Point, rhs: Point) -> Point {
         return Point(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }
 }
 
-struct Frame {
+public struct Frame {
     var origin: Point
     var size: Size
 }
 
-enum Location {
-    static func at(x: Int = 0, y: Int = 0) -> Location { return .tl(Point(x: x, y: y)) }
-    static func at(_ point: Point) -> Location { return .tl(point) }
-    static func topLeft(x: Int = 0, y: Int = 0) -> Location { return .tl(Point(x: x, y: y)) }
-    static func topLeft(_ point: Point) -> Location { return .tl(point) }
-    static func topCenter(x: Int = 0, y: Int = 0) -> Location { return .tc(Point(x: x, y: y)) }
-    static func topCenter(_ point: Point) -> Location { return .tc(point) }
-    static func topRight(x: Int = 0, y: Int = 0) -> Location { return .tr(Point(x: x, y: y)) }
-    static func topRight(_ point: Point) -> Location { return .tr(point) }
-    static func middleLeft(x: Int = 0, y: Int = 0) -> Location { return .ml(Point(x: x, y: y)) }
-    static func middleLeft(_ point: Point) -> Location { return .ml(point) }
-    static func middleCenter(x: Int = 0, y: Int = 0) -> Location { return .mc(Point(x: x, y: y)) }
-    static func middleCenter(_ point: Point) -> Location { return .mc(point) }
-    static func middleRight(x: Int = 0, y: Int = 0) -> Location { return .mr(Point(x: x, y: y)) }
-    static func middleRight(_ point: Point) -> Location { return .mr(point) }
-    static func bottomLeft(x: Int = 0, y: Int = 0) -> Location { return .bl(Point(x: x, y: y)) }
-    static func bottomLeft(_ point: Point) -> Location { return .bl(point) }
-    static func bottomCenter(x: Int = 0, y: Int = 0) -> Location { return .bc(Point(x: x, y: y)) }
-    static func bottomCenter(_ point: Point) -> Location { return .bc(point) }
-    static func bottomRight(x: Int = 0, y: Int = 0) -> Location { return .br(Point(x: x, y: y)) }
-    static func bottomRight(_ point: Point) -> Location { return .br(point) }
+public enum Location {
+    public static func at(x: Int = 0, y: Int = 0) -> Location { return .tl(Point(x: x, y: y)) }
+    public static func at(_ point: Point) -> Location { return .tl(point) }
+    public static func topLeft(x: Int = 0, y: Int = 0) -> Location { return .tl(Point(x: x, y: y)) }
+    public static func topLeft(_ point: Point) -> Location { return .tl(point) }
+    public static func topCenter(x: Int = 0, y: Int = 0) -> Location { return .tc(Point(x: x, y: y)) }
+    public static func topCenter(_ point: Point) -> Location { return .tc(point) }
+    public static func topRight(x: Int = 0, y: Int = 0) -> Location { return .tr(Point(x: x, y: y)) }
+    public static func topRight(_ point: Point) -> Location { return .tr(point) }
+    public static func middleLeft(x: Int = 0, y: Int = 0) -> Location { return .ml(Point(x: x, y: y)) }
+    public static func middleLeft(_ point: Point) -> Location { return .ml(point) }
+    public static func middleCenter(x: Int = 0, y: Int = 0) -> Location { return .mc(Point(x: x, y: y)) }
+    public static func middleCenter(_ point: Point) -> Location { return .mc(point) }
+    public static func middleRight(x: Int = 0, y: Int = 0) -> Location { return .mr(Point(x: x, y: y)) }
+    public static func middleRight(_ point: Point) -> Location { return .mr(point) }
+    public static func bottomLeft(x: Int = 0, y: Int = 0) -> Location { return .bl(Point(x: x, y: y)) }
+    public static func bottomLeft(_ point: Point) -> Location { return .bl(point) }
+    public static func bottomCenter(x: Int = 0, y: Int = 0) -> Location { return .bc(Point(x: x, y: y)) }
+    public static func bottomCenter(_ point: Point) -> Location { return .bc(point) }
+    public static func bottomRight(x: Int = 0, y: Int = 0) -> Location { return .br(Point(x: x, y: y)) }
+    public static func bottomRight(_ point: Point) -> Location { return .br(point) }
 
     case tl(Point)
     case tc(Point)

@@ -2,8 +2,8 @@
 ///  CanvasView.swift
 //
 
-class CanvasView: ComponentView {
-    enum Drawable {
+public class CanvasView: ComponentView {
+    public enum Drawable {
         case line(FloatPoint, FloatPoint)
         case box(FloatPoint, FloatSize)
         case fn((Float) -> Float)
@@ -32,7 +32,7 @@ class CanvasView: ComponentView {
             }
         }
 
-        func drawFunction(in canvas: PixelCanvas, _ function: (Float) -> Float, viewport: FloatFrame, pixelSize: Size) {
+        private func drawFunction(in canvas: PixelCanvas, _ function: (Float) -> Float, viewport: FloatFrame, pixelSize: Size) {
             let x0 = viewport.minX
             let x1 = viewport.maxX
             let dx = viewport.width / Float(pixelSize.width - 1)
@@ -47,7 +47,7 @@ class CanvasView: ComponentView {
             }
         }
 
-        func drawLine(in canvas: PixelCanvas, _ a: FloatPoint, _ b: FloatPoint, viewport: FloatFrame, pixelSize: Size) {
+        private func drawLine(in canvas: PixelCanvas, _ a: FloatPoint, _ b: FloatPoint, viewport: FloatFrame, pixelSize: Size) {
             guard
                 let pa: FloatPoint = viewport.normalize(a)?.map(to: FloatSize(pixelSize)),
                 let pb: FloatPoint = viewport.normalize(b)?.map(to: FloatSize(pixelSize))
@@ -90,7 +90,7 @@ class CanvasView: ComponentView {
             }
         }
 
-        func drawBox(in canvas: PixelCanvas, _ origin: FloatPoint, _ size: FloatSize, viewport: FloatFrame, pixelSize: Size) {
+        private func drawBox(in canvas: PixelCanvas, _ origin: FloatPoint, _ size: FloatSize, viewport: FloatFrame, pixelSize: Size) {
             guard size.width > 0 && size.height > 0 else { return }
 
             guard
@@ -101,7 +101,7 @@ class CanvasView: ComponentView {
             return drawAbsBox(in: canvas, Point(x: p0.x, y: p0.y), Size(width: p1.x - p0.x, height: p1.y - p0.y))
         }
 
-        func drawAbsBox(in canvas: PixelCanvas, _ origin: Point, _ size: Size) {
+        private func drawAbsBox(in canvas: PixelCanvas, _ origin: Point, _ size: Size) {
             let (x0, y0) = (min(origin.x, origin.x + size.width), min(origin.y, origin.y + size.height))
             let (x1, y1) = (max(origin.x, origin.x + size.width), max(origin.y, origin.y + size.height))
 
@@ -178,7 +178,7 @@ class CanvasView: ComponentView {
     let viewport: FloatFrame
     let drawables: [Drawable]
 
-    init(_ location: Location, _ size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
+    public init(_ location: Location, _ size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
         self.size = size
         self.viewport = viewport
         self.drawables = drawables

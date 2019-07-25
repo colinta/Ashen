@@ -2,7 +2,7 @@
 ///  Chars.swift
 //
 
-class Buffer {
+public class Buffer {
     typealias Chars = [Int: [Int: AttrCharType]]
     private(set) var chars: Chars = [:]
     private var offset: Point = .zero
@@ -60,5 +60,23 @@ class Buffer {
             row[x] = char
         }
         chars[y] = row
+    }
+}
+
+extension Buffer: CustomStringConvertible {
+    public var description: String {
+        var description = ""
+        for j in 0 ..< size.height {
+            for i in 0 ..< size.width {
+                guard let c = (chars[j] ?? [:])[i]
+                else {
+                    description += " "
+                    continue
+                }
+                description += c.string ?? " "
+            }
+            description += "\n"
+        }
+        return description
     }
 }

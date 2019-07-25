@@ -2,12 +2,12 @@
 ///  InputView.swift
 //
 
-class InputView: ComponentView {
-    typealias OnChangeHandler = ((String) -> AnyMessage)
-    typealias OnCursorChangeHandler = ((Cursor) -> AnyMessage)
-    typealias OnEnterHandler = (() -> AnyMessage)
+public class InputView: ComponentView {
+    public typealias OnChangeHandler = ((String) -> AnyMessage)
+    public typealias OnCursorChangeHandler = ((Cursor) -> AnyMessage)
+    public typealias OnEnterHandler = (() -> AnyMessage)
 
-    struct Cursor {
+    public struct Cursor {
         static func `default`(for text: String) -> Cursor {
             return Cursor(at: text.count, length: 0)
         }
@@ -25,8 +25,8 @@ class InputView: ComponentView {
         }
     }
 
-    let size: DesiredSize
     var text: String
+    let size: DesiredSize
     var cursor: Cursor
     /// If `forceCursor` is assigned, it will overide the auto-updating cursor
     let forceCursor: Cursor?
@@ -52,7 +52,7 @@ class InputView: ComponentView {
         return lines
     }
 
-    init(_ location: Location = .tl(.zero),
+    public init(_ location: Location = .tl(.zero),
         _ size: DesiredSize = DesiredSize(),
         text: String = "",
         isFirstResponder: Bool = false,
@@ -75,7 +75,7 @@ class InputView: ComponentView {
         self.location = location
     }
 
-    override func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myChange = self.onChange
         let onChange: OnChangeHandler = { text in

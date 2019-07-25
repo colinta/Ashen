@@ -6,13 +6,13 @@
 /// Usage:
 ///     FlowLayout(location, size, orientation, components: [ComponentView])
 ///     FlowLayout(location, size, orientation, direction: .ltr, components: [ComponentView])
-class FlowLayout: ComponentLayout {
-    enum Orientation {
+public class FlowLayout: ComponentLayout {
+    public enum Orientation {
         case vertical
         case horizontal
     }
 
-    enum Direction {
+    public enum Direction {
         case ltr
         case rtl
     }
@@ -21,19 +21,19 @@ class FlowLayout: ComponentLayout {
     let direction: Direction
     let size: Size
 
-    static func horizontal(_ size: Size, direction: Direction = .ltr, components: [Component]) -> FlowLayout {
+    public static func horizontal(_ size: Size, direction: Direction = .ltr, components: [Component]) -> FlowLayout {
         return FlowLayout(.tl(.zero), size, orientation: .horizontal, direction: direction, components: components)
     }
 
-    static func vertical(_ size: Size, direction: Direction = .ltr, components: [Component]) -> FlowLayout {
+    public static func vertical(_ size: Size, direction: Direction = .ltr, components: [Component]) -> FlowLayout {
         return FlowLayout(.tl(.zero), size, orientation: .vertical, direction: direction, components: components)
     }
 
-    convenience init(_ size: Size, orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
+    public convenience init(_ size: Size, orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
         self.init(.tl(.zero), size, orientation: orientation, direction: direction, components: components)
     }
 
-    init(_ location: Location, _ size: Size, orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
+    public init(_ location: Location, _ size: Size, orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
         self.size = size
         self.orientation = orientation
         self.direction = direction
@@ -55,7 +55,7 @@ class FlowLayout: ComponentLayout {
         }
     }
 
-    func horizontalLayout(in buffer: Buffer, size screenSize: Size) {
+    private func horizontalLayout(in buffer: Buffer, size screenSize: Size) {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var rowHeight = 0
@@ -90,7 +90,7 @@ class FlowLayout: ComponentLayout {
         }
     }
 
-    func verticalLayout(in buffer: Buffer, size screenSize: Size) {
+    private func verticalLayout(in buffer: Buffer, size screenSize: Size) {
         var viewX = direction == .ltr ? 0 : screenSize.width
         var viewY = 0
         var colWidth = 0
