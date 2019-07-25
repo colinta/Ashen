@@ -12,11 +12,11 @@ public class Component: Equatable {
 
     func render(size: Size) -> Buffer {
         let buffer = Buffer(size: size)
-        render(in: buffer, size: size)
+        render(to: buffer, in: Rect(size: size))
         return buffer
     }
 
-    func render(in _: Buffer, size _: Size) {
+    func render(to _: Buffer, in _: Rect) {
     }
 
     public func map<T, U>(_: @escaping (T) -> U) -> Self {
@@ -42,7 +42,7 @@ public class ComponentLayout: ComponentView {
     var components: [Component] = []
     var views: [ComponentView] { return components.compactMap { $0 as? ComponentView } }
 
-        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+    override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
         window.components = components.map { comp in
             return comp.map(mapper)
@@ -73,8 +73,8 @@ public class ComponentLayout: ComponentView {
         return components.flatMap { $0.messages(for: event) }
     }
 
-    override func render(in buffer: Buffer, size screenSize: Size) {
-        Window.render(views: views, in: buffer, size: screenSize)
+    override func render(to buffer: Buffer, in rect: Rect) {
+        Window.render(views: views, to: buffer, in: rect)
     }
 
     override func merge(with prevComponent: Component) {

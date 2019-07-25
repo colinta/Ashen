@@ -31,7 +31,7 @@ struct MockProgram: Program {
         return (mockModel, [], .continue)
     }
 
-    func render(model: Any, in screenSize: Size) -> Component {
+    func render(model: Any, in size: Size) -> Component {
         if let component = component {
             return Window(components: [component, OnNext({ return Continue() })])
         }

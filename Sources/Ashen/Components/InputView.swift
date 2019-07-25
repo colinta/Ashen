@@ -123,8 +123,8 @@ public class InputView: ComponentView {
         return DesiredSize(width: calcWidth, height: max(1, calcHeight))
     }
 
-    override func render(in buffer: Buffer, size: Size) {
-        guard size.width > 0 && size.height > 0 else { return }
+    override func render(to buffer: Buffer, in rect: Rect) {
+        guard rect.size.width > 0 && rect.size.height > 0 else { return }
 
         let normalCursor = self.cursor.normal
 
@@ -156,14 +156,14 @@ public class InputView: ComponentView {
         }
 
         let xClip: Int, yClip: Int
-        if cursorPoint.x >= size.width {
-            xClip = size.width - cursorPoint.x - 1
+        if cursorPoint.x >= rect.size.width {
+            xClip = rect.size.width - cursorPoint.x - 1
         }
         else {
             xClip = 0
         }
-        if cursorPoint.y >= size.height {
-            yClip = size.height - cursorPoint.y - 1
+        if cursorPoint.y >= rect.size.height {
+            yClip = rect.size.height - cursorPoint.y - 1
         }
         else {
             yClip = 0

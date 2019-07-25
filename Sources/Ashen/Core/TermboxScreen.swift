@@ -148,8 +148,7 @@ public class TermboxScreen: ScreenType {
         case .ctrlRightBracket:
             return .signal_ctrl_rbracket
         case .ctrl6:
-            fatalError("here")
-            // return .unrecognized
+            return .signal_ctrl_6
         case .ctrlSlash:
             return .signal_ctrl_fslash
         case .space:
@@ -204,8 +203,10 @@ public class TermboxScreen: ScreenType {
     }
 
     private func termBoxCharacter(_ character: UnicodeScalar) -> KeyEvent {
+        let key = KeyEvent(rawValue: UInt16(character.value)) ?? .unrecognized
         debug("=============== \(#file) line \(#line) ===============")
         debug("character: \(character)")
-        return KeyEvent(rawValue: UInt16(character.value)) ?? .unrecognized
+        debug("key: \(key)")
+        return key
     }
 }

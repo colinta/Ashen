@@ -42,7 +42,7 @@ public class SpinnerView: ComponentView {
     let color: Int?
     let animating: Bool
 
-    public init(_ location: Location, model: Model = Model.default, color: Int? = nil, animating: Bool = true) {
+    public init(_ location: Location = .mc(.zero), model: Model = Model.default, color: Int? = nil, animating: Bool = true) {
         self.model = model
         self.index = nil
         self.color = color
@@ -61,7 +61,7 @@ public class SpinnerView: ComponentView {
         return DesiredSize(width: 1, height: 1)
     }
 
-    override func render(in buffer: Buffer, size _: Size) {
+    override func render(to buffer: Buffer, in _: Rect) {
         let chr = model.chr(index: index ?? 0)
         let attrs: [Attr]
         if let color = color {

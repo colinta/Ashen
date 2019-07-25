@@ -46,27 +46,27 @@ public class FlowLayout: ComponentLayout {
         return DesiredSize(size)
     }
 
-    override func render(in buffer: Buffer, size screenSize: Size) {
+    override func render(to buffer: Buffer, in rect: Rect) {
         switch orientation {
         case .horizontal:
-            horizontalLayout(in: buffer, size: screenSize)
+            horizontalLayout(to: buffer, in: Rect(size: rect.size))
         case .vertical:
-            verticalLayout(in: buffer, size: screenSize)
+            verticalLayout(to: buffer, in: Rect(size: rect.size))
         }
     }
 
-    private func horizontalLayout(in buffer: Buffer, size screenSize: Size) {
-        var viewX = direction == .ltr ? 0 : screenSize.width
+    private func horizontalLayout(to buffer: Buffer, in rect: Rect) {
+        var viewX = direction == .ltr ? 0 : rect.size.width
         var viewY = 0
         var rowHeight = 0
         for view in views {
-            let viewSize = view.desiredSize().constrain(in: screenSize)
+            let viewSize = view.desiredSize().constrain(in: rect.size)
 
             rowHeight = max(rowHeight, viewSize.height)
 
             let offset: Point
             if direction == .ltr {
-                if viewX + viewSize.width > screenSize.width {
+                if viewX + viewSize.width > rect.size.width {
                     viewY += rowHeight
                     rowHeight = viewSize.height
                     viewX = 0
@@ -79,27 +79,27 @@ public class FlowLayout: ComponentLayout {
                 if viewX < 0 {
                     viewY += rowHeight
                     rowHeight = viewSize.height
-                    viewX = screenSize.width - viewSize.width
+                    viewX = rect.size.width - viewSize.width
                 }
                 offset = Point(x: viewX, y: viewY)
             }
 
             buffer.push(offset: offset, clip: viewSize) {
-                view.render(in: buffer, size: viewSize)
+                view.render(to: buffer, in: Rect(size: viewSize))
             }
         }
     }
 
-    private func verticalLayout(in buffer: Buffer, size screenSize: Size) {
-        var viewX = direction == .ltr ? 0 : screenSize.width
+    private func verticalLayout(to buffer: Buffer, in rect: Rect) {
+        var viewX = direction == .ltr ? 0 : rect.size.width
         var viewY = 0
         var colWidth = 0
         for view in views {
-            let viewSize = view.desiredSize().constrain(in: screenSize)
+            let viewSize = view.desiredSize().constrain(in: rect.size)
 
             colWidth = max(colWidth, viewSize.width)
 
-            if viewY + viewSize.height > screenSize.height {
+            if viewY + viewSize.height > rect.size.height {
                 if direction == .ltr {
                     viewX += colWidth
                 }
@@ -120,7 +120,7 @@ public class FlowLayout: ComponentLayout {
             viewY += viewSize.height
 
             buffer.push(offset: offset, clip: viewSize) {
-                view.render(in: buffer, size: viewSize)
+                view.render(to: buffer, in: Rect(size: viewSize))
             }
         }
     }

@@ -169,6 +169,7 @@ public enum KeyEvent: UInt16 {
 
     case key_delete
     case key_insert
+    case signal_ctrl_6
 
     case unrecognized = 0xffff
 
@@ -253,6 +254,7 @@ public extension KeyEvent {
         case .key_backspace: return "⌫"
         case .key_delete: return "⌦"
         case .key_insert: return "⌅"
+        case .signal_ctrl_6: return "^6"
 
         case .key_down: return "↓"
         case .key_up: return "↑"

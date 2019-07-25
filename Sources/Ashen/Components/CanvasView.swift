@@ -2,6 +2,8 @@
 ///  CanvasView.swift
 //
 
+private let BRAILLE_START = 0x2800
+
 public class CanvasView: ComponentView {
     public enum Drawable {
         case line(FloatPoint, FloatPoint)
@@ -141,7 +143,7 @@ public class CanvasView: ComponentView {
             return on ? 1 : 0
         }
 
-        func render(in buffer: Buffer) {
+        func render(to buffer: Buffer) {
             var py = 0
             let dy = 4
             var sy = 0
@@ -160,7 +162,7 @@ public class CanvasView: ComponentView {
                     let b8 = status(px + 1, py + 3)
                     let unicode = b1 + b2 << 1 + b3 << 2 + b4 << 3 + b5 << 4 + b6 << 5 + b7 << 6 + b8 << 7
                     if unicode > 0,
-                        let char = UnicodeScalar(0x2800 + unicode).map({ String(describing: $0) })
+                        let char = UnicodeScalar(BRAILLE_START + unicode).map({ String(describing: $0) })
                     {
                         buffer.write(AttrChar(char), x: sx, y: sy)
                     }
@@ -178,7 +180,7 @@ public class CanvasView: ComponentView {
     let viewport: FloatFrame
     let drawables: [Drawable]
 
-    public init(_ location: Location, _ size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
+    public init(_ location: Location = .tl(.zero), _ size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
         self.size = size
         self.viewport = viewport
         self.drawables = drawables
@@ -190,13 +192,15 @@ public class CanvasView: ComponentView {
         return size
     }
 
-    override func render(in buffer: Buffer, size: Size) {
-        let drawWidth = size.width * 2
-        let drawHeight = size.height * 4
+    override func render(to buffer: Buffer, in rect: Rect) {
+        let drawSize = Size(
+            width: rect.size.width * 2, // braille characters are 2 columns
+            height: rect.size.height * 4 // and 4 rows
+            )
         let canvas = PixelCanvas()
         for drawable in drawables {
-            drawable.draw(in: canvas, viewport: viewport, pixelSize: Size(width: drawWidth, height: drawHeight))
+            drawable.draw(in: canvas, viewport: viewport, pixelSize: drawSize)
         }
-        canvas.render(in: buffer)
+        canvas.render(to: buffer)
     }
 }

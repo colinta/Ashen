@@ -14,12 +14,12 @@ public class Window: ComponentLayout {
         return DesiredSize(width: Int.max, height: Int.max)
     }
 
-    static func render(views: [ComponentView], in buffer: Buffer, size screenSize: Size) {
+    static func render(views: [ComponentView], to buffer: Buffer, in rect: Rect) {
         for view in views.reversed() {
-            let viewSize = view.desiredSize().constrain(in: screenSize)
-            let offset = view.location.origin(for: viewSize, in: screenSize)
+            let viewSize = view.desiredSize().constrain(in: rect.size)
+            let offset = view.location.origin(for: viewSize, in: rect.size) - rect.origin
             buffer.push(offset: offset, clip: viewSize) {
-                view.render(in: buffer, size: viewSize)
+                view.render(to: buffer, in: Rect(size: viewSize))
             }
         }
     }

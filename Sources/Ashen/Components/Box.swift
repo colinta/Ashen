@@ -96,11 +96,11 @@ public class Box: ComponentLayout {
         return DesiredSize(size)
     }
 
-    override func render(in buffer: Buffer, size screenSize: Size) {
+    override func render(to buffer: Buffer, in rect: Rect) {
         if let label = label {
             var xOffset = 2
             for char in label.chars {
-                if xOffset > screenSize.width - 4 { break }
+                if xOffset > rect.size.width - 4 { break }
                 buffer.write(char, x: xOffset, y: 0)
                 xOffset += 1
             }
@@ -147,18 +147,18 @@ public class Box: ComponentLayout {
             }
 
             borderOffset = Point(x: borderX, y: borderY)
-            innerSize = Size(width: max(0, screenSize.width - widthClip), height: max(0, screenSize.height - heightClip))
+            innerSize = Size(width: max(0, rect.size.width - widthClip), height: max(0, rect.size.height - heightClip))
 
             // draw the border
-            let minX = 0, maxX = screenSize.width - 1
-            let minY = 0, maxY = screenSize.height - 1
-            switch (screenSize.width, screenSize.height) {
+            let minX = 0, maxX = rect.size.width - 1
+            let minY = 0, maxY = rect.size.height - 1
+            switch (rect.size.width, rect.size.height) {
             case (1, 1):
                 buffer.write(AttrChar(border.dot), x: minX, y: minY)
             case (_, 1):
                 buffer.write(AttrChar(border.leftCap), x: minX, y: minY)
                 buffer.write(AttrChar(border.rightCap), x: maxX, y: minY)
-                if screenSize.width > 2 {
+                if rect.size.width > 2 {
                     for x in 1 ..< maxX {
                         buffer.write(AttrChar(border.tbSide), x: x, y: minY)
                     }
@@ -166,7 +166,7 @@ public class Box: ComponentLayout {
             case (1, _):
                 buffer.write(AttrChar(border.topCap), x: minX, y: minY)
                 buffer.write(AttrChar(border.bottomCap), x: minX, y: maxY)
-                if screenSize.height > 2 {
+                if rect.size.height > 2 {
                     for y in 1 ..< maxY {
                         buffer.write(AttrChar(border.lrSide), x: minX, y: y)
                     }
@@ -176,13 +176,13 @@ public class Box: ComponentLayout {
                 buffer.write(AttrChar(border.trCorner), x: maxX, y: minY)
                 buffer.write(AttrChar(border.blCorner), x: minX, y: maxY)
                 buffer.write(AttrChar(border.brCorner), x: maxX, y: maxY)
-                if screenSize.width > 2 {
+                if rect.size.width > 2 {
                     for x in 1 ..< maxX {
                         buffer.write(AttrChar(border.topSide), x: x, y: minY)
                         buffer.write(AttrChar(border.bottomSide), x: x, y: maxY)
                     }
                 }
-                if screenSize.height > 2 {
+                if rect.size.height > 2 {
                     for y in 1 ..< maxY {
                         buffer.write(AttrChar(border.leftSide), x: minX, y: y)
                         buffer.write(AttrChar(border.rightSide), x: maxX, y: y)
@@ -192,15 +192,17 @@ public class Box: ComponentLayout {
         }
         else {
             borderOffset = .zero
-            innerSize = screenSize
+            innerSize = rect.size
         }
 
         buffer.push(offset: borderOffset, clip: innerSize) {
+            var innerRect = Rect(origin: scrollOffset)
             for view in views.reversed() {
-                let viewSize = view.desiredSize().constrain(in: innerSize) + scrollOffset
+                let viewSize = view.desiredSize().constrain(in: innerSize)
                 let offset = view.location.origin(for: viewSize, in: innerSize) - scrollOffset
+                innerRect.size = viewSize
                 buffer.push(offset: offset, clip: viewSize) {
-                    view.render(in: buffer, size: viewSize)
+                    view.render(to: buffer, in: innerRect)
                 }
             }
 

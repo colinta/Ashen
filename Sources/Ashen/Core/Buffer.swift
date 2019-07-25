@@ -16,7 +16,7 @@ public class Buffer {
     func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {
         guard nextOffset.x < size.width, nextOffset.y < size.height else { return }
         let nextSize = Size(width: min(size.width - nextOffset.x, nextDesiredSize.width), height: min(size.height - nextOffset.y, nextDesiredSize.height))
-        guard nextOffset.x + nextSize.width >= 0, nextOffset.y + nextSize.height >= 0 else { return }
+        guard nextOffset.x + nextSize.width > 0, nextOffset.y + nextSize.height > 0 else { return }
         guard nextSize.width > 0, nextSize.height > 0 else { return }
 
         let prevOffset = offset

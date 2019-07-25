@@ -92,7 +92,7 @@ struct SpecsProgram: Program {
         return (model, [], .continue)
     }
 
-    func render(model: SpecsModel, in screenSize: Size) -> Component {
+    func render(model: SpecsModel, in mySize: Size) -> Component {
         var components: [Component] = []
 
         if model.done {
@@ -104,7 +104,7 @@ struct SpecsProgram: Program {
             }
         }
 
-        components.append(LogView(y: 4, entries: model.specLog, screenSize: screenSize))
+        components.append(LogView(.topLeft(y: 4), size: DesiredSize(mySize), entries: model.specLog))
         if !model.running {
             components.append(OnNext({ SpecsMessage.begin }))
         }

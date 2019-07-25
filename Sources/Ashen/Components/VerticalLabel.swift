@@ -22,10 +22,10 @@ public class VerticalLabelView: ComponentView {
         return DesiredSize(width: linesWidth, height: size.height ?? linesHeight)
     }
 
-    override func render(in buffer: Buffer, size: Size) {
+    override func render(to buffer: Buffer, in rect: Rect) {
         var yOffset = 0
         for attrChar in chars {
-            if yOffset > size.height { return }
+            if yOffset > rect.size.height { return }
             buffer.write(attrChar, x: 0, y: yOffset)
             yOffset += 1
         }

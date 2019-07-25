@@ -50,7 +50,6 @@ public class GridLayout: ComponentLayout {
             return memo
         }
     }
-
     public init(_ location: Location = .tl(.zero), _ size: Size, rows: [Row]) {
         self.size = size
         self.rows = rows
@@ -109,14 +108,14 @@ public class GridLayout: ComponentLayout {
         return calculations
     }
 
-    override func render(in buffer: Buffer, size screenSize: Size) {
+    override func render(to buffer: Buffer, in rect: Rect) {
         var offset: Point = .zero
-        let calculatedRowHeights = GridLayout.calculateDimensions(screen: screenSize.height, weights: rows.map { $0.weight })
+        let calculatedRowHeights = GridLayout.calculateDimensions(screen: rect.size.height, weights: rows.map { $0.weight })
         for (rowIndex, row) in rows.enumerated() {
             let rowHeight = calculatedRowHeights[rowIndex]
             guard rowHeight > 0 else { continue }
 
-            let calculatedColWidths = GridLayout.calculateDimensions(screen: screenSize.width, weights: row.columns.map { $0.weight })
+            let calculatedColWidths = GridLayout.calculateDimensions(screen: rect.size.width, weights: row.columns.map { $0.weight })
             for (colIndex, column) in row.columns.enumerated() {
                 let colWidth = calculatedColWidths[colIndex]
                 guard colWidth > 0 else { continue }
@@ -124,7 +123,7 @@ public class GridLayout: ComponentLayout {
                 let view = column.component
                 let viewSize = Size(width: colWidth, height: rowHeight)
                 buffer.push(offset: offset, clip: viewSize) {
-                    view.render(in: buffer, size: viewSize)
+                    view.render(to: buffer, in: Rect(size: viewSize))
                 }
                 offset.x += colWidth
             }

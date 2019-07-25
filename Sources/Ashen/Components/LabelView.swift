@@ -40,15 +40,23 @@ public class LabelView: ComponentView {
         return DesiredSize(width: size.width ?? linesWidth, height: size.height ?? linesHeight)
     }
 
-    override func render(in buffer: Buffer, size: Size) {
+    override func render(to buffer: Buffer, in rect: Rect) {
         var yOffset = 0, xOffset = 0
         for attrChar in chars {
             if attrChar.string == "\n" {
                 yOffset += 1
                 xOffset = 0
             }
+            else if yOffset - rect.origin.y >= rect.size.height {
+                break
+            }
+            else if yOffset < rect.origin.y || xOffset - rect.origin.x >= rect.size.width {
+                continue
+            }
+            else if xOffset < rect.origin.x {
+                xOffset += 1
+            }
             else {
-                if xOffset > size.width { continue }
                 buffer.write(attrChar, x: xOffset, y: yOffset)
                 xOffset += 1
             }
