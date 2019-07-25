@@ -45,16 +45,27 @@ rendering output is stateless; it is based the model, and you render *all* the
 views and their properties based on that state.
 
 ```swift
-func render(model: Model) -> Component {
+func render(model: Model, in screenSize: Size) -> Component {
     guard
         let data = model.data
     else {
         return SpinnerView()
     }
 
+    let rowHeight: Int
+    if screenSize.height >= 30 {
+      rowHeight = 3
+    }
+    else if screenSize.height >= 20 {
+      rowHeight = 2
+    }
+    else {
+      rowHeight = 1
+    }
+
     return Window(components: [
         LabelView(text: "Our things"),
-        OptimizedListView(dataList: data, rowHeight: 3) { row in
+        OptimizedListView(dataList: data, rowHeight: rowHeight) { row in
             return LabelView(text: row.title)
         }
         // 👆 this view is similar to how UITableView renders cells - only
@@ -192,15 +203,15 @@ container.  There are nine locations:
 ```
 +------------+--------------+-------------+
 |topLeft     |   topCenter  |     topRight|  `topLeft` is so common, it has a
-|aka `at`    |              |             |  shorthand.
+|aka `at`    |   aka `top`  |             |  shorthand.
 |            |              |             |
 +------------+--------------+-------------+  The default value for most views
 |            |              |             |  is at (x: 0, y: 0)
 |middleLeft  | middleCenter |  middleRight|
-|            |              |             |
+|            | aka `center` |             |
 +------------+--------------+-------------+
 |            |              |             |
-|            |              |             |
+|            | aka `bottom` |             |
 |bottomLeft  | bottomCenter |  bottomRight|
 +------------+--------------+-------------+
 ```
