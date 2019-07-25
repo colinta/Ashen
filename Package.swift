@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "Ashen",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v10_14),
     ],
     products: [
         .library(name: "Ashen", targets: ["Ashen"]),
