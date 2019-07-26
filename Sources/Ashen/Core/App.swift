@@ -59,12 +59,12 @@ func sync(_ block: @escaping () -> Void) {
     messageThread.sync { block() }
 }
 
-public struct App<T: Program> {
+public struct App<ProgramType: Program> {
     let screen: ScreenType
-    let program: T
+    let program: ProgramType
     private let timeFactor: Float
 
-    public init(program: T, screen: ScreenType) {
+    public init(program: ProgramType, screen: ScreenType) {
         self.program = program
         self.screen = screen
 
@@ -99,7 +99,7 @@ public struct App<T: Program> {
     private func main() -> AppState {
         var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
-        var prevState: [(T.ModelType, Buffer?)] = []
+        var prevState: [(ProgramType.ModelType, Buffer?)] = []
         var inThePast: Int?
         var (model, commands) = program.initial()
 
@@ -107,7 +107,7 @@ public struct App<T: Program> {
         let buffer = screen.render(window: window)
         prevState.append((model, buffer))
 
-        var messageQueue: [T.MessageType] = []
+        var messageQueue: [ProgramType.MessageType] = []
         let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
         while state == .continue {
             sync {}
@@ -115,7 +115,7 @@ public struct App<T: Program> {
             for command in commands {
                 commandBackgroundThread.async {
                     command.start { msg in
-                        if let msg = msg as? T.MessageType {
+                        if let msg = msg as? ProgramType.MessageType {
                             sync {
                                 messageQueue.append(msg)
                             }
@@ -140,10 +140,10 @@ public struct App<T: Program> {
                 else if case .window = event {
                     updateAndRender = true
                 }
-                else if case let .key(key) = event, key == .signalCtrlZ {
+                else if case let .key(key) = event, key == .ctrl(.z) {
                     inThePast = max(0, (inThePast ?? prevState.count) - 1)
                 }
-                else if case let .key(key) = event, key == .signalCtrlX {
+                else if case let .key(key) = event, key == .ctrl(.x) {
                     let nextState = (inThePast ?? prevState.count) + 1
                     if nextState >= prevState.count {
                         inThePast = nil
@@ -152,7 +152,7 @@ public struct App<T: Program> {
                         inThePast = nextState
                     }
                 }
-                else if case let .key(key) = event, key == .keySpace, let pastIndex = inThePast {
+                else if case let .key(key) = event, key == .space, let pastIndex = inThePast {
                     let (newModel, _) = prevState[pastIndex]
                     model = newModel
                     window = program.render(model: model, in: screen.size)
@@ -181,7 +181,7 @@ public struct App<T: Program> {
             else {
                 for event in events {
                     for message in window.messages(for: event) {
-                        if let message = message as? T.MessageType {
+                        if let message = message as? ProgramType.MessageType {
                             sync {
                                 messageQueue.append(message)
                             }
@@ -208,7 +208,7 @@ public struct App<T: Program> {
                     }
                     first = false
 
-                    var message: T.MessageType!
+                    var message: ProgramType.MessageType!
                     sync {
                         message = messageQueue.removeFirst()
                     }

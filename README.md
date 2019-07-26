@@ -165,7 +165,7 @@ struct SpinnersDemo: Program {
         }
         return Window(
             components: spinners + [
-                OnKeyPress(.keyEnter, { return Message.quit }),
+                OnKeyPress(.enter, { return Message.quit }),
             ])
     }
 

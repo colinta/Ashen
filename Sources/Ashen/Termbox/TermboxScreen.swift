@@ -98,20 +98,32 @@ public class TermboxScreen: ScreenType {
         }
 
         let chains: [EscapeSequence] = [
-            EscapeSequence(.keyShiftDown) { return "[1;2B" },
-            EscapeSequence(.keyShiftUp) { return "[1;2A" },
-            EscapeSequence(.keyShiftLeft) { return "[1;2D" },
-            EscapeSequence(.keyShiftRight) { return "[1;2C" },
-            EscapeSequence(.keyAltDown) { return "[1;9B" },
-            EscapeSequence(.keyAltUp) { return "[1;9A" },
-            EscapeSequence(.keyAltLeft) { return "[1;9D" },
-            EscapeSequence(.keyAltRight) { return "[1;9C" },
-            EscapeSequence(.keyAltLeft) { return "b" },
-            EscapeSequence(.keyAltRight) { return "f" },
-            EscapeSequence(.keyShiftHome) { return "[1;2H" },
-            EscapeSequence(.keyShiftEnd) { return "[1;2F" },
-            EscapeSequence(.signalAltBslash) { return "\\" },
-            EscapeSequence(.keyBacktab) { return "[Z" },
+            easyAltChar(),
+            EscapeSequence(.ctrl(.alt(.tab))) { return "\t" },
+            EscapeSequence(.backtab) { return "[Z" },
+            EscapeSequence(.alt(.down)) { return "[1;9B" },
+            EscapeSequence(.alt(.up)) { return "[1;9A" },
+            EscapeSequence(.alt(.left)) { return "[1;9D" },
+            EscapeSequence(.alt(.right)) { return "[1;9C" },
+            // classic
+            EscapeSequence(.shift(.down)) { return "[1;10B" },
+            EscapeSequence(.shift(.up)) { return "[1;10A" },
+            EscapeSequence(.shift(.left)) { return "[1;10D" },
+            EscapeSequence(.shift(.right)) { return "[1;10C" },
+            // modern
+            EscapeSequence(.shift(.down)) { return "[1;2B" },
+            EscapeSequence(.shift(.up)) { return "[1;2A" },
+            EscapeSequence(.shift(.left)) { return "[1;2D" },
+            EscapeSequence(.shift(.right)) { return "[1;2C" },
+            // home/end
+            EscapeSequence(.alt(.home)) { return "[1;9H" },
+            EscapeSequence(.alt(.end)) { return "[1;9F" },
+            EscapeSequence(.alt(.shift(.home))) { return "[1;10H" },
+            EscapeSequence(.alt(.shift(.end))) { return "[1;10F" },
+            EscapeSequence(.ctrl(.alt(.home))) { return "[1;13H" },
+            EscapeSequence(.ctrl(.alt(.end))) { return "[1;13F" },
+            EscapeSequence(.shift(.home)) { return "[1;2H" },
+            EscapeSequence(.shift(.end)) { return "[1;2F" },
         ]
         let matchEvent: Event? = chains.reduce(nil) { event, chain in
             return event ?? chain.match(events)
@@ -127,7 +139,7 @@ public class TermboxScreen: ScreenType {
             if let extraEvent = extraEvent {
                 extraEvents.append(extraEvent)
             }
-            return .key(.keyEsc)
+            return .key(.esc)
         }
     }
 
@@ -152,148 +164,200 @@ public class TermboxScreen: ScreenType {
             }
         }
     }
+}
 
-    private func termBoxMouse(_ mouse: Key) -> MouseButton? {
-        switch mouse {
-        case .mouseLeft:
-            return .left
-        case .mouseRight:
-            return .right
-        case .mouseMiddle:
-            return .middle
-        case .mouseRelease:
-            return .release
-        case .mouseWheelUp:
-            return .wheelUp
-        case .mouseWheelDown:
-            return .wheelDown
-        default:
-            return nil
-        }
-    }
+private func easyAltChar() -> EscapeSequence{
+    return EscapeSequence(
+        { events in
+            guard events.count == 1 else { fatalError("already guarded against") }
 
-    private func termBoxKey(_ key: Key) -> KeyEvent? {
-        switch key {
-        case .ctrl2:
-            return .signalCtrlAt
-        case .ctrlA:
-            return .signalCtrlA
-        case .ctrlB:
-            return .signalCtrlB
-        case .ctrlC:
-            return .signalCtrlC
-        case .ctrlD:
-            return .signalCtrlD
-        case .ctrlE:
-            return .signalCtrlE
-        case .ctrlF:
-            return .signalCtrlF
-        case .ctrlG:
-            return .signalCtrlG
-        case .backspace:
-            return .keyBackspace
-        case .tab:
-            return .keyTab
-        case .ctrlJ:
-            return .signalCtrlJ
-        case .ctrlK:
-            return .signalCtrlK
-        case .ctrlL:
-            return .signalCtrlL
-        case .enter:
-            return .keyEnter
-        case .ctrlN:
-            return .signalCtrlN
-        case .ctrlO:
-            return .signalCtrlO
-        case .ctrlP:
-            return .signalCtrlP
-        case .ctrlQ:
-            return .signalCtrlQ
-        case .ctrlR:
-            return .signalCtrlR
-        case .ctrlS:
-            return .signalCtrlS
-        case .ctrlT:
-            return .signalCtrlT
-        case .ctrlU:
-            return .signalCtrlU
-        case .ctrlV:
-            return .signalCtrlV
-        case .ctrlW:
-            return .signalCtrlW
-        case .ctrlX:
-            return .signalCtrlX
-        case .ctrlY:
-            return .signalCtrlY
-        case .ctrlZ:
-            return .signalCtrlZ
-        case .esc:
-            return .keyEsc
-        case .ctrlBackslash:
-            return .signalCtrlBslash
-        case .ctrlRightBracket:
-            return .signalCtrlRbracket
-        case .ctrl6:
-            return .signalCtrl6
-        case .ctrlSlash:
-            return .signalCtrlFslash
-        case .space:
-            return .keySpace
-        case .f1:
-            return .keyF1
-        case .f2:
-            return .keyF2
-        case .f3:
-            return .keyF3
-        case .f4:
-            return .keyF4
-        case .f5:
-            return .keyF5
-        case .f6:
-            return .keyF6
-        case .f7:
-            return .keyF7
-        case .f8:
-            return .keyF8
-        case .f9:
-            return .keyF9
-        case .f10:
-            return .keyF10
-        case .f11:
-            return .keyF11
-        case .f12:
-            return .keyF12
-        case .insert:
-            return .keyInsert
-        case .delete:
-            return .keyDelete
-        case .home:
-            return .keyHome
-        case .end:
-            return .keyEnd
-        case .pageUp:
-            return .keyPageup
-        case .pageDown:
-            return .keyPagedown
-        case .arrowUp:
-            return .keyUp
-        case .arrowDown:
-            return .keyDown
-        case .arrowLeft:
-            return .keyLeft
-        case .arrowRight:
-            return .keyRight
-        default:
-            return nil
-        }
-    }
+            let event = events[0]
+            if case let .character(_, eventValue) = event,
+                case let .char(key) = termBoxCharacter(eventValue)!
+            {
+                return .alt(.char(key))
+            }
+            if case let .key(_, eventValue) = event,
+                case let .fn(key) = termBoxKey(eventValue)!
+            {
+                return .alt(.fn(key))
+            }
+            if case let .key(_, eventValue) = event,
+                case let .ctrl(key) = termBoxKey(eventValue)!
+            {
+                return .ctrl(.alt(key.toAltKey))
+            }
+            else {
+                fatalError("already guarded against")
+            }
+        },
+        { events in
+            guard events.count == 1 else { return false }
 
-    private func termBoxCharacter(_ character: UnicodeScalar) -> KeyEvent? {
-        guard
-            character.value < UInt16.max,
-            let key = KeyEvent(rawValue: UInt16(character.value))
-        else { return nil }
-        return key
+            let event = events[0]
+            if case let .character(_, eventValue) = event,
+                termBoxCharacter(eventValue) != nil
+            {
+                return true
+            }
+            if case let .key(_, eventValue) = event,
+                let key = termBoxKey(eventValue),
+                case .fn = key
+            {
+                return true
+            }
+            if case let .key(_, eventValue) = event,
+                let key = termBoxKey(eventValue),
+                case .ctrl = key
+            {
+                return true
+            }
+            else {
+                return false
+            }
+        })
+}
+
+private func termBoxMouse(_ mouse: Key) -> MouseButton? {
+    switch mouse {
+    case .mouseLeft:
+        return .left
+    case .mouseRight:
+        return .right
+    case .mouseMiddle:
+        return .middle
+    case .mouseRelease:
+        return .release
+    case .mouseWheelUp:
+        return .wheelUp
+    case .mouseWheelDown:
+        return .wheelDown
+    default:
+        return nil
     }
+}
+
+private func termBoxKey(_ key: Key) -> KeyEvent? {
+    switch key {
+    case .ctrl2:
+        return .ctrl(.two)
+    case .ctrlA:
+        return .ctrl(.a)
+    case .ctrlB:
+        return .ctrl(.b)
+    case .ctrlC:
+        return .ctrl(.c)
+    case .ctrlD:
+        return .ctrl(.d)
+    case .ctrlE:
+        return .ctrl(.e)
+    case .ctrlF:
+        return .ctrl(.f)
+    case .ctrlG:
+        return .ctrl(.g)
+    case .ctrlJ:
+        return .ctrl(.j)
+    case .ctrlK:
+        return .ctrl(.k)
+    case .ctrlL:
+        return .ctrl(.l)
+    case .enter:
+        return .enter
+    case .ctrlN:
+        return .ctrl(.n)
+    case .ctrlO:
+        return .ctrl(.o)
+    case .ctrlP:
+        return .ctrl(.p)
+    case .ctrlQ:
+        return .ctrl(.q)
+    case .ctrlR:
+        return .ctrl(.r)
+    case .ctrlS:
+        return .ctrl(.s)
+    case .ctrlT:
+        return .ctrl(.t)
+    case .ctrlU:
+        return .ctrl(.u)
+    case .ctrlV:
+        return .ctrl(.v)
+    case .ctrlW:
+        return .ctrl(.w)
+    case .ctrlX:
+        return .ctrl(.x)
+    case .ctrlY:
+        return .ctrl(.y)
+    case .ctrlZ:
+        return .ctrl(.z)
+    case .ctrlBackslash:
+        return .ctrl(.backslash)
+    case .ctrlRightBracket:
+        return .ctrl(.rightBracket)
+    case .ctrl6:
+        return .ctrl(.six)
+    case .ctrlSlash:
+        return .ctrl(.underscore)
+    case .backspace:
+        return .backspace
+    case .tab:
+        return .tab
+    case .esc:
+        return .esc
+    case .space:
+        return .space
+    case .f1:
+        return .f1
+    case .f2:
+        return .f2
+    case .f3:
+        return .f3
+    case .f4:
+        return .f4
+    case .f5:
+        return .f5
+    case .f6:
+        return .f6
+    case .f7:
+        return .f7
+    case .f8:
+        return .f8
+    case .f9:
+        return .f9
+    case .f10:
+        return .f10
+    case .f11:
+        return .f11
+    case .f12:
+        return .f12
+    case .insert:
+        return .insert
+    case .delete:
+        return .delete
+    case .home:
+        return .home
+    case .end:
+        return .end
+    case .pageUp:
+        return .pageUp
+    case .pageDown:
+        return .pageDown
+    case .arrowUp:
+        return .up
+    case .arrowDown:
+        return .down
+    case .arrowLeft:
+        return .left
+    case .arrowRight:
+        return .right
+    default:
+        return nil
+    }
+}
+
+private func termBoxCharacter(_ character: UnicodeScalar) -> KeyEvent? {
+    guard
+        character.value < UInt16.max,
+        let key = KeyEvent(character: UInt16(character.value))
+    else { return nil }
+    return key
 }

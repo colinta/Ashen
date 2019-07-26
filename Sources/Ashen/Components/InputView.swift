@@ -233,46 +233,46 @@ public class InputView: ComponentView {
     }
 
     private func keyEvent(_ onChange: OnChangeHandler, key: KeyEvent) -> [AnyMessage?] {
-        if key.isPrintable || (key == .keyEnter && isMultiline) {
+        if key.isPrintable || (key == .enter && isMultiline) {
             return insert(onChange, string: key.toString)
         }
-        else if key == .keyEnter, let onEnter = onEnter {
+        else if key == .enter, let onEnter = onEnter {
             return [onEnter()]
         }
-        else if key == .keyBackspace {
+        else if key == .backspace {
             return backspace(onChange)
         }
         else if key == .signalEot { // ctrl+d == delete
             return delete(onChange)
         }
-        else if key == .keyLeft {
+        else if key == .left {
             return moveLeft(onChange)
         }
-        else if key == .keyRight {
+        else if key == .right {
             return moveRight(onChange)
         }
-        else if key == .keyShiftLeft {
+        else if key == .shift(.left) {
             return extendLeft(onChange)
         }
-        else if key == .keyShiftRight {
+        else if key == .shift(.right) {
             return extendRight(onChange)
         }
-        else if key == .keyUp || key == .keyShiftUp {
-            return moveUp(onChange, extend: key == .keyShiftUp)
+        else if key == .up || key == .shift(.up) {
+            return moveUp(onChange, extend: key == .shift(.up))
         }
-        else if key == .keyDown || key == .keyShiftDown {
-            return moveDown(onChange, extend: key == .keyShiftDown)
+        else if key == .down || key == .shift(.down) {
+            return moveDown(onChange, extend: key == .shift(.down))
         }
-        else if key == .signalCtrlA {
+        else if key == .ctrl(.a) {
             return moveToTop(onChange)
         }
-        else if key == .signalCtrlE {
+        else if key == .ctrl(.e) {
             return moveToBottom(onChange)
         }
-        else if key == .keyHome {
+        else if key == .home {
             return moveToBeginOfLine(onChange)
         }
-        else if key == .keyEnd {
+        else if key == .end {
             return moveToEndOfLine(onChange)
         }
         return []
@@ -491,24 +491,24 @@ extension InputView: KeyboardTrapComponent {
         guard isFirstResponder else { return false }
 
         if key.isPrintable ||
-            isMultiline && key == .keyEnter ||
-            key == .keyBackspace ||
+            isMultiline && key == .enter ||
+            key == .backspace ||
             key == .signalEot ||
-            key == .keyLeft ||
-            key == .keyRight ||
-            key == .keyShiftLeft ||
-            key == .keyShiftRight ||
-            key == .keyUp ||
-            key == .keyShiftUp ||
-            key == .keyShiftUp ||
-            key == .keyDown ||
-            key == .keyShiftDown ||
-            key == .keyShiftDown ||
-            key == .keyEnter ||
-            key == .keyHome ||
-            key == .keyEnd ||
-            key == .signalCtrlA ||
-            key == .signalCtrlE
+            key == .left ||
+            key == .right ||
+            key == .shift(.left) ||
+            key == .shift(.right) ||
+            key == .up ||
+            key == .shift(.up) ||
+            key == .shift(.up) ||
+            key == .down ||
+            key == .shift(.down) ||
+            key == .shift(.down) ||
+            key == .enter ||
+            key == .home ||
+            key == .end ||
+            key == .ctrl(.a) ||
+            key == .ctrl(.e)
         {
             return true
         }
