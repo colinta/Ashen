@@ -3,12 +3,16 @@
 //
 
 
-public class LabelView: ComponentView {
+public class LabelView: ComponentView, CustomDebugStringConvertible {
     let size: DesiredSize
     let chars: [AttrCharType]
 
     let linesHeight: Int
     let linesWidth: Int
+
+    public var debugDescription: String {
+        return "LabelView(\(chars))"
+    }
 
     public init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), text: TextType) {
         self.size = size
@@ -61,5 +65,12 @@ public class LabelView: ComponentView {
                 xOffset += 1
             }
         }
+    }
+}
+
+
+extension String.StringInterpolation {
+    mutating func appendInterpolation(_ value: LabelView) {
+        appendInterpolation(value.debugDescription)
     }
 }

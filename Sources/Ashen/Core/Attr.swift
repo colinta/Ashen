@@ -2,29 +2,57 @@
 ///  Attr.swift
 //
 
-import Darwin.ncurses
+import Termbox
 
 public enum Attr {
     case underline
     case reverse
     case bold
-    case color(Int)
+    case foreground(Color)
+    case background(Color)
 
-    public static let systemBlack = Int(COLOR_BLACK)
-    public static let systemRed = Int(COLOR_RED)
-    public static let systemGreen = Int(COLOR_GREEN)
-    public static let systemYellow = Int(COLOR_YELLOW)
-    public static let systemBlue = Int(COLOR_BLUE)
-    public static let systemMagenta = Int(COLOR_MAGENTA)
-    public static let systemCyan = Int(COLOR_CYAN)
-    public static let systemWhite = Int(COLOR_WHITE)
+    var toTermbox: Attributes {
+        switch self {
+        case .underline: return .underline
+        case .reverse: return .reverse
+        case .bold: return .bold
+        case let .foreground(color): return color.toTermbox
+        case let .background(color): return color.toTermbox
+        }
+    }
+}
 
-    public static let black = 16
-    public static let red = 17
-    public static let green = 18
-    public static let yellow = 19
-    public static let blue = 20
-    public static let magenta = 21
-    public static let cyan = 22
-    public static let white = 23
+public enum Color {
+    case none
+    case black
+    case red
+    case green
+    case yellow
+    case blue
+    case magenta
+    case cyan
+    case white
+
+    var toTermbox: Attributes {
+        switch self {
+        case .none:
+            return .default
+        case .black:
+            return .black
+        case .red:
+            return .red
+        case .green:
+            return .green
+        case .yellow:
+            return .yellow
+        case .blue:
+            return .blue
+        case .magenta:
+            return .magenta
+        case .cyan:
+            return .cyan
+        case .white:
+            return .white
+        }
+    }
 }

@@ -81,17 +81,17 @@ public class OnKeyPress: Component {
     public typealias OnKeyHandler = (KeyEvent) -> AnyMessage
     public typealias EmptyKeyHandler = () -> AnyMessage
     var onKey: OnKeyHandler
-    var filter: [KeyEvent]
-    var reject: [KeyEvent]
+    var only: [KeyEvent]
+    var except: [KeyEvent]
 
     public convenience init(_ key: KeyEvent, _ onKey: @escaping EmptyKeyHandler) {
-        self.init({ _ in return onKey() }, filter: [key])
+        self.init({ _ in return onKey() }, only: [key])
     }
 
-    public init(_ onKey: @escaping OnKeyHandler, filter: [KeyEvent] = [], reject: [KeyEvent] = []) {
+    public init(_ onKey: @escaping OnKeyHandler, only: [KeyEvent] = [], except: [KeyEvent] = []) {
         self.onKey = onKey
-        self.filter = filter
-        self.reject = reject
+        self.only = only
+        self.except = except
     }
 
         override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
@@ -108,8 +108,8 @@ public class OnKeyPress: Component {
         switch event {
         case let .key(key):
             guard
-                filter == [] || filter.contains(key),
-                !reject.contains(key)
+                only == [] || only.contains(key),
+                !except.contains(key)
             else { break }
             return [onKey(key)]
         default: break

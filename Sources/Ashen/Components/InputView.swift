@@ -264,10 +264,16 @@ public class InputView: ComponentView {
             return moveDown(onChange, extend: key == .key_shift_down)
         }
         else if key == .signal_ctrl_a {
-            return moveToBeginning(onChange)
+            return moveToTop(onChange)
         }
         else if key == .signal_ctrl_e {
-            return moveToEnd(onChange)
+            return moveToBottom(onChange)
+        }
+        else if key == .key_home {
+            return moveToBeginOfLine(onChange)
+        }
+        else if key == .key_end {
+            return moveToEndOfLine(onChange)
         }
         return []
     }
@@ -451,14 +457,28 @@ public class InputView: ComponentView {
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToBeginning(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+    private func moveToTop(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         guard cursor.at != 0 || cursor.length != 0 else { return [] }
 
         cursor = Cursor(at: 0, length: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToEnd(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+    private func moveToBottom(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+        guard cursor.at != text.count || cursor.length != 0 else { return [] }
+
+        cursor = Cursor(at: text.count, length: 0)
+        return [onCursorChange?(cursor), SystemMessage.rerender]
+    }
+
+    private func moveToBeginOfLine(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+        guard cursor.at != 0 || cursor.length != 0 else { return [] }
+
+        cursor = Cursor(at: 0, length: 0)
+        return [onCursorChange?(cursor), SystemMessage.rerender]
+    }
+
+    private func moveToEndOfLine(_ onChange: OnChangeHandler) -> [AnyMessage?] {
         guard cursor.at != text.count || cursor.length != 0 else { return [] }
 
         cursor = Cursor(at: text.count, length: 0)
@@ -485,6 +505,8 @@ extension InputView: KeyboardTrapComponent {
             key == .key_shift_down ||
             key == .key_shift_down ||
             key == .key_enter ||
+            key == .key_home ||
+            key == .key_end ||
             key == .signal_ctrl_a ||
             key == .signal_ctrl_e
         {

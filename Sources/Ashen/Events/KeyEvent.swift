@@ -1,39 +1,39 @@
 public enum KeyEvent: UInt16 {
     case signal_ctrl_at = 0        // @
-    case signal_ctrl_a = 1         // a
-    case signal_ctrl_b = 2         // b
-    case signal_ctrl_c = 3         // c
-    case signal_ctrl_d = 4         // d
-    case signal_ctrl_e = 5         // e
-    case signal_ctrl_f = 6         // f
-    case signal_ctrl_g = 7         // g
-    case signal_ctrl_h_broken = 8  // ???
-    case key_tab = 9               // i == tab
-    case signal_ctrl_j = 10        // j
-    case signal_ctrl_k = 11        // k
-    case signal_ctrl_l = 12        // l
-    case key_enter = 13            // m == enter
-    case signal_ctrl_n = 14        // n
-    case signal_ctrl_o = 15        // o
-    case signal_ctrl_p = 16        // p
-    case signal_ctrl_q = 17        // q
-    case signal_ctrl_r = 18        // r
-    case signal_ctrl_s = 19        // s
-    case signal_ctrl_t = 20        // t
-    case signal_ctrl_u = 21        // u
-    case signal_ctrl_v = 22        // v
-    case signal_ctrl_w = 23        // w
-    case signal_ctrl_x = 24        // x
-    case signal_ctrl_y = 25        // y
-    case signal_ctrl_z = 26        // z
-    case key_esc = 27              // [ == ESC
-    case signal_ctrl_bslash = 28   // \
-    case signal_ctrl_rbracket = 29 // ]
-    case signal_ctrl_caret = 30    // ^
-    case signal_ctrl_fslash = 31   // / or -
-    case key_space = 32
+    case signal_ctrl_a             // a
+    case signal_ctrl_b             // b
+    case signal_ctrl_c             // c
+    case signal_ctrl_d             // d
+    case signal_ctrl_e             // e
+    case signal_ctrl_f             // f
+    case signal_ctrl_g             // g
+    case signal_ctrl_h      // ???
+    case key_tab                   // i == tab
+    case signal_ctrl_j             // j
+    case signal_ctrl_k             // k
+    case signal_ctrl_l             // l
+    case key_enter                 // m == enter
+    case signal_ctrl_n             // n
+    case signal_ctrl_o             // o
+    case signal_ctrl_p             // p
+    case signal_ctrl_q             // q
+    case signal_ctrl_r             // r
+    case signal_ctrl_s             // s
+    case signal_ctrl_t             // t
+    case signal_ctrl_u             // u
+    case signal_ctrl_v             // v
+    case signal_ctrl_w             // w
+    case signal_ctrl_x             // x
+    case signal_ctrl_y             // y
+    case signal_ctrl_z             // z
+    case key_esc                   // [ == ESC
+    case signal_ctrl_bslash        // \
+    case signal_ctrl_rbracket      // ]
+    case signal_ctrl_caret         // ^
+    case signal_ctrl_fslash        // / or -
 
-    case symbol_bang = 33
+    case key_space = 32
+    case symbol_bang
     case symbol_dquot
     case symbol_hash
     case symbol_dollar
@@ -134,23 +134,27 @@ public enum KeyEvent: UInt16 {
     case symbol_rcurly
     case symbol_tilde
 
-    case key_backspace = 127
+    case key_backspace = 0x7f
+    case key_backtab
 
-    case key_backtab = 353
-
-    case key_down = 258
+    case key_down
     case key_up
     case key_left
     case key_right
-    case key_home = 262
-    case signal_ctrl_h = 263  // what is this?  ^h sends it? 263
+    case key_home
+    case key_shift_down
+    case key_shift_up
+    case key_shift_left
+    case key_shift_right
+    case key_alt_down
+    case key_alt_up
+    case key_alt_left
+    case key_alt_right
 
-    case key_shift_down = 336
-    case key_shift_up = 337
-    case key_shift_left = 393
-    case key_shift_right = 402
+    case signal_ctrl_h_broken        // what is this?  ^h sends it?
+    case signal_alt_bslash
 
-    case key_f1 = 265
+    case key_f1
     case key_f2
     case key_f3
     case key_f4
@@ -163,9 +167,11 @@ public enum KeyEvent: UInt16 {
     case key_f11
     case key_f12
 
-    case key_pagedown = 338
-    case key_pageup = 339
-    case key_end = 360
+    case key_pagedown
+    case key_pageup
+    case key_end
+    case key_shift_home
+    case key_shift_end
 
     case key_delete
     case key_insert
@@ -243,6 +249,7 @@ public extension KeyEvent {
         case .signal_ctrl_y: return "^Y"
         case .signal_ctrl_z: return "^Z"
         case .signal_ctrl_bslash: return "^\\"
+        case .signal_alt_bslash: return "⌥\\"
         case .signal_ctrl_rbracket: return "^]"
         case .signal_ctrl_caret: return "^^"
         case .signal_ctrl_fslash: return "^/"
@@ -266,10 +273,17 @@ public extension KeyEvent {
         case .key_shift_left: return "⇧←"
         case .key_shift_right: return "⇧→"
 
+        case .key_alt_down: return "⌥↓"
+        case .key_alt_up: return "⌥↑"
+        case .key_alt_left: return "⌥←"
+        case .key_alt_right: return "⌥→"
+
         case .key_home: return "⤒"
         case .key_pageup: return "↟"
         case .key_pagedown: return "↡"
         case .key_end: return "⤓"
+        case .key_shift_home: return "⇧⤒"
+        case .key_shift_end: return "⇧⤓"
 
         case .key_f1: return "𝑓1"
         case .key_f2: return "𝑓2"
@@ -391,7 +405,7 @@ public extension KeyEvent {
         case .letter_y: return "y"
         case .letter_z: return "z"
 
-        case .unrecognized: return "<?>"
+        case .unrecognized: return "⸮"
         }
     }
 }
