@@ -85,7 +85,7 @@ public enum KeyEvent {
     public static let plus: KeyEvent = .char(.plus)
     public static let comma: KeyEvent = .char(.comma)
     public static let dash: KeyEvent = .char(.dash)
-    public static let period: KeyEvent = .char(.period)
+    public static let dot: KeyEvent = .char(.dot)
     public static let number0: KeyEvent = .char(.number0)
     public static let number1: KeyEvent = .char(.number1)
     public static let number2: KeyEvent = .char(.number2)
@@ -181,10 +181,22 @@ extension KeyEvent: Equatable {
 public extension KeyEvent {
     var isPrintable: Bool {
         switch self {
+        case let .alt(key):
+            return key.isPrintable
         case .char:
             return true
         default:
             return false
+        }
+    }
+
+    var toPrintable: String {
+        switch self {
+        case let .alt(key): return "\(key.toPrintable)"
+        case let .char(key): return "\(key.toPrintable)"
+        case let .fn(key): return "\(key.toPrintable)"
+        default:
+            return toString
         }
     }
 
@@ -362,7 +374,7 @@ public enum AltKeyEvent {
     public static let plus: AltKeyEvent = .char(.plus)
     public static let comma: AltKeyEvent = .char(.comma)
     public static let dash: AltKeyEvent = .char(.dash)
-    public static let period: AltKeyEvent = .char(.period)
+    public static let dot: AltKeyEvent = .char(.dot)
     public static let number0: AltKeyEvent = .char(.number0)
     public static let number1: AltKeyEvent = .char(.number1)
     public static let number2: AltKeyEvent = .char(.number2)
@@ -442,9 +454,115 @@ public enum AltKeyEvent {
     public static let pipe: AltKeyEvent = .char(.pipe)
     public static let rightCurly: AltKeyEvent = .char(.rightCurly)
     public static let tilde: AltKeyEvent = .char(.tilde)
-
 }
+
 public extension AltKeyEvent {
+    var isPrintable: Bool {
+        return toPrintable != ""
+    }
+
+    var toPrintable: String {
+        switch self {
+        case .char(.a): return "å"
+        case .char(.b): return "∫"
+        case .char(.c): return "ç"
+        case .char(.d): return "∂"
+        case .char(.e): return "󰀀" // uF0000, combining ´
+        case .char(.f): return "ƒ"
+        case .char(.g): return "©"
+        case .char(.h): return "˙"
+        case .char(.i): return "󰀁" // uF0001, combining ˆ
+        case .char(.j): return "∆"
+        case .char(.k): return "˚"
+        case .char(.l): return "¬"
+        case .char(.m): return "µ"
+        case .char(.n): return "󰀂" // uF0002, combining ˜
+        case .char(.o): return "ø"
+        case .char(.p): return "π"
+        case .char(.q): return "œ"
+        case .char(.r): return "®"
+        case .char(.s): return "ß"
+        case .char(.t): return "†"
+        case .char(.u): return "󰀃" // uF0003, combining ¨
+        case .char(.v): return "√"
+        case .char(.w): return "∑"
+        case .char(.x): return "≈"
+        case .char(.y): return "¥"
+        case .char(.z): return "Ω"
+        case .char(.backtick): return "󰀄" // uF0004, combining `
+        case .char(.number1): return "¡"
+        case .char(.number2): return "™"
+        case .char(.number3): return "£"
+        case .char(.number4): return "¢"
+        case .char(.number5): return "∞"
+        case .char(.number6): return "§"
+        case .char(.number7): return "¶"
+        case .char(.number8): return "•"
+        case .char(.number9): return "ª"
+        case .char(.number0): return "º"
+        case .char(.dash): return "–"
+        case .char(.eq): return "≠"
+        case .char(.leftBracket): return "“"
+        case .char(.rightBracket): return "‘"
+        case .char(.backslash): return "«"
+        case .char(.semicolon): return "…"
+        case .char(.singleQuote): return "æ"
+        case .char(.comma): return "≤"
+        case .char(.dot): return "≥"
+        case .char(.slash): return "÷"
+        // shifted
+        case .char(.A): return "Å"
+        case .char(.B): return "ı"
+        case .char(.C): return "Ç"
+        case .char(.D): return "Î"
+        case .char(.E): return "´"
+        case .char(.F): return "Ï"
+        case .char(.G): return "˝"
+        case .char(.H): return "Ó"
+        case .char(.I): return "ˆ"
+        case .char(.J): return "Ô"
+        case .char(.K): return ""
+        case .char(.L): return "Ò"
+        case .char(.M): return "Â"
+        case .char(.N): return "˜"
+        case .char(.O): return "Ø"
+        case .char(.P): return "∏"
+        case .char(.Q): return "Œ"
+        case .char(.R): return "‰"
+        case .char(.S): return "Í"
+        case .char(.T): return "ˇ"
+        case .char(.U): return "¨"
+        case .char(.V): return "◊"
+        case .char(.W): return "„"
+        case .char(.X): return "˛"
+        case .char(.Y): return "Á"
+        case .char(.Z): return "¸"
+        case .char(.tilde): return "~"
+        case .char(.bang): return "⁄"
+        case .char(.at): return "€"
+        case .char(.hash): return "‹"
+        case .char(.dollar): return "›"
+        case .char(.percent): return "ﬁ"
+        case .char(.caret): return "ﬂ"
+        case .char(.amp): return "‡"
+        case .char(.star): return "°"
+        case .char(.leftParen): return "·"
+        case .char(.rightParen): return "‚"
+        case .char(.underscore): return "—"
+        case .char(.plus): return "±"
+        case .char(.leftCurly): return "”"
+        case .char(.rightCurly): return "’"
+        case .char(.pipe): return "»"
+        case .char(.colon): return "Ú"
+        case .char(.doubleQuote): return "Æ"
+        case .char(.lt): return "¯"
+        case .char(.gt): return "˘"
+        case .char(.question): return "¿"
+        default:
+            return ""
+        }
+    }
+
     var toString: String {
         switch self {
         case let .shift(key): return "⇧\(key.toString)"
@@ -467,8 +585,8 @@ public enum ShiftKeyEvent {
     case right
     case home
     case end
-
 }
+
 public extension ShiftKeyEvent {
     var toString: String {
         switch self {
@@ -503,7 +621,7 @@ public enum CharKeyEvent: UInt16 {
     case plus
     case comma
     case dash
-    case period
+    case dot
     case slash
 
     case number0
@@ -590,9 +708,13 @@ public enum CharKeyEvent: UInt16 {
     case pipe
     case rightCurly
     case tilde
-
 }
+
 public extension CharKeyEvent {
+    var toPrintable: String {
+        return toString
+    }
+
     var toString: String {
         switch self {
         case .space: return " "
@@ -610,7 +732,7 @@ public extension CharKeyEvent {
         case .plus: return "+"
         case .comma: return ","
         case .dash: return "-"
-        case .period: return "."
+        case .dot: return "."
         case .slash: return "/"
 
         case .colon: return ":"
@@ -736,24 +858,27 @@ public enum FnKeyEvent {
 }
 
 public extension FnKeyEvent {
+    var toPrintable: String {
+        switch self {
+        case .enter:
+            return "\n"
+        default:
+            return ""
+        }
+    }
+
     var toString: String {
         switch self {
-        case .backtab: return "⇤"
+        case .tab: return "⇥"
+        case .enter: return "↩︎"
         case .esc: return "⎋"
-
         case .backspace: return "⌫"
-        case .delete: return "⌦"
-        case .insert: return "⌅"
+        case .backtab: return "⇤"
 
         case .down: return "↓"
         case .up: return "↑"
         case .left: return "←"
         case .right: return "→"
-
-        case .home: return "⤒"
-        case .pageUp: return "↟"
-        case .pageDown: return "↡"
-        case .end: return "⤓"
 
         case .f1: return "𝔽1"
         case .f2: return "𝔽2"
@@ -768,8 +893,12 @@ public extension FnKeyEvent {
         case .f11: return "𝔽11"
         case .f12: return "𝔽12"
 
-        case .tab: return "⇥"
-        case .enter: return "↩︎"
+        case .home: return "⤒"
+        case .pageUp: return "↟"
+        case .pageDown: return "↡"
+        case .end: return "⤓"
+        case .delete: return "⌦"
+        case .insert: return "⌅"
         }
     }
 }

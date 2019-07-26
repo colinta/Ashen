@@ -9,15 +9,15 @@ public class InputView: ComponentView {
 
     public struct Cursor {
         static func `default`(for text: String) -> Cursor {
-            return Cursor(at: text.count, length: 0)
+            return Cursor(at: text.count, selection: 0)
         }
 
         let at: Int
-        let length: Int
+        let selection: Int
 
-        var normal: Cursor {
-            if self.length < 0 {
-                return Cursor(at: self.at + self.length, length: -self.length)
+        var normalized: Cursor {
+            if self.selection < 0 {
+                return Cursor(at: self.at + self.selection, selection: -self.selection)
             }
             else {
                 return self
@@ -126,7 +126,7 @@ public class InputView: ComponentView {
     override func render(to buffer: Buffer, in rect: Rect) {
         guard rect.size.width > 0 && rect.size.height > 0 else { return }
 
-        let normalCursor = self.cursor.normal
+        let normalCursor = self.cursor.normalized
 
         var yOffset = 0
         var xOffset = 0
@@ -174,8 +174,8 @@ public class InputView: ComponentView {
         cOffset = 0
 
         for char in text {
-            let attrs: [Attr]
-            if normalCursor.length > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.length {
+            var attrs: [Attr]
+            if normalCursor.selection > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.selection {
                 attrs = [.reverse]
             }
             else if cOffset == normalCursor.at {
@@ -194,10 +194,25 @@ public class InputView: ComponentView {
             }
 
             let printableChar: String
-            if char == "\n" {
+            switch char {
+            case "\n":
                 printableChar = " "
-            }
-            else {
+            case "󰀀": // uF0000
+                printableChar = "´"
+                attrs.append(.reverse)
+            case "󰀁": // uF0001
+                printableChar = "ˆ"
+                attrs.append(.reverse)
+            case "󰀂": // uF0002
+                printableChar = "˜"
+                attrs.append(.reverse)
+            case "󰀃": // uF0003
+                printableChar = "¨"
+                attrs.append(.reverse)
+            case "󰀄": // uF0004
+                printableChar = "`"
+                attrs.append(.reverse)
+            default:
                 printableChar = String(char)
             }
 
@@ -226,262 +241,265 @@ public class InputView: ComponentView {
 
         switch event {
         case let .key(key):
-            return keyEvent(onChange, key: key).compactMap { $0 }
+            return keyEvent(key: key).compactMap { $0 }
         default:
             return []
         }
     }
 
-    private func keyEvent(_ onChange: OnChangeHandler, key: KeyEvent) -> [AnyMessage?] {
-        if key.isPrintable || (key == .enter && isMultiline) {
-            return insert(onChange, string: key.toString)
+    private func keyEvent(key: KeyEvent) -> [AnyMessage?] {
+        if key.isPrintable {
+            return insert(string: key.toPrintable)
+        }
+        else if key == .enter, isMultiline {
+            return insert(string: key.toPrintable)
         }
         else if key == .enter, let onEnter = onEnter {
             return [onEnter()]
         }
         else if key == .backspace {
-            return backspace(onChange)
+            return backspace()
         }
         else if key == .signalEot { // ctrl+d == delete
-            return delete(onChange)
+            return delete()
         }
         else if key == .left {
-            return moveLeft(onChange)
+            return moveLeft()
         }
         else if key == .right {
-            return moveRight(onChange)
+            return moveRight()
         }
         else if key == .shift(.left) {
-            return extendLeft(onChange)
+            return extendLeft()
         }
         else if key == .shift(.right) {
-            return extendRight(onChange)
+            return extendRight()
         }
         else if key == .up || key == .shift(.up) {
-            return moveUp(onChange, extend: key == .shift(.up))
+            return moveUp(extend: key == .shift(.up))
         }
         else if key == .down || key == .shift(.down) {
-            return moveDown(onChange, extend: key == .shift(.down))
+            return moveDown(extend: key == .shift(.down))
         }
         else if key == .ctrl(.a) {
-            return moveToTop(onChange)
+            return moveToTop()
         }
         else if key == .ctrl(.e) {
-            return moveToBottom(onChange)
+            return moveToBottom()
         }
         else if key == .home {
-            return moveToBeginOfLine(onChange)
+            return moveToBeginOfLine()
         }
         else if key == .end {
-            return moveToEndOfLine(onChange)
+            return moveToEndOfLine()
         }
         return []
     }
 
-    private func insert(_ onChange: OnChangeHandler, string insert: String) -> [AnyMessage?] {
+    private func insert(string insert: String) -> [AnyMessage?] {
         let offset = insert.count
-        if cursor.at == text.count && cursor.length == 0 {
+        if cursor.at == text.count && cursor.selection == 0 {
             let nextText = text + insert
-            cursor = Cursor(at: cursor.at + offset, length: 0)
-            text = nextText
-            return [onCursorChange?(cursor), onChange(nextText)]
+            cursor = Cursor(at: cursor.at + offset, selection: 0)
+            (text, cursor) = fixDiacritics(nextText, cursor: cursor)
+            return [onCursorChange?(cursor), onChange(text)]
         }
 
-        let normalCursor = cursor.normal
+        let normalCursor = cursor.normalized
         // weird escape sequences can cause this:
         guard normalCursor.at < text.count else { return [] }
 
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
-        let end = text.index(cursorStart, offsetBy: normalCursor.length)
+        let end = text.index(cursorStart, offsetBy: normalCursor.selection)
         let nextText = text.replacingCharacters(in: cursorStart..<end, with: insert)
-        cursor = Cursor(at: normalCursor.at + offset, length: 0)
-        text = nextText
-        return [onCursorChange?(cursor), onChange(nextText)]
+        cursor = Cursor(at: normalCursor.at + offset, selection: 0)
+        (text, cursor) = fixDiacritics(nextText, cursor: cursor)
+        return [onCursorChange?(cursor), onChange(text)]
     }
 
-    private func backspace(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at > 0 || cursor.length > 0 else { return [] }
+    private func backspace() -> [AnyMessage?] {
+        guard cursor.at > 0 || cursor.selection > 0 else { return [] }
 
-        let normalCursor = cursor.normal
+        let normalCursor = cursor.normalized
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let range: Range<String.Index>
-        if normalCursor.length == 0 {
+        if normalCursor.selection == 0 {
             let prev = text.index(cursorStart, offsetBy: -1)
             range = prev ..< cursorStart
-            cursor = Cursor(at: normalCursor.at - 1, length: 0)
+            cursor = Cursor(at: normalCursor.at - 1, selection: 0)
         }
         else {
-            let end = text.index(cursorStart, offsetBy: normalCursor.length)
+            let end = text.index(cursorStart, offsetBy: normalCursor.selection)
             range = cursorStart ..< end
-            cursor = Cursor(at: normalCursor.at, length: 0)
+            cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
-        text = nextText
-        return [onCursorChange?(cursor), onChange(nextText)]
+        (text, cursor) = fixDiacritics(nextText, cursor: cursor)
+        return [onCursorChange?(cursor), onChange(text)]
     }
 
-    private func delete(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        if cursor.at == text.count && cursor.length == 0 { return [] }
+    private func delete() -> [AnyMessage?] {
+        if cursor.at == text.count && cursor.selection == 0 { return [] }
 
-        let normalCursor = cursor.normal
+        let normalCursor = cursor.normalized
         let cursorStart = text.index(text.startIndex, offsetBy: normalCursor.at)
         let range: Range<String.Index>
-        if normalCursor.length == 0 {
+        if normalCursor.selection == 0 {
             let next = text.index(cursorStart, offsetBy: 1)
             range = cursorStart ..< next
-            cursor = Cursor(at: normalCursor.at, length: 0)
+            cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         else {
-            let end = text.index(cursorStart, offsetBy: normalCursor.length)
+            let end = text.index(cursorStart, offsetBy: normalCursor.selection)
             range = cursorStart ..< end
-            cursor = Cursor(at: normalCursor.at, length: 0)
+            cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
-        text = nextText
-        return [onCursorChange?(cursor), onChange(nextText)]
+        (text, cursor) = fixDiacritics(nextText, cursor: cursor)
+        return [onCursorChange?(cursor), onChange(text)]
     }
 
-    private func moveLeft(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        let normalCursor = cursor.normal
-        if cursor.length == 0 {
-            cursor = Cursor(at: max(cursor.at - 1, 0), length: 0)
+    private func moveLeft() -> [AnyMessage?] {
+        let normalCursor = cursor.normalized
+        if cursor.selection == 0 {
+            cursor = Cursor(at: max(cursor.at - 1, 0), selection: 0)
             return [onCursorChange?(cursor), SystemMessage.rerender]
         }
         else {
-            cursor = Cursor(at: normalCursor.at, length: 0)
+            cursor = Cursor(at: normalCursor.at, selection: 0)
             return [onCursorChange?(cursor), SystemMessage.rerender]
         }
     }
 
-    private func moveRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        let normalCursor = cursor.normal
-        if cursor.length == 0 {
+    private func moveRight() -> [AnyMessage?] {
+        let normalCursor = cursor.normalized
+        if cursor.selection == 0 {
             let maxCursor = text.count
-            cursor = Cursor(at: min(cursor.at + 1, maxCursor), length: 0)
+            cursor = Cursor(at: min(cursor.at + 1, maxCursor), selection: 0)
             return [onCursorChange?(cursor), SystemMessage.rerender]
         }
         else {
-            cursor = Cursor(at: normalCursor.at + normalCursor.length, length: 0)
+            cursor = Cursor(at: normalCursor.at + normalCursor.selection, selection: 0)
             return [onCursorChange?(cursor), SystemMessage.rerender]
         }
     }
 
-    private func extendLeft(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        if cursor.at + cursor.length == 0 { return [] }
-        cursor = Cursor(at: cursor.at, length: cursor.length - 1)
+    private func extendLeft() -> [AnyMessage?] {
+        if cursor.at + cursor.selection == 0 { return [] }
+        cursor = Cursor(at: cursor.at, selection: cursor.selection - 1)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func extendRight(_ onChange: OnChangeHandler) -> [AnyMessage?] {
+    private func extendRight() -> [AnyMessage?] {
         let maxCursor = text.count
-        if cursor.at + cursor.length == maxCursor { return [] }
-        cursor = Cursor(at: cursor.at, length: cursor.length + 1)
+        if cursor.at + cursor.selection == maxCursor { return [] }
+        cursor = Cursor(at: cursor.at, selection: cursor.selection + 1)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveUp(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage?] {
+    private func moveUp(extend: Bool) -> [AnyMessage?] {
         let lines = textLines
         var x = 0
         var prevX = 0
         var prevLength = 0
-        let maxX = cursor.at + cursor.length
+        let maxX = cursor.at + cursor.selection
         for line in lines {
-            let length = line.count + 1
-            if x + length > maxX {
+            let selection = line.count + 1
+            if x + selection > maxX {
                 let lineOffset = maxX - x
                 x = prevX + min(lineOffset, prevLength)
                 break
             }
-            prevLength = length - 1
+            prevLength = selection - 1
             prevX = x
-            x += length
+            x += selection
         }
 
         let prevCursor = cursor
         if extend {
             if x == 0 {
-                cursor = Cursor(at: cursor.at, length: extend ? -cursor.at : 0)
+                cursor = Cursor(at: cursor.at, selection: extend ? -cursor.at : 0)
             }
             else {
-                cursor = Cursor(at: cursor.at, length: x - cursor.at)
+                cursor = Cursor(at: cursor.at, selection: x - cursor.at)
             }
         }
         else if x == 0 {
-            cursor = Cursor(at: 0, length: 0)
+            cursor = Cursor(at: 0, selection: 0)
         }
         else {
-            cursor = Cursor(at: x, length: 0)
+            cursor = Cursor(at: x, selection: 0)
         }
 
-        if prevCursor.at == cursor.at && prevCursor.length == cursor.length {
+        if prevCursor.at == cursor.at && prevCursor.selection == cursor.selection {
             return []
         }
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveDown(_ onChange: OnChangeHandler, extend: Bool) -> [AnyMessage?] {
+    private func moveDown(extend: Bool) -> [AnyMessage?] {
         let lines = textLines
         var x = 0
         var prevX = 0
-        let maxX = cursor.at + cursor.length
+        let maxX = cursor.at + cursor.selection
         for line in lines {
-            let length = line.count
+            let selection = line.count
             if x > maxX {
                 let lineOffset = maxX - prevX
-                x += min(lineOffset, length)
+                x += min(lineOffset, selection)
                 break
             }
             prevX = x
-            x += length + 1
+            x += selection + 1
         }
 
         let prevCursor = cursor
         if extend {
             if x > text.count {
-                cursor = Cursor(at: cursor.at, length: text.count - cursor.at)
+                cursor = Cursor(at: cursor.at, selection: text.count - cursor.at)
             }
             else {
-                cursor = Cursor(at: cursor.at, length: x - cursor.at)
+                cursor = Cursor(at: cursor.at, selection: x - cursor.at)
             }
         }
         else if x > text.count {
-            cursor = Cursor(at: text.count, length: 0)
+            cursor = Cursor(at: text.count, selection: 0)
         }
         else {
-            cursor = Cursor(at: x, length: 0)
+            cursor = Cursor(at: x, selection: 0)
         }
 
-        if prevCursor.at == cursor.at && prevCursor.length == cursor.length {
+        if prevCursor.at == cursor.at && prevCursor.selection == cursor.selection {
             return []
         }
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToTop(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != 0 || cursor.length != 0 else { return [] }
+    private func moveToTop() -> [AnyMessage?] {
+        guard cursor.at != 0 || cursor.selection != 0 else { return [] }
 
-        cursor = Cursor(at: 0, length: 0)
+        cursor = Cursor(at: 0, selection: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToBottom(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != text.count || cursor.length != 0 else { return [] }
+    private func moveToBottom() -> [AnyMessage?] {
+        guard cursor.at != text.count || cursor.selection != 0 else { return [] }
 
-        cursor = Cursor(at: text.count, length: 0)
+        cursor = Cursor(at: text.count, selection: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToBeginOfLine(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != 0 || cursor.length != 0 else { return [] }
+    private func moveToBeginOfLine() -> [AnyMessage?] {
+        guard cursor.at != 0 || cursor.selection != 0 else { return [] }
 
-        cursor = Cursor(at: 0, length: 0)
+        cursor = Cursor(at: 0, selection: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 
-    private func moveToEndOfLine(_ onChange: OnChangeHandler) -> [AnyMessage?] {
-        guard cursor.at != text.count || cursor.length != 0 else { return [] }
+    private func moveToEndOfLine() -> [AnyMessage?] {
+        guard cursor.at != text.count || cursor.selection != 0 else { return [] }
 
-        cursor = Cursor(at: text.count, length: 0)
+        cursor = Cursor(at: text.count, selection: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
 }
@@ -491,7 +509,7 @@ extension InputView: KeyboardTrapComponent {
         guard isFirstResponder else { return false }
 
         if key.isPrintable ||
-            isMultiline && key == .enter ||
+            (isMultiline && key == .enter) ||
             key == .backspace ||
             key == .signalEot ||
             key == .left ||
@@ -514,5 +532,129 @@ extension InputView: KeyboardTrapComponent {
         }
 
         return false
+    }
+}
+
+private func fixDiacritics(_ text: String, cursor: InputView.Cursor) -> (String, InputView.Cursor) {
+    let newText = text
+        // ´ áéíóú
+        .replacingOccurrences(of: "󰀀A", with: "Á")
+        .replacingOccurrences(of: "󰀀E", with: "É")
+        .replacingOccurrences(of: "󰀀I", with: "Í")
+        .replacingOccurrences(of: "󰀀O", with: "Ó")
+        .replacingOccurrences(of: "󰀀U", with: "Ú")
+        .replacingOccurrences(of: "󰀀Y", with: "Ý")
+        .replacingOccurrences(of: "󰀀a", with: "á")
+        .replacingOccurrences(of: "󰀀e", with: "é")
+        .replacingOccurrences(of: "󰀀i", with: "í")
+        .replacingOccurrences(of: "󰀀o", with: "ó")
+        .replacingOccurrences(of: "󰀀u", with: "ú")
+        .replacingOccurrences(of: "󰀀y", with: "ý")
+        .replacingOccurrences(of: "󰀀C", with: "Ć")
+        .replacingOccurrences(of: "󰀀c", with: "ć")
+        .replacingOccurrences(of: "󰀀L", with: "Ĺ")
+        .replacingOccurrences(of: "󰀀l", with: "ĺ")
+        .replacingOccurrences(of: "󰀀N", with: "Ń")
+        .replacingOccurrences(of: "󰀀n", with: "ń")
+        .replacingOccurrences(of: "󰀀R", with: "Ŕ")
+        .replacingOccurrences(of: "󰀀r", with: "ŕ")
+        .replacingOccurrences(of: "󰀀S", with: "Ś")
+        .replacingOccurrences(of: "󰀀s", with: "ś")
+        .replacingOccurrences(of: "󰀀Z", with: "Ź")
+        .replacingOccurrences(of: "󰀀z", with: "ź")
+        .replacingOccurrences(of: "󰀀G", with: "Ǵ")
+        .replacingOccurrences(of: "󰀀g", with: "ǵ")
+        .replacingOccurrences(of: "󰀀Æ", with: "Ǽ")
+        .replacingOccurrences(of: "󰀀æ", with: "ǽ")
+        .replacingOccurrences(of: "󰀀K", with: "Ḱ")
+        .replacingOccurrences(of: "󰀀k", with: "ḱ")
+        .replacingOccurrences(of: "󰀀M", with: "Ḿ")
+        .replacingOccurrences(of: "󰀀m", with: "ḿ")
+        .replacingOccurrences(of: "󰀀P", with: "Ṕ")
+        .replacingOccurrences(of: "󰀀p", with: "ṕ")
+        .replacingOccurrences(of: "󰀀W", with: "Ẃ")
+        .replacingOccurrences(of: "󰀀w", with: "ẃ")
+        // ˆ âêîôû
+        .replacingOccurrences(of: "󰀁A", with: "Â")
+        .replacingOccurrences(of: "󰀁E", with: "Ê")
+        .replacingOccurrences(of: "󰀁I", with: "Î")
+        .replacingOccurrences(of: "󰀁O", with: "Ô")
+        .replacingOccurrences(of: "󰀁U", with: "Û")
+        .replacingOccurrences(of: "󰀁a", with: "â")
+        .replacingOccurrences(of: "󰀁e", with: "ê")
+        .replacingOccurrences(of: "󰀁i", with: "î")
+        .replacingOccurrences(of: "󰀁o", with: "ô")
+        .replacingOccurrences(of: "󰀁u", with: "û")
+        .replacingOccurrences(of: "󰀁C", with: "Ĉ")
+        .replacingOccurrences(of: "󰀁c", with: "ĉ")
+        .replacingOccurrences(of: "󰀁G", with: "Ĝ")
+        .replacingOccurrences(of: "󰀁g", with: "ĝ")
+        .replacingOccurrences(of: "󰀁H", with: "Ĥ")
+        .replacingOccurrences(of: "󰀁h", with: "ĥ")
+        .replacingOccurrences(of: "󰀁J", with: "Ĵ")
+        .replacingOccurrences(of: "󰀁j", with: "ĵ")
+        .replacingOccurrences(of: "󰀁S", with: "Ŝ")
+        .replacingOccurrences(of: "󰀁s", with: "ŝ")
+        .replacingOccurrences(of: "󰀁W", with: "Ŵ")
+        .replacingOccurrences(of: "󰀁w", with: "ŵ")
+        .replacingOccurrences(of: "󰀁Y", with: "Ŷ")
+        .replacingOccurrences(of: "󰀁y", with: "ŷ")
+        // ˜ ñãõ
+        .replacingOccurrences(of: "󰀂A", with: "Ã")
+        .replacingOccurrences(of: "󰀂N", with: "Ñ")
+        .replacingOccurrences(of: "󰀂O", with: "Õ")
+        .replacingOccurrences(of: "󰀂a", with: "ã")
+        .replacingOccurrences(of: "󰀂n", with: "ñ")
+        .replacingOccurrences(of: "󰀂o", with: "õ")
+        .replacingOccurrences(of: "󰀂I", with: "Ĩ")
+        .replacingOccurrences(of: "󰀂i", with: "ĩ")
+        .replacingOccurrences(of: "󰀂U", with: "Ũ")
+        .replacingOccurrences(of: "󰀂u", with: "ũ")
+        // ¨ äëïöü
+        .replacingOccurrences(of: "󰀃A", with: "Ä")
+        .replacingOccurrences(of: "󰀃E", with: "Ë")
+        .replacingOccurrences(of: "󰀃I", with: "Ï")
+        .replacingOccurrences(of: "󰀃O", with: "Ö")
+        .replacingOccurrences(of: "󰀃U", with: "Ü")
+        .replacingOccurrences(of: "󰀃a", with: "ä")
+        .replacingOccurrences(of: "󰀃e", with: "ë")
+        .replacingOccurrences(of: "󰀃i", with: "ï")
+        .replacingOccurrences(of: "󰀃o", with: "ö")
+        .replacingOccurrences(of: "󰀃u", with: "ü")
+        .replacingOccurrences(of: "󰀃Y", with: "Ÿ")
+        .replacingOccurrences(of: "󰀃y", with: "ÿ")
+        .replacingOccurrences(of: "󰀃W", with: "Ẅ")
+        .replacingOccurrences(of: "󰀃w", with: "ẅ")
+        .replacingOccurrences(of: "󰀃X", with: "Ẍ")
+        .replacingOccurrences(of: "󰀃x", with: "ẍ")
+        .replacingOccurrences(of: "󰀃t", with: "ẗ")
+        .replacingOccurrences(of: "󰀃H", with: "Ḧ")
+        .replacingOccurrences(of: "󰀃h", with: "ḧ")
+        .replacingOccurrences(of: "󰀃3", with: "Ӟ")
+        // ` àèìòù
+        .replacingOccurrences(of: "󰀄A", with: "À")
+        .replacingOccurrences(of: "󰀄E", with: "È")
+        .replacingOccurrences(of: "󰀄I", with: "Ì")
+        .replacingOccurrences(of: "󰀄O", with: "Ò")
+        .replacingOccurrences(of: "󰀄U", with: "Ù")
+        .replacingOccurrences(of: "󰀄a", with: "à")
+        .replacingOccurrences(of: "󰀄e", with: "è")
+        .replacingOccurrences(of: "󰀄i", with: "ì")
+        .replacingOccurrences(of: "󰀄o", with: "ò")
+        .replacingOccurrences(of: "󰀄u", with: "ù")
+        .replacingOccurrences(of: "󰀄N", with: "Ǹ")
+        .replacingOccurrences(of: "󰀄n", with: "ǹ")
+        .replacingOccurrences(of: "󰀄W", with: "Ẁ")
+        .replacingOccurrences(of: "󰀄w", with: "ẁ")
+        .replacingOccurrences(of: "󰀄Y", with: "Ỳ")
+        .replacingOccurrences(of: "󰀄y", with: "ỳ")
+    if newText != text {
+        return (newText, InputView.Cursor(
+            at: cursor.at - text.count + newText.count,
+            selection: 0
+            ))
+    }
+    else {
+        return (text, cursor)
     }
 }

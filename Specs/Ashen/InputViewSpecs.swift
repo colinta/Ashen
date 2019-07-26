@@ -55,7 +55,7 @@ struct InputViewSpecs: Spec {
                 changedText = text
                 return ""
             })
-        subject.cursor = InputView.Cursor(at: startingCursor.0, length: startingCursor.1)
+        subject.cursor = InputView.Cursor(at: startingCursor.0, selection: startingCursor.1)
 
         _ = subject.messages(for: Event.key(keyEvent))
         let newText = changedText ?? text
