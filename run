@@ -1,8 +1,0 @@
-#!/usr/local/bin/bash
-
-set -o pipefail && xcodebuild -configuration Debug build | xcpretty
-status=$?
-if [[ $status == 0 && $1 != "build" ]]; then
-  ./build/Debug/Ashen "$@"
-fi
-# swift build -Xlinker -lcurses
