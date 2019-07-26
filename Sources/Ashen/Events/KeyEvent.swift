@@ -1,181 +1,181 @@
 public enum KeyEvent: UInt16 {
-    case signal_ctrl_at = 0        // @
-    case signal_ctrl_a             // a
-    case signal_ctrl_b             // b
-    case signal_ctrl_c             // c
-    case signal_ctrl_d             // d
-    case signal_ctrl_e             // e
-    case signal_ctrl_f             // f
-    case signal_ctrl_g             // g
-    case signal_ctrl_h      // ???
-    case key_tab                   // i == tab
-    case signal_ctrl_j             // j
-    case signal_ctrl_k             // k
-    case signal_ctrl_l             // l
-    case key_enter                 // m == enter
-    case signal_ctrl_n             // n
-    case signal_ctrl_o             // o
-    case signal_ctrl_p             // p
-    case signal_ctrl_q             // q
-    case signal_ctrl_r             // r
-    case signal_ctrl_s             // s
-    case signal_ctrl_t             // t
-    case signal_ctrl_u             // u
-    case signal_ctrl_v             // v
-    case signal_ctrl_w             // w
-    case signal_ctrl_x             // x
-    case signal_ctrl_y             // y
-    case signal_ctrl_z             // z
-    case key_esc                   // [ == ESC
-    case signal_ctrl_bslash        // \
-    case signal_ctrl_rbracket      // ]
-    case signal_ctrl_caret         // ^
-    case signal_ctrl_fslash        // / or -
+    case signalCtrlAt = 0        // @
+    case signalCtrlA             // a
+    case signalCtrlB             // b
+    case signalCtrlC             // c
+    case signalCtrlD             // d
+    case signalCtrlE             // e
+    case signalCtrlF             // f
+    case signalCtrlG             // g
+    case signalCtrlH      // ???
+    case keyTab                   // i == tab
+    case signalCtrlJ             // j
+    case signalCtrlK             // k
+    case signalCtrlL             // l
+    case keyEnter                 // m == enter
+    case signalCtrlN             // n
+    case signalCtrlO             // o
+    case signalCtrlP             // p
+    case signalCtrlQ             // q
+    case signalCtrlR             // r
+    case signalCtrlS             // s
+    case signalCtrlT             // t
+    case signalCtrlU             // u
+    case signalCtrlV             // v
+    case signalCtrlW             // w
+    case signalCtrlX             // x
+    case signalCtrlY             // y
+    case signalCtrlZ             // z
+    case keyEsc                   // [ == ESC
+    case signalCtrlBslash        // \
+    case signalCtrlRbracket      // ]
+    case signalCtrlCaret         // ^
+    case signalCtrlFslash        // / or -
 
-    case key_space = 32
-    case symbol_bang
-    case symbol_dquot
-    case symbol_hash
-    case symbol_dollar
-    case symbol_percent
-    case symbol_amp
-    case symbol_squot
-    case symbol_lparen
-    case symbol_rparen
-    case symbol_star
-    case symbol_plus
-    case symbol_comma
-    case symbol_dash
-    case symbol_period
-    case symbol_fslash
+    case keySpace = 32
+    case symbolBang
+    case symbolDquot
+    case symbolHash
+    case symbolDollar
+    case symbolPercent
+    case symbolAmp
+    case symbolSquot
+    case symbolLparen
+    case symbolRparen
+    case symbolStar
+    case symbolPlus
+    case symbolComma
+    case symbolDash
+    case symbolPeriod
+    case symbolFslash
 
-    case number_0 = 48
-    case number_1
-    case number_2
-    case number_3
-    case number_4
-    case number_5
-    case number_6
-    case number_7
-    case number_8
-    case number_9
+    case number0 = 48
+    case number1
+    case number2
+    case number3
+    case number4
+    case number5
+    case number6
+    case number7
+    case number8
+    case number9
 
-    case symbol_colon = 58
-    case symbol_semicolon
-    case symbol_lt
-    case symbol_eq
-    case symbol_gt
-    case symbol_question
-    case symbol_at
+    case symbolColon = 58
+    case symbolSemicolon
+    case symbolLt
+    case symbolEq
+    case symbolGt
+    case symbolQuestion
+    case symbolAt
 
-    case letter_A = 65
-    case letter_B
-    case letter_C
-    case letter_D
-    case letter_E
-    case letter_F
-    case letter_G
-    case letter_H
-    case letter_I
-    case letter_J
-    case letter_K
-    case letter_L
-    case letter_M
-    case letter_N
-    case letter_O
-    case letter_P
-    case letter_Q
-    case letter_R
-    case letter_S
-    case letter_T
-    case letter_U
-    case letter_V
-    case letter_W
-    case letter_X
-    case letter_Y
-    case letter_Z
+    case A = 65
+    case B
+    case C
+    case D
+    case E
+    case F
+    case G
+    case H
+    case I
+    case J
+    case K
+    case L
+    case M
+    case N
+    case O
+    case P
+    case Q
+    case R
+    case S
+    case T
+    case U
+    case V
+    case W
+    case X
+    case Y
+    case Z
 
-    case symbol_lbracket = 91
-    case symbol_bslash
-    case symbol_rbracket
-    case symbol_caret
-    case symbol_underscore
-    case symbol_backtick
+    case symbolLbracket = 91
+    case symbolBslash
+    case symbolRbracket
+    case symbolCaret
+    case symbolUnderscore
+    case symbolBacktick
 
-    case letter_a = 97
-    case letter_b
-    case letter_c
-    case letter_d
-    case letter_e
-    case letter_f
-    case letter_g
-    case letter_h
-    case letter_i
-    case letter_j
-    case letter_k
-    case letter_l
-    case letter_m
-    case letter_n
-    case letter_o
-    case letter_p
-    case letter_q
-    case letter_r
-    case letter_s
-    case letter_t
-    case letter_u
-    case letter_v
-    case letter_w
-    case letter_x
-    case letter_y
-    case letter_z
+    case a = 97
+    case b
+    case c
+    case d
+    case e
+    case f
+    case g
+    case h
+    case i
+    case j
+    case k
+    case l
+    case m
+    case n
+    case o
+    case p
+    case q
+    case r
+    case s
+    case t
+    case u
+    case v
+    case w
+    case x
+    case y
+    case z
 
-    case symbol_lcurly = 123
-    case symbol_pipe
-    case symbol_rcurly
-    case symbol_tilde
+    case symbolLcurly = 123
+    case symbolPipe
+    case symbolRcurly
+    case symbolTilde
 
-    case key_backspace = 0x7f
-    case key_backtab
+    case keyBackspace = 0x7f
+    case keyBacktab
 
-    case key_down
-    case key_up
-    case key_left
-    case key_right
-    case key_home
-    case key_shift_down
-    case key_shift_up
-    case key_shift_left
-    case key_shift_right
-    case key_alt_down
-    case key_alt_up
-    case key_alt_left
-    case key_alt_right
+    case keyDown
+    case keyUp
+    case keyLeft
+    case keyRight
+    case keyHome
+    case keyShiftDown
+    case keyShiftUp
+    case keyShiftLeft
+    case keyShiftRight
+    case keyAltDown
+    case keyAltUp
+    case keyAltLeft
+    case keyAltRight
 
-    case signal_ctrl_h_broken        // what is this?  ^h sends it?
-    case signal_alt_bslash
+    case signalCtrlHBroken        // what is this?  ^h sends it?
+    case signalAltBslash
 
-    case key_f1
-    case key_f2
-    case key_f3
-    case key_f4
-    case key_f5
-    case key_f6
-    case key_f7
-    case key_f8
-    case key_f9
-    case key_f10
-    case key_f11
-    case key_f12
+    case keyF1
+    case keyF2
+    case keyF3
+    case keyF4
+    case keyF5
+    case keyF6
+    case keyF7
+    case keyF8
+    case keyF9
+    case keyF10
+    case keyF11
+    case keyF12
 
-    case key_pagedown
-    case key_pageup
-    case key_end
-    case key_shift_home
-    case key_shift_end
+    case keyPagedown
+    case keyPageup
+    case keyEnd
+    case keyShiftHome
+    case keyShiftEnd
 
-    case key_delete
-    case key_insert
-    case signal_ctrl_6
+    case keyDelete
+    case keyInsert
+    case signalCtrl6
 
     case unrecognized = 0xffff
 
@@ -184,36 +184,36 @@ public enum KeyEvent: UInt16 {
     // (eg C-c int, C-t info, C-z suspend, C-\ quit)
     //
     // the rest are named after ASCII codes from http://www.ascii-code.com
-    public static let signal_nul: KeyEvent = .signal_ctrl_at
-    public static let signal_soh: KeyEvent = .signal_ctrl_a
-    public static let signal_stx: KeyEvent = .signal_ctrl_b
-    public static let signal_int: KeyEvent = .signal_ctrl_c
-    public static let signal_eot: KeyEvent = .signal_ctrl_d
-    public static let signal_enq: KeyEvent = .signal_ctrl_e
-    public static let signal_ack: KeyEvent = .signal_ctrl_f
-    public static let signal_bel: KeyEvent = .signal_ctrl_g
-    public static let signal_bs: KeyEvent = .signal_ctrl_h_broken
-    public static let signal_lf: KeyEvent = .signal_ctrl_j
-    public static let signal_vt: KeyEvent = .signal_ctrl_k
-    public static let signal_ff: KeyEvent = .signal_ctrl_l
-    public static let signal_so: KeyEvent = .signal_ctrl_n
-    public static let signal_discard: KeyEvent = .signal_ctrl_o
-    public static let signal_dle: KeyEvent = .signal_ctrl_p
-    public static let signal_start: KeyEvent = .signal_ctrl_q
-    public static let signal_reprint: KeyEvent = .signal_ctrl_r
-    public static let signal_stop: KeyEvent = .signal_ctrl_s
-    public static let signal_info: KeyEvent = .signal_ctrl_t
-    public static let signal_kill: KeyEvent = .signal_ctrl_u
-    public static let signal_next: KeyEvent = .signal_ctrl_v
-    public static let signal_etb: KeyEvent = .signal_ctrl_w
-    public static let signal_cancel: KeyEvent = .signal_ctrl_x
-    public static let signal_dsusp: KeyEvent = .signal_ctrl_y
-    public static let signal_suspend: KeyEvent = .signal_ctrl_z
-    public static let signal_quit: KeyEvent = .signal_ctrl_bslash
-    public static let signal_gs: KeyEvent = .signal_ctrl_rbracket
-    public static let signal_rs: KeyEvent = .signal_ctrl_caret
-    public static let signal_us: KeyEvent = .signal_ctrl_fslash
-    public static let signal_h: KeyEvent = .signal_ctrl_h
+    public static let signalNul: KeyEvent = .signalCtrlAt
+    public static let signalSoh: KeyEvent = .signalCtrlA
+    public static let signalStx: KeyEvent = .signalCtrlB
+    public static let signalInt: KeyEvent = .signalCtrlC
+    public static let signalEot: KeyEvent = .signalCtrlD
+    public static let signalEnq: KeyEvent = .signalCtrlE
+    public static let signalAck: KeyEvent = .signalCtrlF
+    public static let signalBel: KeyEvent = .signalCtrlG
+    public static let signalBs: KeyEvent = .signalCtrlHBroken
+    public static let signalLf: KeyEvent = .signalCtrlJ
+    public static let signalVt: KeyEvent = .signalCtrlK
+    public static let signalFf: KeyEvent = .signalCtrlL
+    public static let signalSo: KeyEvent = .signalCtrlN
+    public static let signalDiscard: KeyEvent = .signalCtrlO
+    public static let signalDle: KeyEvent = .signalCtrlP
+    public static let signalStart: KeyEvent = .signalCtrlQ
+    public static let signalReprint: KeyEvent = .signalCtrlR
+    public static let signalStop: KeyEvent = .signalCtrlS
+    public static let signalInfo: KeyEvent = .signalCtrlT
+    public static let signalKill: KeyEvent = .signalCtrlU
+    public static let signalNext: KeyEvent = .signalCtrlV
+    public static let signalEtb: KeyEvent = .signalCtrlW
+    public static let signalCancel: KeyEvent = .signalCtrlX
+    public static let signalDsusp: KeyEvent = .signalCtrlY
+    public static let signalSuspend: KeyEvent = .signalCtrlZ
+    public static let signalQuit: KeyEvent = .signalCtrlBslash
+    public static let signalGs: KeyEvent = .signalCtrlRbracket
+    public static let signalRs: KeyEvent = .signalCtrlCaret
+    public static let signalUs: KeyEvent = .signalCtrlFslash
+    public static let signalH: KeyEvent = .signalCtrlH
 }
 
 public extension KeyEvent {
@@ -223,187 +223,187 @@ public extension KeyEvent {
 
     var toString: String {
         switch self {
-        case .signal_ctrl_at: return "^@"
-        case .signal_ctrl_a: return "^A"
-        case .signal_ctrl_b: return "^B"
-        case .signal_ctrl_c: return "^C"
-        case .signal_ctrl_d: return "^D"
-        case .signal_ctrl_e: return "^E"
-        case .signal_ctrl_f: return "^F"
-        case .signal_ctrl_g: return "^G"
-        case .signal_ctrl_h_broken: return "^⌫"
-        case .signal_ctrl_j: return "^J"
-        case .signal_ctrl_k: return "^K"
-        case .signal_ctrl_l: return "^L"
-        case .signal_ctrl_n: return "^N"
-        case .signal_ctrl_o: return "^O"
-        case .signal_ctrl_p: return "^P"
-        case .signal_ctrl_q: return "^Q"
-        case .signal_ctrl_r: return "^R"
-        case .signal_ctrl_s: return "^S"
-        case .signal_ctrl_t: return "^T"
-        case .signal_ctrl_u: return "^U"
-        case .signal_ctrl_v: return "^V"
-        case .signal_ctrl_w: return "^W"
-        case .signal_ctrl_x: return "^X"
-        case .signal_ctrl_y: return "^Y"
-        case .signal_ctrl_z: return "^Z"
-        case .signal_ctrl_bslash: return "^\\"
-        case .signal_alt_bslash: return "⌥\\"
-        case .signal_ctrl_rbracket: return "^]"
-        case .signal_ctrl_caret: return "^^"
-        case .signal_ctrl_fslash: return "^/"
-        case .signal_ctrl_h: return "^H"
+        case .signalCtrlAt: return "^@"
+        case .signalCtrlA: return "^A"
+        case .signalCtrlB: return "^B"
+        case .signalCtrlC: return "^C"
+        case .signalCtrlD: return "^D"
+        case .signalCtrlE: return "^E"
+        case .signalCtrlF: return "^F"
+        case .signalCtrlG: return "^G"
+        case .signalCtrlHBroken: return "^⌫"
+        case .signalCtrlJ: return "^J"
+        case .signalCtrlK: return "^K"
+        case .signalCtrlL: return "^L"
+        case .signalCtrlN: return "^N"
+        case .signalCtrlO: return "^O"
+        case .signalCtrlP: return "^P"
+        case .signalCtrlQ: return "^Q"
+        case .signalCtrlR: return "^R"
+        case .signalCtrlS: return "^S"
+        case .signalCtrlT: return "^T"
+        case .signalCtrlU: return "^U"
+        case .signalCtrlV: return "^V"
+        case .signalCtrlW: return "^W"
+        case .signalCtrlX: return "^X"
+        case .signalCtrlY: return "^Y"
+        case .signalCtrlZ: return "^Z"
+        case .signalCtrlBslash: return "^\\"
+        case .signalAltBslash: return "⌥\\"
+        case .signalCtrlRbracket: return "^]"
+        case .signalCtrlCaret: return "^^"
+        case .signalCtrlFslash: return "^/"
+        case .signalCtrlH: return "^H"
 
-        case .key_backtab: return "\\T"
-        case .key_esc: return "\\["
+        case .keyBacktab: return "\\T"
+        case .keyEsc: return "\\["
 
-        case .key_backspace: return "⌫"
-        case .key_delete: return "⌦"
-        case .key_insert: return "⌅"
-        case .signal_ctrl_6: return "^6"
+        case .keyBackspace: return "⌫"
+        case .keyDelete: return "⌦"
+        case .keyInsert: return "⌅"
+        case .signalCtrl6: return "^6"
 
-        case .key_down: return "↓"
-        case .key_up: return "↑"
-        case .key_left: return "←"
-        case .key_right: return "→"
+        case .keyDown: return "↓"
+        case .keyUp: return "↑"
+        case .keyLeft: return "←"
+        case .keyRight: return "→"
 
-        case .key_shift_down: return "⇧↓"
-        case .key_shift_up: return "⇧↑"
-        case .key_shift_left: return "⇧←"
-        case .key_shift_right: return "⇧→"
+        case .keyShiftDown: return "⇧↓"
+        case .keyShiftUp: return "⇧↑"
+        case .keyShiftLeft: return "⇧←"
+        case .keyShiftRight: return "⇧→"
 
-        case .key_alt_down: return "⌥↓"
-        case .key_alt_up: return "⌥↑"
-        case .key_alt_left: return "⌥←"
-        case .key_alt_right: return "⌥→"
+        case .keyAltDown: return "⌥↓"
+        case .keyAltUp: return "⌥↑"
+        case .keyAltLeft: return "⌥←"
+        case .keyAltRight: return "⌥→"
 
-        case .key_home: return "⤒"
-        case .key_pageup: return "↟"
-        case .key_pagedown: return "↡"
-        case .key_end: return "⤓"
-        case .key_shift_home: return "⇧⤒"
-        case .key_shift_end: return "⇧⤓"
+        case .keyHome: return "⤒"
+        case .keyPageup: return "↟"
+        case .keyPagedown: return "↡"
+        case .keyEnd: return "⤓"
+        case .keyShiftHome: return "⇧⤒"
+        case .keyShiftEnd: return "⇧⤓"
 
-        case .key_f1: return "𝑓1"
-        case .key_f2: return "𝑓2"
-        case .key_f3: return "𝑓3"
-        case .key_f4: return "𝑓4"
-        case .key_f5: return "𝑓5"
-        case .key_f6: return "𝑓6"
-        case .key_f7: return "𝑓7"
-        case .key_f8: return "𝑓8"
-        case .key_f9: return "𝑓9"
-        case .key_f10: return "𝑓10"
-        case .key_f11: return "𝑓11"
-        case .key_f12: return "𝑓12"
+        case .keyF1: return "𝑓1"
+        case .keyF2: return "𝑓2"
+        case .keyF3: return "𝑓3"
+        case .keyF4: return "𝑓4"
+        case .keyF5: return "𝑓5"
+        case .keyF6: return "𝑓6"
+        case .keyF7: return "𝑓7"
+        case .keyF8: return "𝑓8"
+        case .keyF9: return "𝑓9"
+        case .keyF10: return "𝑓10"
+        case .keyF11: return "𝑓11"
+        case .keyF12: return "𝑓12"
 
         // printables:
 
-        case .key_tab: return "\t"
-        case .key_enter: return "\n"
-        case .key_space: return " "
+        case .keyTab: return "\t"
+        case .keyEnter: return "\n"
+        case .keySpace: return " "
 
-        case .symbol_bang: return "!"
-        case .symbol_dquot: return "\""
-        case .symbol_hash: return "#"
-        case .symbol_dollar: return "$"
-        case .symbol_percent: return "%"
-        case .symbol_amp: return "&"
-        case .symbol_squot: return "'"
-        case .symbol_lparen: return "("
-        case .symbol_rparen: return ")"
-        case .symbol_star: return "*"
-        case .symbol_plus: return "+"
-        case .symbol_comma: return ","
-        case .symbol_dash: return "-"
-        case .symbol_period: return "."
-        case .symbol_fslash: return "/"
+        case .symbolBang: return "!"
+        case .symbolDquot: return "\""
+        case .symbolHash: return "#"
+        case .symbolDollar: return "$"
+        case .symbolPercent: return "%"
+        case .symbolAmp: return "&"
+        case .symbolSquot: return "'"
+        case .symbolLparen: return "("
+        case .symbolRparen: return ")"
+        case .symbolStar: return "*"
+        case .symbolPlus: return "+"
+        case .symbolComma: return ","
+        case .symbolDash: return "-"
+        case .symbolPeriod: return "."
+        case .symbolFslash: return "/"
 
-        case .symbol_colon: return ":"
-        case .symbol_semicolon: return ";"
-        case .symbol_lt: return "<"
-        case .symbol_eq: return "="
-        case .symbol_gt: return ">"
-        case .symbol_question: return "?"
-        case .symbol_at: return "@"
+        case .symbolColon: return ":"
+        case .symbolSemicolon: return ";"
+        case .symbolLt: return "<"
+        case .symbolEq: return "="
+        case .symbolGt: return ">"
+        case .symbolQuestion: return "?"
+        case .symbolAt: return "@"
 
-        case .symbol_lbracket: return "["
-        case .symbol_bslash: return "\\"
-        case .symbol_rbracket: return "]"
-        case .symbol_caret: return "^"
-        case .symbol_underscore: return "_"
-        case .symbol_backtick: return "`"
+        case .symbolLbracket: return "["
+        case .symbolBslash: return "\\"
+        case .symbolRbracket: return "]"
+        case .symbolCaret: return "^"
+        case .symbolUnderscore: return "_"
+        case .symbolBacktick: return "`"
 
-        case .symbol_lcurly: return "{"
-        case .symbol_pipe: return "|"
-        case .symbol_rcurly: return "}"
-        case .symbol_tilde: return "~"
+        case .symbolLcurly: return "{"
+        case .symbolPipe: return "|"
+        case .symbolRcurly: return "}"
+        case .symbolTilde: return "~"
 
-        case .number_0: return "0"
-        case .number_1: return "1"
-        case .number_2: return "2"
-        case .number_3: return "3"
-        case .number_4: return "4"
-        case .number_5: return "5"
-        case .number_6: return "6"
-        case .number_7: return "7"
-        case .number_8: return "8"
-        case .number_9: return "9"
+        case .number0: return "0"
+        case .number1: return "1"
+        case .number2: return "2"
+        case .number3: return "3"
+        case .number4: return "4"
+        case .number5: return "5"
+        case .number6: return "6"
+        case .number7: return "7"
+        case .number8: return "8"
+        case .number9: return "9"
 
-        case .letter_A: return "A"
-        case .letter_B: return "B"
-        case .letter_C: return "C"
-        case .letter_D: return "D"
-        case .letter_E: return "E"
-        case .letter_F: return "F"
-        case .letter_G: return "G"
-        case .letter_H: return "H"
-        case .letter_I: return "I"
-        case .letter_J: return "J"
-        case .letter_K: return "K"
-        case .letter_L: return "L"
-        case .letter_M: return "M"
-        case .letter_N: return "N"
-        case .letter_O: return "O"
-        case .letter_P: return "P"
-        case .letter_Q: return "Q"
-        case .letter_R: return "R"
-        case .letter_S: return "S"
-        case .letter_T: return "T"
-        case .letter_U: return "U"
-        case .letter_V: return "V"
-        case .letter_W: return "W"
-        case .letter_X: return "X"
-        case .letter_Y: return "Y"
-        case .letter_Z: return "Z"
+        case .A: return "A"
+        case .B: return "B"
+        case .C: return "C"
+        case .D: return "D"
+        case .E: return "E"
+        case .F: return "F"
+        case .G: return "G"
+        case .H: return "H"
+        case .I: return "I"
+        case .J: return "J"
+        case .K: return "K"
+        case .L: return "L"
+        case .M: return "M"
+        case .N: return "N"
+        case .O: return "O"
+        case .P: return "P"
+        case .Q: return "Q"
+        case .R: return "R"
+        case .S: return "S"
+        case .T: return "T"
+        case .U: return "U"
+        case .V: return "V"
+        case .W: return "W"
+        case .X: return "X"
+        case .Y: return "Y"
+        case .Z: return "Z"
 
-        case .letter_a: return "a"
-        case .letter_b: return "b"
-        case .letter_c: return "c"
-        case .letter_d: return "d"
-        case .letter_e: return "e"
-        case .letter_f: return "f"
-        case .letter_g: return "g"
-        case .letter_h: return "h"
-        case .letter_i: return "i"
-        case .letter_j: return "j"
-        case .letter_k: return "k"
-        case .letter_l: return "l"
-        case .letter_m: return "m"
-        case .letter_n: return "n"
-        case .letter_o: return "o"
-        case .letter_p: return "p"
-        case .letter_q: return "q"
-        case .letter_r: return "r"
-        case .letter_s: return "s"
-        case .letter_t: return "t"
-        case .letter_u: return "u"
-        case .letter_v: return "v"
-        case .letter_w: return "w"
-        case .letter_x: return "x"
-        case .letter_y: return "y"
-        case .letter_z: return "z"
+        case .a: return "a"
+        case .b: return "b"
+        case .c: return "c"
+        case .d: return "d"
+        case .e: return "e"
+        case .f: return "f"
+        case .g: return "g"
+        case .h: return "h"
+        case .i: return "i"
+        case .j: return "j"
+        case .k: return "k"
+        case .l: return "l"
+        case .m: return "m"
+        case .n: return "n"
+        case .o: return "o"
+        case .p: return "p"
+        case .q: return "q"
+        case .r: return "r"
+        case .s: return "s"
+        case .t: return "t"
+        case .u: return "u"
+        case .v: return "v"
+        case .w: return "w"
+        case .x: return "x"
+        case .y: return "y"
+        case .z: return "z"
 
         case .unrecognized: return "⸮"
         }

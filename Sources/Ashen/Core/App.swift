@@ -131,19 +131,19 @@ public struct App<T: Program> {
             var rerender = false
 
             for event in events {
-                if case let .key(key) = event, key == .signal_quit {
+                if case let .key(key) = event, key == .signalQuit {
                     return .quit
                 }
-                else if case let .key(key) = event, key == .signal_int {
+                else if case let .key(key) = event, key == .signalInt {
                     return .error
                 }
                 else if case .window = event {
                     updateAndRender = true
                 }
-                else if case let .key(key) = event, key == .signal_ctrl_z {
+                else if case let .key(key) = event, key == .signalCtrlZ {
                     inThePast = max(0, (inThePast ?? prevState.count) - 1)
                 }
-                else if case let .key(key) = event, key == .signal_ctrl_x {
+                else if case let .key(key) = event, key == .signalCtrlX {
                     let nextState = (inThePast ?? prevState.count) + 1
                     if nextState >= prevState.count {
                         inThePast = nil
@@ -152,7 +152,7 @@ public struct App<T: Program> {
                         inThePast = nextState
                     }
                 }
-                else if case let .key(key) = event, key == .key_space, let pastIndex = inThePast {
+                else if case let .key(key) = event, key == .keySpace, let pastIndex = inThePast {
                     let (newModel, _) = prevState[pastIndex]
                     model = newModel
                     window = program.render(model: model, in: screen.size)

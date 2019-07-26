@@ -98,20 +98,20 @@ public class TermboxScreen: ScreenType {
         }
 
         let chains: [EscapeSequence] = [
-            EscapeSequence(.key_shift_down) { return "[1;2B" },
-            EscapeSequence(.key_shift_up) { return "[1;2A" },
-            EscapeSequence(.key_shift_left) { return "[1;2D" },
-            EscapeSequence(.key_shift_right) { return "[1;2C" },
-            EscapeSequence(.key_alt_down) { return "[1;9B" },
-            EscapeSequence(.key_alt_up) { return "[1;9A" },
-            EscapeSequence(.key_alt_left) { return "[1;9D" },
-            EscapeSequence(.key_alt_right) { return "[1;9C" },
-            EscapeSequence(.key_alt_left) { return "b" },
-            EscapeSequence(.key_alt_right) { return "f" },
-            EscapeSequence(.key_shift_home) { return "[1;2H" },
-            EscapeSequence(.key_shift_end) { return "[1;2F" },
-            EscapeSequence(.signal_alt_bslash) { return "\\" },
-            EscapeSequence(.key_backtab) { return "[Z" },
+            EscapeSequence(.keyShiftDown) { return "[1;2B" },
+            EscapeSequence(.keyShiftUp) { return "[1;2A" },
+            EscapeSequence(.keyShiftLeft) { return "[1;2D" },
+            EscapeSequence(.keyShiftRight) { return "[1;2C" },
+            EscapeSequence(.keyAltDown) { return "[1;9B" },
+            EscapeSequence(.keyAltUp) { return "[1;9A" },
+            EscapeSequence(.keyAltLeft) { return "[1;9D" },
+            EscapeSequence(.keyAltRight) { return "[1;9C" },
+            EscapeSequence(.keyAltLeft) { return "b" },
+            EscapeSequence(.keyAltRight) { return "f" },
+            EscapeSequence(.keyShiftHome) { return "[1;2H" },
+            EscapeSequence(.keyShiftEnd) { return "[1;2F" },
+            EscapeSequence(.signalAltBslash) { return "\\" },
+            EscapeSequence(.keyBacktab) { return "[Z" },
         ]
         let matchEvent: Event? = chains.reduce(nil) { event, chain in
             return event ?? chain.match(events)
@@ -127,7 +127,7 @@ public class TermboxScreen: ScreenType {
             if let extraEvent = extraEvent {
                 extraEvents.append(extraEvent)
             }
-            return .key(.key_esc)
+            return .key(.keyEsc)
         }
     }
 
@@ -175,115 +175,115 @@ public class TermboxScreen: ScreenType {
     private func termBoxKey(_ key: Key) -> KeyEvent? {
         switch key {
         case .ctrl2:
-            return .signal_ctrl_at
+            return .signalCtrlAt
         case .ctrlA:
-            return .signal_ctrl_a
+            return .signalCtrlA
         case .ctrlB:
-            return .signal_ctrl_b
+            return .signalCtrlB
         case .ctrlC:
-            return .signal_ctrl_c
+            return .signalCtrlC
         case .ctrlD:
-            return .signal_ctrl_d
+            return .signalCtrlD
         case .ctrlE:
-            return .signal_ctrl_e
+            return .signalCtrlE
         case .ctrlF:
-            return .signal_ctrl_f
+            return .signalCtrlF
         case .ctrlG:
-            return .signal_ctrl_g
+            return .signalCtrlG
         case .backspace:
-            return .key_backspace
+            return .keyBackspace
         case .tab:
-            return .key_tab
+            return .keyTab
         case .ctrlJ:
-            return .signal_ctrl_j
+            return .signalCtrlJ
         case .ctrlK:
-            return .signal_ctrl_k
+            return .signalCtrlK
         case .ctrlL:
-            return .signal_ctrl_l
+            return .signalCtrlL
         case .enter:
-            return .key_enter
+            return .keyEnter
         case .ctrlN:
-            return .signal_ctrl_n
+            return .signalCtrlN
         case .ctrlO:
-            return .signal_ctrl_o
+            return .signalCtrlO
         case .ctrlP:
-            return .signal_ctrl_p
+            return .signalCtrlP
         case .ctrlQ:
-            return .signal_ctrl_q
+            return .signalCtrlQ
         case .ctrlR:
-            return .signal_ctrl_r
+            return .signalCtrlR
         case .ctrlS:
-            return .signal_ctrl_s
+            return .signalCtrlS
         case .ctrlT:
-            return .signal_ctrl_t
+            return .signalCtrlT
         case .ctrlU:
-            return .signal_ctrl_u
+            return .signalCtrlU
         case .ctrlV:
-            return .signal_ctrl_v
+            return .signalCtrlV
         case .ctrlW:
-            return .signal_ctrl_w
+            return .signalCtrlW
         case .ctrlX:
-            return .signal_ctrl_x
+            return .signalCtrlX
         case .ctrlY:
-            return .signal_ctrl_y
+            return .signalCtrlY
         case .ctrlZ:
-            return .signal_ctrl_z
+            return .signalCtrlZ
         case .esc:
-            return .key_esc
+            return .keyEsc
         case .ctrlBackslash:
-            return .signal_ctrl_bslash
+            return .signalCtrlBslash
         case .ctrlRightBracket:
-            return .signal_ctrl_rbracket
+            return .signalCtrlRbracket
         case .ctrl6:
-            return .signal_ctrl_6
+            return .signalCtrl6
         case .ctrlSlash:
-            return .signal_ctrl_fslash
+            return .signalCtrlFslash
         case .space:
-            return .key_space
+            return .keySpace
         case .f1:
-            return .key_f1
+            return .keyF1
         case .f2:
-            return .key_f2
+            return .keyF2
         case .f3:
-            return .key_f3
+            return .keyF3
         case .f4:
-            return .key_f4
+            return .keyF4
         case .f5:
-            return .key_f5
+            return .keyF5
         case .f6:
-            return .key_f6
+            return .keyF6
         case .f7:
-            return .key_f7
+            return .keyF7
         case .f8:
-            return .key_f8
+            return .keyF8
         case .f9:
-            return .key_f9
+            return .keyF9
         case .f10:
-            return .key_f10
+            return .keyF10
         case .f11:
-            return .key_f11
+            return .keyF11
         case .f12:
-            return .key_f12
+            return .keyF12
         case .insert:
-            return .key_insert
+            return .keyInsert
         case .delete:
-            return .key_delete
+            return .keyDelete
         case .home:
-            return .key_home
+            return .keyHome
         case .end:
-            return .key_end
+            return .keyEnd
         case .pageUp:
-            return .key_pageup
+            return .keyPageup
         case .pageDown:
-            return .key_pagedown
+            return .keyPagedown
         case .arrowUp:
-            return .key_up
+            return .keyUp
         case .arrowDown:
-            return .key_down
+            return .keyDown
         case .arrowLeft:
-            return .key_left
+            return .keyLeft
         case .arrowRight:
-            return .key_right
+            return .keyRight
         default:
             return nil
         }

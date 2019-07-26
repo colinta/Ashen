@@ -110,18 +110,18 @@ func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
 }
 
 public protocol URLSessionProtocol: class {
-    func ashen_dataTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
-    func ashen_downloadTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
-    func ashen_cancel()
+    func ashenDataTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
+    func ashenDownloadTask(with: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol
+    func ashenCancel()
 }
 extension URLSession: URLSessionProtocol {
-    public func ashen_dataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+    public func ashenDataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
         return dataTask(with: request) { data, response, error in
             completionHandler?(data, responseToHeaders(response), error)
         }
     }
 
-    public func ashen_downloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+    public func ashenDownloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
         return downloadTask(with: request) { url, response, error in
             if let url = url,
                 let data = try? Data(contentsOf: url, options: [])
@@ -134,17 +134,17 @@ extension URLSession: URLSessionProtocol {
         }
     }
 
-    public func ashen_cancel() {
+    public func ashenCancel() {
         invalidateAndCancel()
     }
 }
 
 
 public protocol URLSessionTaskProtocol: class {
-    func ashen_start()
+    func ashenStart()
 }
 extension URLSessionTask: URLSessionTaskProtocol {
-    public func ashen_start() {
+    public func ashenStart() {
         resume()
     }
 }
@@ -284,7 +284,7 @@ public class Http: Command {
     }
 
     public func cancel() {
-        session.ashen_cancel()
+        session.ashenCancel()
     }
 
     public func start(_ done: @escaping (AnyMessage) -> Void) {
@@ -317,13 +317,13 @@ public class Http: Command {
     }
 
     private func startDataTask(_ request: URLRequest) {
-        let task = session.ashen_dataTask(with: request, completionHandler: urlSessionDelegate.onReceived)
-        task.ashen_start()
+        let task = session.ashenDataTask(with: request, completionHandler: urlSessionDelegate.onReceived)
+        task.ashenStart()
     }
 
     private func startDownloadTask(_ request: URLRequest) {
-        let task = session.ashen_downloadTask(with: request, completionHandler: urlSessionDelegate.onReceived)
-        task.ashen_start()
+        let task = session.ashenDownloadTask(with: request, completionHandler: urlSessionDelegate.onReceived)
+        task.ashenStart()
     }
 }
 
