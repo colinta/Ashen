@@ -75,7 +75,7 @@ public class InputView: ComponentView {
         self.location = location
     }
 
-        override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+    override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myChange = self.onChange
         let onChange: OnChangeHandler = { text in
