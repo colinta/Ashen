@@ -4,7 +4,7 @@
 
 
 public protocol AttrCharType {
-    var string: String? { get }
+    var char: String? { get }
     var attrs: [Attr] { get }
 }
 
@@ -13,33 +13,33 @@ public protocol TextType {
 }
 
 public struct AttrChar: AttrCharType {
-    public var string: String?
+    public var char: String?
     public var attrs: [Attr]
 
-    init(_ string: String?, _ attrs: [Attr] = []) {
-        self.string = string
+    public init(_ char: String?, _ attrs: [Attr] = []) {
+        self.char = char
         self.attrs = attrs
     }
 
-    init(_ char: Character, _ attrs: [Attr] = []) {
-        self.string = String(char)
+    public init(_ char: Character, _ attrs: [Attr] = []) {
+        self.char = String(char)
         self.attrs = attrs
     }
 }
 
 public struct AttrText: TextType {
-    private(set) var content: [TextType]
+    public private(set) var chars: [AttrCharType]
 
-    public var chars: [AttrCharType] {
-        return content.flatMap { $0.chars }
+    public init(_ content: [TextType]) {
+        self.chars = content.flatMap { $0.chars }
     }
 
-    public init(_ content: [TextType] = []) {
-        self.content = content
+    public init(_ chars: [AttrCharType] = []) {
+        self.chars = chars
     }
 
     public mutating func append(_ text: TextType) {
-        self.content.append(text)
+        self.chars += text.chars
     }
 }
 
@@ -70,18 +70,18 @@ extension String: TextType {
 }
 
 extension Character: AttrCharType {
-    public var string: String? { return String(self) }
+    public var char: String? { return String(self) }
     public var attrs: [Attr] { return [] }
 }
 
 public func + (lhs: AttrText, rhs: TextType) -> AttrText {
-    return AttrText(lhs.content + [rhs])
+    return AttrText(lhs.chars + rhs.chars)
 }
 
 public func + (lhs: AttrText, rhs: AttrText) -> AttrText {
-    return AttrText(lhs.content + rhs.content)
+    return AttrText(lhs.chars + rhs.chars)
 }
 
 public func + (lhs: TextType, rhs: TextType) -> TextType {
-    return AttrText([lhs, rhs])
+    return AttrText(lhs.chars + rhs.chars)
 }

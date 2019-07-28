@@ -24,7 +24,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
         var linesWidth = 0
         var currentWidth = 0
         for attrChar in chars {
-            if attrChar.string == "\n" {
+            if attrChar.char == "\n" {
                 linesHeight += 1
                 linesWidth = max(linesWidth, currentWidth)
                 currentWidth = 0
@@ -47,7 +47,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     override func render(to buffer: Buffer, in rect: Rect) {
         var yOffset = 0, xOffset = 0
         for attrChar in chars {
-            if attrChar.string == "\n" {
+            if attrChar.char == "\n" {
                 yOffset += 1
                 xOffset = 0
             }

@@ -37,10 +37,10 @@ public class TermboxScreen: ScreenType {
 
         for (y, row) in chars {
             guard y >= 0 && y < size.height else { continue }
-            for (x, char) in row {
-                guard x >= 0 && x < size.width, let string = char.string else { continue }
+            for (x, attrChar) in row {
+                guard x >= 0 && x < size.width, let string = attrChar.char else { continue }
 
-                Termbox.puts(x: Int32(x), y: Int32(y), string: string, foreground: foregroundAttrs(char.attrs), background: backgroundAttrs(char.attrs))
+                Termbox.puts(x: Int32(x), y: Int32(y), string: string, foreground: foregroundAttrs(attrChar.attrs), background: backgroundAttrs(attrChar.attrs))
             }
         }
 

@@ -37,9 +37,9 @@ public class Buffer {
         size = prevSize
     }
 
-    func write(_ char: AttrCharType, x localX: Int, y localY: Int) {
+    func write(_ attrChar: AttrCharType, x localX: Int, y localY: Int) {
         guard
-            char.string != "",
+            attrChar.char != "",
             localX >= 0, localY >= 0,
             localX < size.width, localY < size.height
         else { return }
@@ -52,12 +52,12 @@ public class Buffer {
 
         var row = chars[y] ?? [:]
         if let prevText = row[x] {
-            if prevText.string == nil, let string = char.string {
-                row[x] = AttrChar(string, prevText.attrs)
+            if prevText.char == nil, let char = attrChar.char {
+                row[x] = AttrChar(char, prevText.attrs)
             }
         }
         else {
-            row[x] = char
+            row[x] = attrChar
         }
         chars[y] = row
     }
@@ -68,12 +68,14 @@ extension Buffer: CustomStringConvertible {
         var description = ""
         for j in 0 ..< size.height {
             for i in 0 ..< size.width {
-                guard let c = (chars[j] ?? [:])[i]
+                guard
+                    let c = (chars[j] ?? [:])[i],
+                    let char = c.char
                 else {
                     description += " "
                     continue
                 }
-                description += c.string ?? " "
+                description += char
             }
             description += "\n"
         }
