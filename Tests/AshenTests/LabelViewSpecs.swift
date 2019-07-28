@@ -2,6 +2,7 @@
 ///  LabelViewSpecs.swift
 //
 
+@testable import Ashen
 
 struct LabelViewSpecs: Spec {
     var name: String { return "LabelViewSpecs" }

@@ -2,7 +2,10 @@
 ///  Expectations.swift
 //
 
+@testable import Ashen
+
 class Expectations {
+    var originalDescription: String?
     var description: String?
     var showSuccess: Bool
     private var passed = 0
@@ -16,6 +19,12 @@ class Expectations {
     }
 
     func commit() {
+        commitNext()
+        description = nil
+        originalDescription = nil
+    }
+
+    func commitNext() {
         totalPassed += passed
         totalFailed += failed
 
@@ -30,12 +39,13 @@ class Expectations {
         }
         passed = 0
         failed = 0
-        description = nil
+        description = originalDescription
     }
 
     func describe(_ newDescription: String) -> Self {
         commit()
         description = newDescription
+        originalDescription = newDescription
         return self
     }
 
@@ -66,12 +76,20 @@ class Expectations {
             isEqual = lhs == nil && rhs == nil
         }
 
-        if let description = description, !isEqual {
-            let lhsDesc: String = (lhs.map { "\($0)" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
-            let rhsDesc: String = (rhs.map { "\($0)" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
+        if !isEqual, let description = description {
+            let lhsDesc: String = (lhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
+            let rhsDesc: String = (rhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
             self.description = "\(description) (" + (addlDescription == "" ? "" : "\(addlDescription): ") + "\(lhsDesc) != \(rhsDesc))"
         }
         assert(isEqual)
+        return self
+    }
+
+    @discardableResult
+    func refute(_ values: Bool...) -> Self {
+        for value in values {
+            assert(!value)
+        }
         return self
     }
 
@@ -86,14 +104,7 @@ class Expectations {
             }
         }
 
-        return self
-    }
-
-    @discardableResult
-    func refute(_ values: Bool...) -> Self {
-        for value in values {
-            assert(!value)
-        }
+        commitNext()
         return self
     }
 }

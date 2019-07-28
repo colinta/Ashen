@@ -2,6 +2,7 @@
 ///  SpecRunner.swift
 //
 
+@testable import Ashen
 
 protocol Spec {
     var name: String { get }

@@ -2,6 +2,7 @@
 ///  ScreenSpecs.swift
 //
 
+@testable import Ashen
 
 struct ScreenSpecs: Spec {
     var name: String { return "ScreenSpecs" }

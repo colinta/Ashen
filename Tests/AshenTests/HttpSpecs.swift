@@ -3,7 +3,7 @@
 //
 
 import Foundation
-
+@testable import Ashen
 
 struct HttpSpecs: Spec {
     var name: String { return "HttpSpecs" }
@@ -12,17 +12,17 @@ struct HttpSpecs: Spec {
         var cancelled = 0
         var request: URLRequest?
 
-        func ashen_dataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+        func ashenDataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
 
-        func ashen_downloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+        func ashenDownloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
 
-        func ashen_cancel() {
+        func ashenCancel() {
             cancelled += 1
         }
     }
@@ -30,7 +30,7 @@ struct HttpSpecs: Spec {
     class MockSessionTask: URLSessionTaskProtocol {
         var started = 0
 
-        func ashen_start() {
+        func ashenStart() {
             started += 1
         }
     }

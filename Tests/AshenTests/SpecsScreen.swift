@@ -2,6 +2,8 @@
 ///  SpecsScreen.swift
 //
 
+@testable import Ashen
+
 class SpecsScreen: ScreenType {
     var size: Size = Size.max
     var buffer: Buffer?

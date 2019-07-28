@@ -14,6 +14,8 @@ let package = Package(
     ],
     targets: [
         .target(name: "Ashen", dependencies: ["Termbox"]),
-        // .target(name: "Ashen"),
+        .testTarget(
+            name: "AshenTests",
+            dependencies: ["Ashen"]),
     ]
     )

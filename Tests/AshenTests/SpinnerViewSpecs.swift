@@ -2,6 +2,7 @@
 ///  SpinnerViewSpecs.swift
 //
 
+@testable import Ashen
 
 struct SpinnerViewSpecs: Spec {
     var name: String { return "SpinnerViewSpecs" }

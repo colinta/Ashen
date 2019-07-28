@@ -2,6 +2,7 @@
 ///  WindowSpecs.swift
 //
 
+@testable import Ashen
 
 struct WindowSpecs: Spec {
     var name: String { return "WindowSpecs" }

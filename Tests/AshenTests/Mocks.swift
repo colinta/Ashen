@@ -2,6 +2,8 @@
 ///  Mocks.swift
 //
 
+@testable import Ashen
+
 struct MockProgram: Program {
     var mockModel: Any
     var component: Component?
@@ -44,7 +46,7 @@ struct MockProgram: Program {
 class MockScreen: ScreenType {
     var size: Size
     var events: [Event] = []
-    var renderedWindow: Window?
+    var renderedWindow: Component?
     var renderedBuffer: Buffer?
     var setupCalled = 0
     var teardownCalled = 0

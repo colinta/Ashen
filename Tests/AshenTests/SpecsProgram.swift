@@ -3,7 +3,7 @@
 //
 
 import Foundation
-
+@testable import Ashen
 
 private let specs: [Spec] = [
     BoxSpecs(),
@@ -59,7 +59,12 @@ struct SpecsProgram: Program {
         var runNext = false
         switch message {
         case .quit:
-            return (model, [], .quit)
+            if model.failed > 0 {
+                return (model, [], .error)
+            }
+            else {
+                return (model, [], .quit)
+            }
         case .begin:
             model.running = true
             runNext = true
@@ -104,7 +109,7 @@ struct SpecsProgram: Program {
             }
         }
 
-        components.append(LogView(.topLeft(y: 4), size: DesiredSize(mySize), entries: model.specLog))
+        components.append(LogView(.topLeft(y: 4), DesiredSize(mySize), entries: model.specLog))
         if !model.running {
             components.append(OnNext({ SpecsMessage.begin }))
         }

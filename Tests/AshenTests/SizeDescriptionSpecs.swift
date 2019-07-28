@@ -2,6 +2,7 @@
 ///  SizeDescriptionSpecs.swift
 //
 
+@testable import Ashen
 
 struct SizeDescriptionSpecs: Spec {
     var name: String { return "SizeDescriptionSpecs" }

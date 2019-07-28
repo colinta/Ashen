@@ -2,6 +2,7 @@
 ///  BoxSpecs.swift
 //
 
+@testable import Ashen
 
 struct BoxSpecs: Spec {
     var name: String { return "BoxSpecs" }
@@ -46,14 +47,14 @@ struct BoxSpecs: Spec {
                 LabelView(.middleCenter(), text: "hi!")
                 ]), "┌───┐\n│___│\n│hi!│\n│___│\n└───┘")
         expect("outputs scrolled components, with border")
-            .assertRenders(Box(.topLeft(), Size(width: 5, height: 5), background: "_", components: [
-                LabelView(.topLeft(x: 0, y: 0), text: "abcdeABCDE"),
-                LabelView(.topLeft(x: 0, y: 1), text: "ABCDEabcde"),
-                LabelView(.topLeft(x: 0, y: 2), text: "1234567890"),
-                LabelView(.topLeft(x: 0, y: 3), text: "ABCDEabcde"),
-                LabelView(.topLeft(x: 0, y: 4), text: "abcdeABCDE"),
-                LabelView(.topLeft(x: 0, y: 5), text: "1234567890"),
-                ], scrollOffset: Point(x: 1, y: 1)), "BCDEa\n23456\nBCDEa\nbcdeA\n23456")
+            .assertRenders(Box(.topLeft(), Size(width: 5, height: 5), border: .doubleSides, background: "_", components: [
+                    LabelView(.topLeft(x: 0, y: 0), text: "abcdefghij"),
+                    LabelView(.topLeft(x: 0, y: 1), text: "ABCDEFGHIJ"),
+                    LabelView(.topLeft(x: 0, y: 2), text: "1234567890"),
+                    LabelView(.topLeft(x: 0, y: 3), text: "klmnopqrst"),
+                    LabelView(.topLeft(x: 0, y: 4), text: "KLMNOPQRST"),
+                    LabelView(.topLeft(x: 0, y: 5), text: "!@#$%^&*()"),
+                ], scrollOffset: Point(x: 1, y: 1)), "╓───╖\n║BCD║\n║234║\n║lmn║\n╙───╜")
         done()
     }
 }
