@@ -64,8 +64,8 @@ public class TermboxScreen: ScreenType {
             if let key = termBoxKey(value) {
                 return .key(key)
             }
-            else if let button = termBoxMouse(value) {
-                return .click(button)
+            else if let mouse = termBoxMouse(value) {
+                return .mouse(mouse)
             }
         case let .character(_, value):
             guard let key = termBoxCharacter(value) else { return nil }
@@ -73,7 +73,7 @@ public class TermboxScreen: ScreenType {
         case let .resize(width, height):
             return .window(width: Int(width), height: Int(height))
         case let .mouse(x, y):
-            return .mouse(Int(x), Int(y))
+            return .mouse(.move(Int(x), Int(y)))
         default:
             break
         }
@@ -219,20 +219,20 @@ private func easyAltChar() -> EscapeSequence{
         })
 }
 
-private func termBoxMouse(_ mouse: Key) -> MouseButton? {
+private func termBoxMouse(_ mouse: Key) -> MouseEvent? {
     switch mouse {
     case .mouseLeft:
-        return .left
+        return .click(.left)
     case .mouseRight:
-        return .right
+        return .click(.right)
     case .mouseMiddle:
-        return .middle
+        return .click(.middle)
     case .mouseRelease:
         return .release
     case .mouseWheelUp:
-        return .wheelUp
+        return .scroll(.up)
     case .mouseWheelDown:
-        return .wheelDown
+        return .scroll(.down)
     default:
         return nil
     }
