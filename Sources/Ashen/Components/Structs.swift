@@ -83,6 +83,34 @@ public struct Rect {
         self.origin = origin
         self.size = size
     }
+
+    public static let zero = Rect(origin: .zero, size: .zero)
+
+    public var minX: Int { return min(origin.x, origin.x + size.width) }
+    public var minY: Int { return min(origin.y, origin.y + size.height) }
+    public var maxX: Int { return max(origin.x, origin.x + size.width) }
+    public var maxY: Int { return max(origin.y, origin.y + size.height) }
+    public var width: Int { return max(size.width, -size.width) }
+    public var height: Int { return max(size.height, -size.height) }
+
+    public func intersection(_ other: Rect) -> Rect? {
+        let x0 = max(minX, other.minX)
+        let x1 = min(maxX, other.maxX)
+        if x1 <= x0 { return nil }
+
+        let y0 = max(minY, other.minY)
+        let y1 = min(maxY, other.maxY)
+        if y1 <= y0 { return nil }
+
+        return Rect(origin: Point(x: x0, y: y0), size: Size(width: x1 - x0, height: y1 - y0))
+    }
+
+    public static func + (lhs: Rect, rhs: Point) -> Rect {
+        return Rect(origin: lhs.origin + rhs, size: lhs.size)
+    }
+    public static func - (lhs: Rect, rhs: Point) -> Rect {
+        return Rect(origin: lhs.origin - rhs, size: lhs.size)
+    }
 }
 
 public enum Location {

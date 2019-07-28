@@ -16,6 +16,7 @@ public class TermboxScreen: ScreenType {
     public func setup() throws {
         try Termbox.initialize()
         Termbox.inputModes = [.esc, .mouse]
+        Termbox.outputMode = .color256
         Termbox.present()
     }
 

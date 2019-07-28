@@ -51,13 +51,16 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
                 yOffset += 1
                 xOffset = 0
             }
+            // y is past bottom of rect, early exit
             else if yOffset - rect.origin.y >= rect.size.height {
                 break
             }
-            else if yOffset < rect.origin.y || xOffset - rect.origin.x >= rect.size.width {
+            // not yet at y=0, or x is past end of rect, skip drawing
+            else if yOffset - rect.origin.y < 0 || xOffset - rect.origin.x >= rect.size.width {
                 continue
             }
-            else if xOffset < rect.origin.x {
+            // not yet at x=0, incease xOffset
+            else if xOffset - rect.origin.x < 0 {
                 xOffset += 1
             }
             else {

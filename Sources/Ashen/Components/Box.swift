@@ -203,16 +203,9 @@ public class Box: ComponentLayout {
             innerSize = rect.size
         }
 
+        let contentSize = innerSize + scrollOffset
         buffer.push(offset: borderOffset, clip: innerSize) {
-            var innerRect = Rect(origin: scrollOffset)
-            for view in views.reversed() {
-                let viewSize = view.desiredSize().constrain(in: innerSize)
-                let offset = view.location.origin(for: viewSize, in: innerSize) - scrollOffset
-                innerRect.size = viewSize
-                buffer.push(offset: offset, clip: viewSize) {
-                    view.render(to: buffer, in: innerRect)
-                }
-            }
+            Window.render(views: views, to: buffer, in: Rect(origin: Point(x: scrollOffset.x, y: scrollOffset.y), size: innerSize), contentSize: contentSize)
 
             if let background = background {
                 for y in 0 ..< innerSize.height {
