@@ -3,5 +3,4 @@
 /Build
 /Packages
 /*.xcodeproj
-_ncurses_header.swift.tmp
 Package.resolved

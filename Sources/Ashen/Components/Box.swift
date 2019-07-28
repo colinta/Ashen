@@ -57,7 +57,7 @@ public class Box: ComponentLayout {
             tbSide: "─", lrSide: "│"
             )
         public static let double = Border(
-            dot: "◻︎", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
+            dot: "◻︎", topCap: "╦", bottomCap: "╩", leftCap: "╠", rightCap: "╣",
             tlCorner: "╔", trCorner: "╗", blCorner: "╚", brCorner: "╝",
             tbSide: "═", lrSide: "║"
             )
@@ -71,8 +71,16 @@ public class Box: ComponentLayout {
             tlCorner: "┏", trCorner: "┓", blCorner: "┗", brCorner: "┛",
             tbSide: "━", lrSide: "┃"
             )
-        // static let double = Border(
-        // static let mixed = Border(
+        public static let doubleSides = Border(
+            dot: "◻︎", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
+            tlCorner: "╓", trCorner: "╖", blCorner: "╙", brCorner: "╜",
+            tbSide: "─", lrSide: "║"
+            )
+        public static let doubleTops = Border(
+            dot: "◻︎", topCap: "╤", bottomCap: "╧", leftCap: "╞", rightCap: "╡",
+            tlCorner: "╒", trCorner: "╕", blCorner: "╘", brCorner: "╛",
+            tbSide: "═", lrSide: "│"
+            )
     }
 
     let size: Size
