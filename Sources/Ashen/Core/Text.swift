@@ -44,19 +44,18 @@ public struct AttrText: TextType {
 }
 
 public struct Text: TextType {
-    public let text: String?
+    public let text: String
     public let attrs: [Attr]
 
     public var chars: [AttrCharType] {
-        guard let text = text else { return [AttrChar(nil, attrs)] }
         return text.map { AttrChar($0, attrs) }
     }
 
     var description: String {
-        return text ?? ""
+        return text
     }
 
-    public init(_ text: String?, attrs: [Attr] = []) {
+    public init(_ text: String, attrs: [Attr] = []) {
         self.text = text
         self.attrs = attrs
     }
