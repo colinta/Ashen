@@ -39,10 +39,15 @@ public enum LoopState {
 // debugging log to output when the "outermost" application exits.
 private var runningApps: Int = 0
 
+private var debugSilenced = false
 private var debugEntries: [String] = []
 // prints to stdout when application exits
 public func debug(_ entry: Any) {
+    guard !debugSilenced else { return }
     debugEntries.append("\(entry)")
+}
+public func debugSilenced(_ val: Bool) {
+    debugSilenced = val
 }
 
 private var logEntries: [String] = []
