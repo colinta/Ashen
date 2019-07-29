@@ -119,6 +119,43 @@ public class OnKeyPress: Component {
     }
 }
 
+public class OnMouse: Component {
+    public typealias OnMouseHandler = (MouseEvent) -> AnyMessage
+    var onMouse: OnMouseHandler
+    var only: [MouseEvent]
+    var except: [MouseEvent]
+
+    public init(_ onMouse: @escaping OnMouseHandler, only: [MouseEvent] = [], except: [MouseEvent] = []) {
+        self.onMouse = onMouse
+        self.only = only
+        self.except = except
+    }
+
+    override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        let component = self
+        let myHandler = self.onMouse
+        let onMouse: OnMouseHandler = { key in
+            return mapper(myHandler(key) as! T)
+        }
+        component.onMouse = onMouse
+        return component
+    }
+
+    override func messages(for event: Event) -> [AnyMessage] {
+        switch event {
+        case let .mouse(mouse):
+            guard
+                only == [] || only.contains(mouse),
+                !except.contains(mouse)
+            else { break }
+            return [onMouse(mouse)]
+        default: break
+        }
+
+        return []
+    }
+}
+
 public class OnDebug: Component {
     public typealias LogHandler = (String) -> AnyMessage
     var onLogEntry: LogHandler
