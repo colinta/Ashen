@@ -21,9 +21,20 @@ public struct AttrChar: AttrCharType {
         self.attrs = attrs
     }
 
+    public init(_ attrs: [Attr]) {
+        self.char = nil
+        self.attrs = attrs
+    }
+
     public init(_ char: Character, _ attrs: [Attr] = []) {
         self.char = String(char)
         self.attrs = attrs
+    }
+}
+
+extension AttrChar: TextType {
+    public var chars: [AttrCharType] {
+        return [self]
     }
 }
 
@@ -32,6 +43,10 @@ public struct AttrText: TextType {
 
     public init(_ content: [TextType]) {
         self.chars = content.flatMap { $0.chars }
+    }
+
+    public init(_ chars: [AttrChar] = []) {
+        self.chars = chars
     }
 
     public init(_ chars: [AttrCharType] = []) {
@@ -55,7 +70,7 @@ public struct Text: TextType {
         return text
     }
 
-    public init(_ text: String, attrs: [Attr] = []) {
+    public init(_ text: String, _ attrs: [Attr] = []) {
         self.text = text
         self.attrs = attrs
     }
