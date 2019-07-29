@@ -10,7 +10,7 @@ public class VerticalLabelView: ComponentView {
     var linesWidth: Int { return 1 }
     var linesHeight: Int { return chars.count }
 
-    public init(_ location: Location, _ height: Int? = nil, text: TextType) {
+    public init(_ location: Location = .tl(.zero), _ height: Int? = nil, text: TextType) {
         self.size = DesiredSize(width: 1, height: height)
         self.chars = text.chars
 
