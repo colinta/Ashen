@@ -150,6 +150,8 @@ public class TermboxScreen: ScreenType {
     private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
         let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
             switch attr {
+            case .foreground(.none):
+                return memo.union(Attributes.white)
             case .background:
                 return memo
             default:
@@ -157,7 +159,7 @@ public class TermboxScreen: ScreenType {
             }
         }
         if retval.rawValue == 0 {
-            return .default
+            return .white
         }
         return retval
     }
@@ -165,6 +167,8 @@ public class TermboxScreen: ScreenType {
     private func backgroundAttrs(_ attrs: [Attr]) -> Attributes {
         let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
             switch attr {
+            case .background(.none):
+                return memo.union(Attributes.black)
             case .foreground:
                 return memo
             default:
@@ -172,7 +176,7 @@ public class TermboxScreen: ScreenType {
             }
         }
         if retval.rawValue == 0 {
-            return .default
+            return .black
         }
         return retval
     }
