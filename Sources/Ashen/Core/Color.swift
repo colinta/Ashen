@@ -14,7 +14,7 @@ public enum Color {
     case magenta
     case cyan
     case white
-    case any(UInt32)
+    case any(AttrSize)
 
     var toTermbox: Attributes {
         switch self {

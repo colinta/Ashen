@@ -2,7 +2,6 @@
 ///  Event.swift
 //
 
-import Darwin.ncurses
 import Termbox
 
 public enum Event {

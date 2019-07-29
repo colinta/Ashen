@@ -165,11 +165,6 @@ public enum KeyEvent {
     public static let pipe: KeyEvent = .char(.pipe)
     public static let rightCurly: KeyEvent = .char(.rightCurly)
     public static let tilde: KeyEvent = .char(.tilde)
-
-    init?(character: UInt16) {
-        guard let char = CharKeyEvent(rawValue: character) else { return nil }
-        self = .char(char)
-    }
 }
 
 extension KeyEvent: Equatable {

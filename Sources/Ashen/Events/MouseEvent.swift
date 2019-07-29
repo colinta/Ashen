@@ -2,35 +2,39 @@
 ///  MouseEvent.swift
 //
 
-public enum MouseEvent {
+public struct MouseEvent {
+    public let x: Int16
+    public let y: Int16
+    public let event: Event
+
+    public enum Event {
+        case click(Button)
+        case scroll(Direction)
+        case release
+    }
+
     public enum Button {
         case left
         case middle
         case right
     }
+
     public enum Direction {
         case up
         case down
     }
 
-    case move(Int, Int)
-    case click(Button)
-    case scroll(Direction)
-    case release
-
 }
 
 public extension MouseEvent {
     var toString: String {
-        switch self {
+        switch self.event {
         case .release:
-            return "release"
-        case let .move(x, y):
-            return "move(\(x), \(y))"
+            return "release((\(x), \(y), )"
         case let .click(btn):
-            return "click(\(btn))"
+            return "click((\(x), \(y), \(btn))"
         case let .scroll(direction):
-            return "scroll(\(direction))"
+            return "scroll((\(x), \(y), \(direction))"
         }
     }
 }
