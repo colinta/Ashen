@@ -15,9 +15,10 @@ public class TermboxScreen: ScreenType {
 
     public func setup() throws {
         try Termbox.initialize()
-        Termbox.inputModes = [.esc, .mouse]
-        Termbox.outputMode = .color256
-        Termbox.present()
+        Termbox.enableMouse()
+        Termbox.outputMode = .trueColor
+        Termbox.clear(foreground: .default, background: .default)
+        Termbox.render()
     }
 
     public func teardown() {
@@ -38,13 +39,15 @@ public class TermboxScreen: ScreenType {
         for (y, row) in chars {
             guard y >= 0 && y < size.height else { continue }
             for (x, attrChar) in row {
-                guard x >= 0 && x < size.width, let string = attrChar.char else { continue }
+                guard x >= 0 && x < size.width, let string = attrChar.char?.unicodeScalars.first else { continue }
 
-                Termbox.puts(x: Int32(x), y: Int32(y), string: string, foreground: foregroundAttrs(attrChar.attrs), background: backgroundAttrs(attrChar.attrs))
+                let foreground = foregroundAttrs(attrChar.attrs)
+                let background = backgroundAttrs(attrChar.attrs)
+                Termbox.putc(x: Int32(x), y: Int32(y), char: string, foreground: foreground, background: background)
             }
         }
 
-        Termbox.present()
+        Termbox.render()
     }
 
     public func nextEvent() -> Event? {
@@ -145,7 +148,7 @@ public class TermboxScreen: ScreenType {
     }
 
     private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
-        return attrs.reduce(Attributes.default) { memo, attr -> Attributes in
+        let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
             switch attr {
             case .background:
                 return memo
@@ -153,10 +156,14 @@ public class TermboxScreen: ScreenType {
                 return memo.union(attr.toTermbox)
             }
         }
+        if retval.rawValue == 0 {
+            return .default
+        }
+        return retval
     }
 
     private func backgroundAttrs(_ attrs: [Attr]) -> Attributes {
-        return attrs.reduce(Attributes.default) { memo, attr -> Attributes in
+        let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
             switch attr {
             case .foreground:
                 return memo
@@ -164,6 +171,10 @@ public class TermboxScreen: ScreenType {
                 return memo.union(attr.toTermbox)
             }
         }
+        if retval.rawValue == 0 {
+            return .default
+        }
+        return retval
     }
 }
 
