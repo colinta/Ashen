@@ -712,12 +712,15 @@ public enum CharKeyEvent: UInt16 {
 
 public extension CharKeyEvent {
     var toPrintable: String {
+        if case .space = self {
+            return " "
+        }
         return toString
     }
 
     var toString: String {
         switch self {
-        case .space: return " "
+        case .space: return "␣"
 
         case .bang: return "!"
         case .doubleQuote: return "\""
