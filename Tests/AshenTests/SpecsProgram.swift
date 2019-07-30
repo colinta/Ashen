@@ -118,7 +118,7 @@ struct SpecsProgram: Program {
 }
 
 extension SpecsProgram {
-    static func toString(_ buffer: Buffer) -> String {
+    static func bufferToString(_ buffer: Buffer) -> String {
         var output = ""
         let lines = buffer.chars
             .map { y, line in return (y, line) }

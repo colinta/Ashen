@@ -16,10 +16,10 @@ struct SpinnerViewSpecs: Spec {
         subject.timeout = -1
         let size = Size(width: 1, height: 1)
         let bufferA = subject.render(size: size)
-        expect("outputs 'a'").assert(SpecsProgram.toString(bufferA) == "a")
+        expect("outputs 'a'").assert(SpecsProgram.bufferToString(bufferA) == "a")
         _ = subject.messages(for: .tick(0))
         let bufferB = subject.render(size: size)
-        expect("outputs 'b'").assert(SpecsProgram.toString(bufferB) == "b")
+        expect("outputs 'b'").assert(SpecsProgram.bufferToString(bufferB) == "b")
         done()
     }
 }

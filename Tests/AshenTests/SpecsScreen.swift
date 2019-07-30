@@ -5,7 +5,7 @@
 @testable import Ashen
 
 class SpecsScreen: ScreenType {
-    var size: Size = Size.max
+    var size = Size.max
     var buffer: Buffer?
 
     func render(window: Component) -> Buffer {
@@ -23,7 +23,7 @@ class SpecsScreen: ScreenType {
 
     func teardown() {
         guard let buffer = buffer else { return }
-        let output = SpecsProgram.toString(buffer)
+        let output = SpecsProgram.bufferToString(buffer)
         print(output)
     }
 

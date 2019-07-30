@@ -62,7 +62,7 @@ class Expectations {
     func assertRenders(_ lhs: ComponentView, _ rhs: String, _ addlDescription: String = "") -> Self {
         let viewSize = lhs.desiredSize().constrain(in: Size.max)
         let buffer = lhs.render(size: viewSize)
-        let rendered = SpecsProgram.toString(buffer)
+        let rendered = SpecsProgram.bufferToString(buffer)
         return assertEqual(rendered, rhs, addlDescription)
     }
 
