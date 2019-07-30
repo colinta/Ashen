@@ -238,42 +238,8 @@ public enum CtrlKeyEvent {
     case caret
     case underscore
     case six
-
-    var toAltKey: AltKeyEvent {
-        switch self {
-        case let .alt(key): return key
-        case .two: return .number2
-        case .a: return .a
-        case .b: return .b
-        case .c: return .c
-        case .d: return .d
-        case .e: return .e
-        case .f: return .f
-        case .g: return .g
-        case .h: return .h
-        case .j: return .j
-        case .k: return .k
-        case .l: return .l
-        case .n: return .n
-        case .o: return .o
-        case .p: return .p
-        case .q: return .q
-        case .r: return .r
-        case .s: return .s
-        case .t: return .t
-        case .u: return .u
-        case .v: return .v
-        case .w: return .w
-        case .x: return .x
-        case .y: return .y
-        case .z: return .z
-        case .backslash: return .backslash
-        case .rightBracket: return .rightBracket
-        case .caret: return .caret
-        case .underscore: return .underscore
-        case .six: return .number6
-        }
-    }
+    case home
+    case end
 }
 
 public extension CtrlKeyEvent {
@@ -310,6 +276,8 @@ public extension CtrlKeyEvent {
         case .underscore: return "_"
         case .h: return "H"
         case .six: return "6"
+        case .home: return "⤒"
+        case .end: return "⤓"
         }
     }
 }
