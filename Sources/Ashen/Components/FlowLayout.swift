@@ -46,7 +46,7 @@ public class FlowLayout: ComponentLayout {
         return size
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         switch orientation {
         case .horizontal:
             horizontalLayout(to: buffer, in: Rect(size: rect.size))

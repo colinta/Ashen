@@ -4,30 +4,43 @@
 
 
 public class Component: Equatable {
-    var id: String = ""
+    var id: String?
 
-    func messages(for _: Event) -> [AnyMessage] {
+    open func messages(for _: Event) -> [AnyMessage] {
         return []
     }
 
-    func render(size: Size) -> Buffer {
+    open func render(size: Size) -> Buffer {
         let buffer = Buffer(size: size)
         render(to: buffer, in: Rect(size: size))
         return buffer
     }
 
-    func render(to _: Buffer, in _: Rect) {
+    open func render(to _: Buffer, in _: Rect) {
     }
 
-    public func map<T, U>(_: @escaping (T) -> U) -> Self {
+    open func map<T, U>(_: @escaping (T) -> U) -> Self {
         return self
     }
 
-    func merge(with _: Component) {
+    open func merge(with _: Component) {
+    }
+
+    // used by ComponentLayout.messages to determine if a keyboard or mouse
+    // event has been handled and should not be handed to other Components
+    open func shouldStopProcessing(event: Event) -> Bool {
+        return false
     }
 
     public static func == (lhs: Component, rhs: Component) -> Bool {
-        return type(of: lhs) == type(of: rhs) && lhs.id == rhs.id
+        guard type(of: lhs) == type(of: rhs) else { return false }
+        guard
+            let lhsId = lhs.id,
+            let rhsId = rhs.id
+        else {
+            return lhs.id == nil && rhs.id == nil
+        }
+        return lhsId == rhsId
     }
 }
 
@@ -50,64 +63,62 @@ public class ComponentLayout: ComponentView {
         return window
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
-        switch event {
-        case let .key(key):
-            var keyboardHandled = false
-            var messages: [AnyMessage] = []
-            for component in components {
-                if let keyboardComponent = component as? KeyboardTrapComponent {
-                    if !keyboardHandled && keyboardComponent.shouldAccept(key: key) {
-                        messages += component.messages(for: event)
-                        keyboardHandled = true
-                    }
-                }
-                else {
-                    messages += component.messages(for: event)
-                }
+    override public func messages(for event: Event) -> [AnyMessage] {
+        var messages: [AnyMessage] = []
+        for component in components {
+            messages += component.messages(for: event)
+            if component.shouldStopProcessing(event: event) {
+                break
             }
-            return messages
-        default:
-            break
         }
-        return components.flatMap { $0.messages(for: event) }
+        return messages
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         Window.render(views: views, to: buffer, in: rect)
     }
 
-    override func merge(with prevComponent: Component) {
-        guard let prevWindow = prevComponent as? ComponentLayout else { return }
+    override public func shouldStopProcessing(event: Event) -> Bool {
+        return components.firstIndex { $0.shouldStopProcessing(event: event) } != nil
+    }
 
-        var windowIndex = 0
-        let prevComponents = prevWindow.components
+    /// Merge this Layout and its components.  The algorithm works like this:
+    /// - prevIndex starts at 0
+    /// - scan through the current components
+    /// - if the component doesn't match the previous component at index
+    ///   prevIndex, scan through the remaining prevLayout components, looking
+    ///   for a match:
+    ///     - if a match is found, the prevIndex points to it; the components
+    ///       that were scanned to that point are considered deleted
+    ///     - if no match is found, restore the prevIndex; the new component is
+    ///       considered inserted, and not merged
+    /// - if the component matches the prev component at prevIndex, merge them.
+    override public func merge(with prevComponent: Component) {
+        guard let prevLayout = prevComponent as? ComponentLayout else { return }
+
+        var prevIndex = 0
+        let prevComponents = prevLayout.components
         for component in components {
-            guard windowIndex < prevComponents.count else { break }
+            guard prevIndex < prevComponents.count else { break }
 
-            if component != prevComponents[windowIndex] {
-                let restoreIndex = windowIndex
-                while component != prevComponents[windowIndex] {
-                    windowIndex += 1
-                    guard windowIndex < prevComponents.count else {
-                        windowIndex = restoreIndex
+            if component != prevComponents[prevIndex] {
+                let restoreIndex = prevIndex
+                while component != prevComponents[prevIndex] {
+                    prevIndex += 1
+                    if prevIndex == prevComponents.count {
+                        prevIndex = restoreIndex
                         break
                     }
                 }
             }
 
-            guard windowIndex < prevComponents.count else { break }
-            let prev = prevComponents[windowIndex]
+            let prev = prevComponents[prevIndex]
             if component == prev {
                 component.merge(with: prev)
-                windowIndex += 1
+                prevIndex += 1
             }
         }
         return
     }
 
-}
-
-protocol KeyboardTrapComponent {
-    func shouldAccept(key: KeyEvent) -> Bool
 }

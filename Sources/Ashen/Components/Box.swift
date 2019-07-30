@@ -104,7 +104,7 @@ public class Box: ComponentLayout {
         return DesiredSize(size)
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         if let label = label {
             var xOffset = 2
             for char in label.chars {

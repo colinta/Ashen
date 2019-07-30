@@ -102,7 +102,7 @@ public class InputView: ComponentView {
         return component
     }
 
-    override func merge(with prevComponent: Component) {
+    override public func merge(with prevComponent: Component) {
         guard let prevInput = prevComponent as? InputView else { return }
 
         cursor = forceCursor ?? prevInput.cursor
@@ -123,7 +123,7 @@ public class InputView: ComponentView {
         return DesiredSize(width: size.width ?? .literal(calcWidth), height: size.height ?? .literal(max(1, calcHeight)))
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         guard rect.size.width > 0 && rect.size.height > 0 else { return }
 
         let normalCursor = self.cursor.normalized
@@ -183,11 +183,11 @@ public class InputView: ComponentView {
                     attrs = [.underline]
                 }
                 else {
-                    attrs = []
+                    attrs = [.bold]
                 }
             }
             else if isFirstResponder{
-                attrs = []
+                attrs = [.bold]
             }
             else {
                 attrs = [.underline]
@@ -234,7 +234,7 @@ public class InputView: ComponentView {
         }
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         guard
             isFirstResponder
         else { return [] }
@@ -502,11 +502,12 @@ public class InputView: ComponentView {
         cursor = Cursor(at: text.count, selection: 0)
         return [onCursorChange?(cursor), SystemMessage.rerender]
     }
-}
 
-extension InputView: KeyboardTrapComponent {
-    func shouldAccept(key: KeyEvent) -> Bool {
-        guard isFirstResponder else { return false }
+    override public func shouldStopProcessing(event: Event) -> Bool {
+        guard
+            isFirstResponder,
+            case let .key(key) = event
+        else { return false }
 
         if key.isPrintable ||
             (isMultiline && key == .enter) ||

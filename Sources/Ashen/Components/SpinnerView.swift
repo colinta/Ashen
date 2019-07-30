@@ -53,7 +53,7 @@ public class SpinnerView: ComponentView {
         self.location = location
     }
 
-    override func merge(with prevComponent: Component) {
+    override public func merge(with prevComponent: Component) {
         guard let prevSpinner = prevComponent as? SpinnerView else { return }
         index = prevSpinner.index
         timeout = prevSpinner.timeout
@@ -63,7 +63,7 @@ public class SpinnerView: ComponentView {
         return DesiredSize(width: 1, height: 1)
     }
 
-    override func render(to buffer: Buffer, in _: Rect) {
+    override public func render(to buffer: Buffer, in _: Rect) {
         let chr = model.chr(index: index ?? 0)
         var attrs: [Attr] = []
         if let foreground = foreground {
@@ -75,7 +75,7 @@ public class SpinnerView: ComponentView {
         buffer.write(AttrChar(chr, attrs), x: 0, y: 0)
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         guard isAnimating else { return [] }
 
         if case let .tick(dt) = event {

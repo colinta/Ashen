@@ -39,7 +39,7 @@ public class LogView: ComponentLayout {
         return DesiredSize(width: desiredWidth, height: desiredHeight)
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         let entriesHeight = entries.reduce(0) { maxHeight, entry in
             let lines = entry.split(separator: "\n")
             return maxHeight + lines.count

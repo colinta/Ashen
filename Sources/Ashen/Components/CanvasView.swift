@@ -192,7 +192,7 @@ public class CanvasView: ComponentView {
         return size
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         let drawSize = Size(
             width: rect.size.width * 2, // braille characters are 2 columns
             height: rect.size.height * 4 // and 4 rows

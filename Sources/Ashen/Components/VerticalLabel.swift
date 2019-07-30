@@ -21,7 +21,7 @@ public class VerticalLabelView: ComponentView {
         return DesiredSize(width: 1, height: height)
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         guard rect.origin.x == 0 else { return }
 
         var yOffset = 0

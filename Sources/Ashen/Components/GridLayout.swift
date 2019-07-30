@@ -108,7 +108,7 @@ public class GridLayout: ComponentLayout {
         return calculations
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         var offset: Point = .zero
         let calculatedRowHeights = GridLayout.calculateDimensions(screen: rect.size.height, weights: rows.map { $0.weight })
         for (rowIndex, row) in rows.enumerated() {

@@ -18,7 +18,7 @@ public class OnTick: Component {
         self.reset = reset
     }
 
-    override func merge(with prevComponent: Component) {
+    override public func merge(with prevComponent: Component) {
         guard !reset else { return }
         guard let prevComponent = prevComponent as? OnTick else { return }
         prevComponent.timeout = timeout
@@ -34,7 +34,7 @@ public class OnTick: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         switch event {
         case let .tick(dt):
             let nextTimeout = timeout - dt
@@ -69,7 +69,7 @@ public class OnNext: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         switch event {
         case .tick: return [onNext()]
         default: return []
@@ -104,28 +104,39 @@ public class OnKeyPress: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
+        guard eventMatches(event) else { return [] }
         switch event {
         case let .key(key):
-            guard
-                only == [] || only.contains(key),
-                !except.contains(key)
-            else { break }
             return [onKey(key)]
         default: break
         }
 
         return []
     }
+
+    private func eventMatches(_ event: Event) -> Bool {
+        guard
+            case let .key(key) = event,
+            only.isEmpty || only.contains(key),
+            !except.contains(key)
+        else { return false }
+
+        return true
+    }
+
+    override public func shouldStopProcessing(event: Event) -> Bool {
+        return eventMatches(event)
+    }
 }
 
 public class OnMouse: Component {
     public typealias OnMouseHandler = (MouseEvent) -> AnyMessage
     var onMouse: OnMouseHandler
-    var only: [MouseEvent]
-    var except: [MouseEvent]
+    var only: [MouseEvent.Event]
+    var except: [MouseEvent.Event]
 
-    public init(_ onMouse: @escaping OnMouseHandler, only: [MouseEvent] = [], except: [MouseEvent] = []) {
+    public init(_ onMouse: @escaping OnMouseHandler, only: [MouseEvent.Event] = [], except: [MouseEvent.Event] = []) {
         self.onMouse = onMouse
         self.only = only
         self.except = except
@@ -141,12 +152,12 @@ public class OnMouse: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         switch event {
         case let .mouse(mouse):
             guard
-                only == [] || only.contains(mouse),
-                !except.contains(mouse)
+                only == [] || only.contains(mouse.event),
+                !except.contains(mouse.event)
             else { break }
             return [onMouse(mouse)]
         default: break
@@ -174,7 +185,7 @@ public class OnDebug: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         switch event {
         case let .log(entry): return [onLogEntry(entry)]
         default: return []
@@ -200,7 +211,7 @@ public class OnResize: Component {
         return component
     }
 
-    override func messages(for event: Event) -> [AnyMessage] {
+    override public func messages(for event: Event) -> [AnyMessage] {
         switch event {
         case let .window(width, height): return [onResize(Size(width: width, height: height))]
         default: return []

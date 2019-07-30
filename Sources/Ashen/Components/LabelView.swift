@@ -44,7 +44,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
         return DesiredSize(width: size.width ?? .literal(linesWidth), height: size.height ?? .literal(linesHeight))
     }
 
-    override func render(to buffer: Buffer, in rect: Rect) {
+    override public func render(to buffer: Buffer, in rect: Rect) {
         var yOffset = 0, xOffset = 0
         for attrChar in chars {
             if attrChar.char == "\n" {
