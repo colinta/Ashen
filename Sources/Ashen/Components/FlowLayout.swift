@@ -21,19 +21,19 @@ public class FlowLayout: ComponentLayout {
     let direction: Direction
     let size: DesiredSize
 
-    public static func horizontal(_ size: DesiredSize = DesiredSize(), direction: Direction = .ltr, components: [Component]) -> FlowLayout {
-        return FlowLayout(.tl(.zero), size, orientation: .horizontal, direction: direction, components: components)
+    public static func horizontal(size: DesiredSize = DesiredSize(), direction: Direction = .ltr, components: [Component]) -> FlowLayout {
+        return FlowLayout(at: .tl(.zero), size: size, orientation: .horizontal, direction: direction, components: components)
     }
 
-    public static func vertical(_ size: DesiredSize = DesiredSize(), direction: Direction = .ltr, components: [Component]) -> FlowLayout {
-        return FlowLayout(.tl(.zero), size, orientation: .vertical, direction: direction, components: components)
+    public static func vertical(size: DesiredSize = DesiredSize(), direction: Direction = .ltr, components: [Component]) -> FlowLayout {
+        return FlowLayout(at: .tl(.zero), size: size, orientation: .vertical, direction: direction, components: components)
     }
 
-    public convenience init(_ size: DesiredSize = DesiredSize(), orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
-        self.init(.tl(.zero), size, orientation: orientation, direction: direction, components: components)
+    public convenience init(size: DesiredSize = DesiredSize(), orientation: Orientation, direction: Direction = .ltr, components: [Component]) {
+        self.init(at: .tl(.zero), size: size, orientation: orientation, direction: direction, components: components)
     }
 
-    public init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), orientation: Orientation = .horizontal, direction: Direction = .ltr, components: [Component]) {
+    public init(at location: Location = .tl(.zero), size: DesiredSize = DesiredSize(), orientation: Orientation = .horizontal, direction: Direction = .ltr, components: [Component]) {
         self.size = size
         self.orientation = orientation
         self.direction = direction

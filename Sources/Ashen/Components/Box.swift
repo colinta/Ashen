@@ -89,7 +89,7 @@ public class Box: ComponentLayout {
     let label: TextType?
     let scrollOffset: Point
 
-    public init(_ location: Location = .tl(.zero), _ size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
+    public init(at location: Location = .tl(.zero), size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }

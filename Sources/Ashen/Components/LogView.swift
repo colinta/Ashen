@@ -6,14 +6,14 @@ public class LogView: ComponentLayout {
     let size: DesiredSize
     let entries: [String]
 
-    public init(_ location: Location = .tl(.zero), _ size: DesiredSize = DesiredSize(), entries: [String]) {
+    public init(at location: Location = .tl(.zero), size: DesiredSize = DesiredSize(), entries: [String]) {
         self.entries = entries
         self.size = size
         super.init()
         self.location = location
         var y = 0
         components = entries.map { entry in
-            let component = LabelView(.topLeft(y: y), text: entry)
+            let component = LabelView(at: .topLeft(y: y), text: entry)
             y += 1
             return component
         }
@@ -34,8 +34,8 @@ public class LogView: ComponentLayout {
             }
         }
 
-        let desiredWidth = size.width ?? maxSize.width
-        let desiredHeight = size.height ?? maxSize.height
+        let desiredWidth = size.width ?? .literal(maxSize.width)
+        let desiredHeight = size.height ?? .literal(maxSize.height)
         return DesiredSize(width: desiredWidth, height: desiredHeight)
     }
 

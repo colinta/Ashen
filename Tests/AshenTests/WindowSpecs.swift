@@ -8,20 +8,20 @@ struct WindowSpecs: Spec {
     var name: String { return "WindowSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
-        let spinnerA = SpinnerView(.topLeft())
+        let spinnerA = SpinnerView(at: .topLeft())
         spinnerA.index = 1
-        let spinnerB = SpinnerView(.topLeft())
+        let spinnerB = SpinnerView(at: .topLeft())
         spinnerB.index = 2
         let prevWindow = Window(components: [
             spinnerA,
             spinnerB,
         ])
         let subject = Window(components: [
-            LabelView(.topLeft(), text: ""),
-            SpinnerView(.topLeft()),
-            LabelView(.topLeft(), text: ""),
-            SpinnerView(.topLeft()),
-            LabelView(.topLeft(), text: ""),
+            LabelView(at: .topLeft(), text: ""),
+            SpinnerView(at: .topLeft()),
+            LabelView(at: .topLeft(), text: ""),
+            SpinnerView(at: .topLeft()),
+            LabelView(at: .topLeft(), text: ""),
         ])
         subject.merge(with: prevWindow)
         let spinnerAFinal = subject.components[1] as! SpinnerView

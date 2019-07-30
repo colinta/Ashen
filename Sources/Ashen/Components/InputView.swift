@@ -52,8 +52,8 @@ public class InputView: ComponentView {
         return lines
     }
 
-    public init(_ location: Location = .tl(.zero),
-        _ size: DesiredSize = DesiredSize(),
+    public init(at location: Location = .tl(.zero),
+        size: DesiredSize = DesiredSize(),
         text: String = "",
         isFirstResponder: Bool = false,
         isMultiline: Bool = false,
@@ -120,7 +120,7 @@ public class InputView: ComponentView {
             calcHeight += 1
         }
 
-        return DesiredSize(width: calcWidth, height: max(1, calcHeight))
+        return DesiredSize(width: size.width ?? .literal(calcWidth), height: size.height ?? .literal(max(1, calcHeight)))
     }
 
     override func render(to buffer: Buffer, in rect: Rect) {

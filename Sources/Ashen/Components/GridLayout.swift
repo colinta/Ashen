@@ -50,7 +50,7 @@ public class GridLayout: ComponentLayout {
             return memo
         }
     }
-    public init(_ location: Location = .tl(.zero), _ size: Size, rows: [Row]) {
+    public init(at location: Location = .tl(.zero), size: Size, rows: [Row]) {
         self.size = size
         self.rows = rows
         super.init()

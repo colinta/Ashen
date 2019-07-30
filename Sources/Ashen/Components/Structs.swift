@@ -32,28 +32,6 @@ public struct Size: Equatable {
     }
 }
 
-public struct DesiredSize {
-    public var width: Int?
-    public var height: Int?
-
-    public init(width: Int? = nil, height: Int? = nil) {
-        self.width = width
-        self.height = height
-    }
-
-    public init(_ size: Size) {
-        self.width = size.width
-        self.height = size.height
-    }
-
-    func constrain(in size: Size) -> Size {
-        return Size(
-            width: min(width ?? size.width, size.width),
-            height: min(height ?? size.height, size.height)
-            )
-    }
-}
-
 public struct Point: Equatable {
     public var x: Int
     public var y: Int

@@ -49,7 +49,7 @@ struct InputViewSpecs: Spec {
         let text = startingText
         var changedText: String?
         let subject = InputView(
-            .topLeft(),
+            at: .topLeft(),
             text: text,
             isFirstResponder: true,
             onChange: { text in

@@ -43,7 +43,7 @@ public class SpinnerView: ComponentView {
     let background: Color?
     let isAnimating: Bool
 
-    public init(_ location: Location = .mc(.zero), model: Model = Model.default, foreground: Color? = nil, background: Color? = nil, isAnimating: Bool = true) {
+    public init(at location: Location = .mc(.zero), model: Model = Model.default, foreground: Color? = nil, background: Color? = nil, isAnimating: Bool = true) {
         self.model = model
         self.index = nil
         self.foreground = foreground

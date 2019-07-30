@@ -180,7 +180,7 @@ public class CanvasView: ComponentView {
     let viewport: FloatFrame
     let drawables: [Drawable]
 
-    public init(_ location: Location = .tl(.zero), _ size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
+    public init(at location: Location = .tl(.zero), size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
         self.size = size
         self.viewport = viewport
         self.drawables = drawables

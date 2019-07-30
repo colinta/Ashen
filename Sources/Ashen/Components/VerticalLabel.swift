@@ -4,14 +4,13 @@
 
 
 public class VerticalLabelView: ComponentView {
-    let size: DesiredSize
+    let height: Dimension
     let chars: [AttrCharType]
 
-    var linesWidth: Int { return 1 }
     var linesHeight: Int { return chars.count }
 
-    public init(_ location: Location = .tl(.zero), _ height: Int? = nil, text: TextType) {
-        self.size = DesiredSize(width: 1, height: height)
+    public init(at location: Location = .tl(.zero), _ height: Dimension = .max, text: TextType) {
+        self.height = height
         self.chars = text.chars
 
         super.init()
@@ -19,14 +18,18 @@ public class VerticalLabelView: ComponentView {
     }
 
     override func desiredSize() -> DesiredSize {
-        return DesiredSize(width: linesWidth, height: size.height ?? linesHeight)
+        return DesiredSize(width: 1, height: height)
     }
 
     override func render(to buffer: Buffer, in rect: Rect) {
+        guard rect.origin.x == 0 else { return }
+
         var yOffset = 0
         for attrChar in chars {
             if yOffset > rect.size.height { return }
-            buffer.write(attrChar, x: 0, y: yOffset)
+            if yOffset >= rect.origin.y {
+                buffer.write(attrChar, x: 0, y: yOffset)
+            }
             yOffset += 1
         }
     }
