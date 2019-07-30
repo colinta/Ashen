@@ -14,12 +14,9 @@ struct SpinnerViewSpecs: Spec {
                 spinner: ["a", "b", "c"]
                 ))
         subject.timeout = -1
-        let size = Size(width: 1, height: 1)
-        let bufferA = subject.render(size: size)
-        expect("outputs 'a'").assert(SpecsProgram.bufferToString(bufferA) == "a")
+        expect("outputs 'a'").assertRenders(subject, "a")
         _ = subject.messages(for: .tick(0))
-        let bufferB = subject.render(size: size)
-        expect("outputs 'b'").assert(SpecsProgram.bufferToString(bufferB) == "b")
+        expect("outputs 'b'").assertRenders(subject, "b")
         done()
     }
 }
