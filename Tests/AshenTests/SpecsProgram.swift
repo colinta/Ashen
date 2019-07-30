@@ -109,7 +109,7 @@ struct SpecsProgram: Program {
             }
         }
 
-        components.append(LogView(at: .topLeft(y: 4), size: DesiredSize(mySize), entries: model.specLog))
+        components.append(LogView(at: .topLeft(y: 4), entries: model.specLog))
         if !model.running {
             components.append(OnNext({ SpecsMessage.begin }))
         }
