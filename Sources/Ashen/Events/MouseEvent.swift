@@ -8,9 +8,10 @@ public struct MouseEvent {
     public let event: Event
 
     public enum Event {
+        case drag(Button)
         case click(Button)
         case scroll(Direction)
-        case release
+        case release(Button)
     }
 
     public enum Button {
@@ -35,12 +36,14 @@ extension MouseEvent.Event: Equatable {
 public extension MouseEvent {
     var toString: String {
         switch self.event {
+        case let .drag(btn):
+            return "drag(\(x), \(y), \(btn))"
         case let .click(btn):
             return "click(\(x), \(y), \(btn))"
         case let .scroll(direction):
             return "scroll(\(x), \(y), \(direction))"
-        case .release:
-            return "release(\(x), \(y))"
+        case let .release(btn):
+            return "release(\(x), \(y), \(btn))"
         }
     }
 }
@@ -48,12 +51,14 @@ public extension MouseEvent {
 public extension MouseEvent.Event {
     var toString: String {
         switch self {
+        case let .drag(btn):
+            return "drag(\(btn))"
         case let .click(btn):
             return "click(\(btn))"
         case let .scroll(direction):
             return "scroll(\(direction))"
-        case .release:
-            return "release"
+        case let .release(btn):
+            return "release(\(btn))"
         }
     }
 }

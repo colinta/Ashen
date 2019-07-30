@@ -8,7 +8,8 @@ import Termbox
 
 public class TermboxScreen: ScreenType {
     public var size: Size { return Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
-    private var extraEvents: [Event] = []
+    private var queuedEvents: [Event] = []
+    private var currentMouseClick: (x: Int16, y: Int16, button: MouseEvent.Button)?
 
     public init() {
         Termbox.debug = debug
@@ -56,31 +57,75 @@ public class TermboxScreen: ScreenType {
     }
 
     public func nextEvent() -> Event? {
-        if extraEvents.count > 0 { return extraEvents.removeFirst() }
-
-        let termboxEvent = Termbox.peekEvent(timeoutInMilliseconds: 1)
-
-        return convertTermboxEvent(termboxEvent)
-    }
-}
-
-private func convertTermboxEvent(_ termboxEvent: TermboxEvent) -> Event? {
-    switch termboxEvent {
-    case let .key(mod, value):
-        if let key = termboxKey(mod, value) {
-            return .key(key)
+        var event: Event? = nil
+        if queuedEvents.count > 0 {
+            event = queuedEvents.removeFirst()
         }
-    case let .character(mod, value):
-        guard let key = termboxCharacter(mod, value) else { return nil }
-        return .key(key)
-    case let .resize(width, height):
-        return .window(width: Int(width), height: Int(height))
-    case let .mouse(x, y, type):
-        return .mouse(MouseEvent(x: x, y: y, event: termboxMouse(type)))
-    default:
-        break
+        else {
+            let termboxEvent = Termbox.peekEvent(timeoutInMilliseconds: 1)
+            event = convertTermboxEvent(termboxEvent)
+        }
+
+        return event
     }
-    return nil
+
+    private func convertTermboxEvent(_ termboxEvent: TermboxEvent) -> Event? {
+        switch termboxEvent {
+        case let .key(mod, value):
+            if let key = termboxKey(mod, value) {
+                return .key(key)
+            }
+        case let .character(mod, value):
+            guard let key = termboxCharacter(mod, value) else { return nil }
+            return .key(key)
+        case let .resize(width, height):
+            return .window(width: Int(width), height: Int(height))
+        case let .mouse(x, y, type):
+            return .mouse(MouseEvent(x: x, y: y, event: termboxMouseEvent(x, y, type)))
+        default:
+            break
+        }
+        return nil
+    }
+
+    private func termboxMouseEvent(_ x: Int16, _ y: Int16, _ type: TermboxMouse) -> MouseEvent.Event {
+        if let prevMouseClick = currentMouseClick, type != .release, type != .wheelUp, type != .wheelDown {
+            if type == .left, prevMouseClick.button == .left {
+                return .drag(.left)
+            }
+            else if type == .middle, prevMouseClick.button == .middle {
+                return .drag(.middle)
+            }
+            else if type == .right, prevMouseClick.button == .right {
+                return .drag(.right)
+            }
+
+            currentMouseClick = nil
+            let nextEvent = termboxMouseEvent(x, y, type)
+            queuedEvents.append(.mouse(MouseEvent(x: x, y: y, event: nextEvent)))
+            return .release(prevMouseClick.button)
+        }
+
+        switch type {
+        case .left:
+            currentMouseClick = (x: x, y: y, button: .left)
+            return .click(.left)
+        case .right:
+            currentMouseClick = (x: x, y: y, button: .right)
+            return .click(.right)
+        case .middle:
+            currentMouseClick = (x: x, y: y, button: .middle)
+            return .click(.middle)
+        case .release:
+            let button = currentMouseClick?.button ?? .left
+            currentMouseClick = nil
+            return .release(button)
+        case .wheelUp:
+            return .scroll(.up)
+        case .wheelDown:
+            return .scroll(.down)
+        }
+    }
 }
 
 private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
@@ -110,24 +155,6 @@ private func backgroundAttrs(_ attrs: [Attr]) -> Attributes {
     }
     return retval
 }
-
-private func termboxMouse(_ type: TermboxMouse) -> MouseEvent.Event {
-    switch type {
-    case .left:
-        return .click(.left)
-    case .right:
-        return .click(.right)
-    case .middle:
-        return .click(.middle)
-    case .release:
-        return .release
-    case .wheelUp:
-        return .scroll(.up)
-    case .wheelDown:
-        return .scroll(.down)
-    }
-}
-
 
 private func termboxKey(_ mod: TermboxModifier, _ key: TermboxKey) -> KeyEvent? {
     switch (mod, key) {
