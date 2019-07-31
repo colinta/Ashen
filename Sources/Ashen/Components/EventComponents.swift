@@ -21,7 +21,7 @@ public class OnTick: Component {
     override public func merge(with prevComponent: Component) {
         guard !reset else { return }
         guard let prevComponent = prevComponent as? OnTick else { return }
-        prevComponent.timeout = timeout
+        timeout = prevComponent.timeout
     }
 
     override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
@@ -35,19 +35,17 @@ public class OnTick: Component {
     }
 
     override public func messages(for event: Event) -> [AnyMessage] {
-        switch event {
-        case let .tick(dt):
-            let nextTimeout = timeout - dt
-            if nextTimeout <= 0 {
-                timeout = nextTimeout + every
-                return [onTick(dt)]
-            }
-            else {
-                timeout = nextTimeout
-            }
-        default: break
+        guard case let .tick(dt) = event else { return [] }
+
+        let nextTimeout = timeout - dt
+        if nextTimeout <= 0 {
+            timeout = nextTimeout + every
+            return [onTick(dt)]
         }
-        return []
+        else {
+            timeout = nextTimeout
+            return []
+        }
     }
 }
 
