@@ -102,21 +102,15 @@ public struct App<ProgramType: Program> {
     }
 
     private func main() -> AppState {
-        var state: LoopState = .continue
         var prevTimestamp = mach_absolute_time()
-        var prevState: [(ProgramType.ModelType, Buffer?)] = []
-        var inThePast: Int?
         var (model, commands) = program.initial()
 
         var window = program.render(model: model, in: screen.size)
-        let buffer = screen.render(window: window)
-        prevState.append((model, buffer))
+        var buffer = screen.render(window: window)
 
         var messageQueue: [ProgramType.MessageType] = []
         let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
-        while state == .continue {
-            sync {}
-
+        while true {
             for command in commands {
                 commandBackgroundThread.async {
                     command.start { msg in
@@ -130,7 +124,7 @@ public struct App<ProgramType: Program> {
             }
             commands = []
 
-            let (events, nextTimestamp) = flushEvents(prevTimestamp: prevTimestamp)
+            let (events, nextTimestamp) = collectSystemEvents(prevTimestamp: prevTimestamp)
             prevTimestamp = nextTimestamp
             var updateAndRender = false
             var rerender = false
@@ -145,92 +139,41 @@ public struct App<ProgramType: Program> {
                 else if case .window = event {
                     updateAndRender = true
                 }
-                else if case let .key(key) = event, key == .ctrl(.z) {
-                    inThePast = max(0, (inThePast ?? prevState.count) - 1)
-                }
-                else if case let .key(key) = event, key == .ctrl(.x) {
-                    let nextState = (inThePast ?? prevState.count) + 1
-                    if nextState >= prevState.count {
-                        inThePast = nil
-                    }
-                    else {
-                        inThePast = nextState
-                    }
-                }
-                else if case let .key(key) = event, key == .space, let pastIndex = inThePast {
-                    let (newModel, _) = prevState[pastIndex]
-                    model = newModel
-                    window = program.render(model: model, in: screen.size)
-                    rerender = true
-                    prevState = Array(prevState[0 ..< pastIndex])
-                    inThePast = nil
-                }
             }
 
-            if let pastIndex = inThePast {
-                let (model, storedBuffer) = prevState[pastIndex]
-                let buffer: Buffer
-                if let storedBuffer = storedBuffer {
-                    buffer = storedBuffer
-                }
-                else {
-                    let newWindow = program.render(model: model, in: screen.size)
-                    buffer = screen.render(window: newWindow)
-                }
-                screen.render(buffer: buffer)
-                sync {
-                    messageQueue = []
-                }
-                continue
-            }
-            else {
-                for event in events {
-                    for message in window.messages(for: event) {
-                        if let message = message as? ProgramType.MessageType {
-                            sync {
-                                messageQueue.append(message)
-                            }
+            for event in events {
+                for message in window.messages(for: event, shouldStop: false) {
+                    if let message = message as? ProgramType.MessageType {
+                        sync {
+                            messageQueue.append(message)
                         }
-                        else if let message = message as? SystemMessage, inThePast == nil {
-                            switch message {
-                            case .rerender:
-                                rerender = true
-                            case .quit:
-                                return .quit
-                            }
+                    }
+                    else if let message = message as? SystemMessage {
+                        switch message {
+                        case .rerender:
+                            rerender = true
+                        case .quit:
+                            return .quit
                         }
                     }
                 }
+            }
 
-                var first = true
-                var count: Int!
-                sync {
-                    count = messageQueue.count
+            var messageQueueCopy: [ProgramType.MessageType]!
+            sync {
+                messageQueueCopy = messageQueue
+                messageQueue = []
+            }
+
+            updateAndRender = updateAndRender || messageQueueCopy.count > 0
+            for message in messageQueueCopy {
+                let (newModel, newCommands, state) = program.update(model: &model, message: message)
+                if state.shouldQuit {
+                    return state.appState
                 }
-                while count > 0 {
-                    if !first {
-                        prevState.append((model, nil))
-                    }
-                    first = false
 
-                    var message: ProgramType.MessageType!
-                    sync {
-                        message = messageQueue.removeFirst()
-                    }
-                    let (newModel, newCommands, newState) = program.update(model: &model, message: message)
-                    if newState.shouldQuit {
-                        return newState.appState
-                    }
-
-                    state = newState
-                    model = newModel
-                    commands += newCommands
-
-                    updateAndRender = true
-                    sync {
-                        count = messageQueue.count
-                    }
-                }
+                model = newModel
+                commands += newCommands
             }
 
             if updateAndRender {
@@ -240,15 +183,12 @@ public struct App<ProgramType: Program> {
             }
 
             if updateAndRender || rerender {
-                let buffer = screen.render(window: window)
-                prevState.append((model, buffer))
+                buffer = screen.render(window: window)
             }
         }
-
-        return .quit
     }
 
-    private func flushEvents(prevTimestamp: UInt64) -> ([Event], UInt64) {
+    private func collectSystemEvents(prevTimestamp: UInt64) -> ([Event], UInt64) {
         var events: [Event] = []
         while let systemEvent = screen.nextEvent() {
             events.append(systemEvent)
@@ -263,7 +203,7 @@ public struct App<ProgramType: Program> {
 
         let currentTime = mach_absolute_time()
         let dt: Float = convertDt(now: currentTime, prevTimestamp: prevTimestamp)
-        if dt > 0.01666 {
+        if dt > 0.001 {
             events.append(.tick(dt))
             return (events, currentTime)
         }
