@@ -10,8 +10,8 @@ public class Component: Equatable {
         return []
     }
 
-    open func messages(for _: Event, shouldStop: Bool) -> [AnyMessage] {
-        return []
+    func messages(for event: Event, shouldStop: Bool) -> [AnyMessage] {
+        return messages(for: event)
     }
 
     open func render(size: Size) -> Buffer {
@@ -71,12 +71,8 @@ public class ComponentLayout: ComponentView {
         return window
     }
 
-    override public func messages(for event: Event) -> [AnyMessage] {
-        return messages(for: event, shouldStop: false)
-    }
-
-    override public func messages(for event: Event, shouldStop shouldStopParent: Bool) -> [AnyMessage] {
-        var messages: [AnyMessage] = []
+    override func messages(for event: Event, shouldStop shouldStopParent: Bool) -> [AnyMessage] {
+        var messages: [AnyMessage] = self.messages(for: event)
         var shouldStop = shouldStopParent
         for component in components {
             guard !shouldStop || component.shouldAlwaysProcess(event: event) else { continue }
