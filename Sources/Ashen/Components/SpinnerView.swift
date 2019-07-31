@@ -84,7 +84,8 @@ public class SpinnerView: ComponentView {
     }
 
     var index: Int?
-    var timeout: Float = 0.05
+    let initialTimeout: Float = 0.05
+    var timeout: Float
 
     let model: Model
     let foreground: Color?
@@ -97,6 +98,7 @@ public class SpinnerView: ComponentView {
         self.foreground = foreground
         self.background = background
         self.isAnimating = isAnimating
+        self.timeout = initialTimeout
         super.init()
         self.location = location
     }
@@ -132,7 +134,7 @@ public class SpinnerView: ComponentView {
 
         if case let .tick(dt) = event {
             if timeout < 0 {
-                timeout = 0.05
+                timeout = initialTimeout
                 index = ((index ?? 0) + 1) % model.spinner.count
                 return [SystemMessage.rerender]
             }
