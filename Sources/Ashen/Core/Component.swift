@@ -10,6 +10,10 @@ public class Component: Equatable {
         return []
     }
 
+    open func messages(for _: Event, shouldStop: Bool) -> [AnyMessage] {
+        return []
+    }
+
     open func render(size: Size) -> Buffer {
         let buffer = Buffer(size: size)
         render(to: buffer, in: Rect(size: size))
@@ -29,6 +33,10 @@ public class Component: Equatable {
     // used by ComponentLayout.messages to determine if a keyboard or mouse
     // event has been handled and should not be handed to other Components
     open func shouldStopProcessing(event: Event) -> Bool {
+        return false
+    }
+
+    open func shouldAlwaysProcess(event: Event) -> Bool {
         return false
     }
 
@@ -64,11 +72,19 @@ public class ComponentLayout: ComponentView {
     }
 
     override public func messages(for event: Event) -> [AnyMessage] {
+        return messages(for: event, shouldStop: false)
+    }
+
+    override public func messages(for event: Event, shouldStop shouldStopParent: Bool) -> [AnyMessage] {
         var messages: [AnyMessage] = []
+        var shouldStop = shouldStopParent
         for component in components {
-            messages += component.messages(for: event)
+            guard !shouldStop || component.shouldAlwaysProcess(event: event) else { continue }
+
+            messages += component.messages(for: event, shouldStop: shouldStop)
+
             if component.shouldStopProcessing(event: event) {
-                break
+                shouldStop = true
             }
         }
         return messages
@@ -79,7 +95,21 @@ public class ComponentLayout: ComponentView {
     }
 
     override public func shouldStopProcessing(event: Event) -> Bool {
-        return components.firstIndex { $0.shouldStopProcessing(event: event) } != nil
+        for component in components {
+            if component.shouldStopProcessing(event: event) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override public func shouldAlwaysProcess(event: Event) -> Bool {
+        for component in components {
+            if component.shouldAlwaysProcess(event: event) {
+                return true
+            }
+        }
+        return false
     }
 
     /// Merge this Layout and its components.  The algorithm works like this:

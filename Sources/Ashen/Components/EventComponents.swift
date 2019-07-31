@@ -125,6 +125,10 @@ public class OnKeyPress: Component {
         return true
     }
 
+    override public func shouldAlwaysProcess(event: Event) -> Bool {
+        return eventMatches(event)
+    }
+
     override public func shouldStopProcessing(event: Event) -> Bool {
         return eventMatches(event)
     }
