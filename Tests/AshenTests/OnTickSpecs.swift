@@ -20,7 +20,7 @@ struct OnTickSpecs: Spec {
         let app = App(program: program, screen: screen)
         _ = app.run()
         expect("receives .tick (\(ticked))").assert(ticked)
-        expect("dt(\(dt)) is reasonable").assert(dt > 0.01)
+        expect("dt(\(dt)) is reasonable").assert(dt > 0.001)
         done()
     }
 }
