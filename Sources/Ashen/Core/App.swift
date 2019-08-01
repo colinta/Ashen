@@ -197,9 +197,8 @@ public struct App<ProgramType: Program> {
             }
         }
 
-        while logEntries.count > 0 {
-            events.append(.log(logEntries.removeFirst()))
-        }
+        events += logEntries.map { .log($0) }
+        logEntries = []
 
         let currentTime = mach_absolute_time()
         let dt: Float = convertDt(now: currentTime, prevTimestamp: prevTimestamp)
