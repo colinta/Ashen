@@ -3,8 +3,8 @@
 //
 
 public struct MouseEvent {
-    public let x: Int16
-    public let y: Int16
+    public let x: Int
+    public let y: Int
     public let event: Event
 
     public enum Event {

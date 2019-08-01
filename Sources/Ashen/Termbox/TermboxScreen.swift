@@ -9,7 +9,7 @@ import Termbox
 public class TermboxScreen: ScreenType {
     public var size: Size { return Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
     private var queuedEvents: [Event] = []
-    private var currentMouseClick: (x: Int16, y: Int16, button: MouseEvent.Button)?
+    private var currentMouseClick: (x: UInt16, y: UInt16, button: MouseEvent.Button)?
 
     public init() {
         Termbox.debug = debug
@@ -81,14 +81,14 @@ public class TermboxScreen: ScreenType {
         case let .resize(width, height):
             return .window(width: Int(width), height: Int(height))
         case let .mouse(x, y, type):
-            return .mouse(MouseEvent(x: x, y: y, event: termboxMouseEvent(x, y, type)))
+            return .mouse(MouseEvent(x: Int(x), y: Int(y), event: termboxMouseEvent(x, y, type)))
         default:
             break
         }
         return nil
     }
 
-    private func termboxMouseEvent(_ x: Int16, _ y: Int16, _ type: TermboxMouse) -> MouseEvent.Event {
+    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse) -> MouseEvent.Event {
         if let prevMouseClick = currentMouseClick, type != .release, type != .wheelUp, type != .wheelDown {
             if type == .left, prevMouseClick.button == .left {
                 return .drag(.left)
@@ -102,7 +102,7 @@ public class TermboxScreen: ScreenType {
 
             currentMouseClick = nil
             let nextEvent = termboxMouseEvent(x, y, type)
-            queuedEvents.append(.mouse(MouseEvent(x: x, y: y, event: nextEvent)))
+            queuedEvents.append(.mouse(MouseEvent(x: Int(x), y: Int(y), event: nextEvent)))
             return .release(prevMouseClick.button)
         }
 
