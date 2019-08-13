@@ -6,7 +6,9 @@
 open class Component: Equatable {
     var id: String?
 
-    public init() {}
+    public init(id: String? = nil) {
+        self.id = id
+    }
 
     open func messages(for _: Event) -> [AnyMessage] {
         return []
