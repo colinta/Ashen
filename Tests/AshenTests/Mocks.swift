@@ -78,7 +78,7 @@ class MockScreen: ScreenType {
         teardownCalled += 1
     }
 
-    func nextEvent() -> Event? {
+    func nextEvent(buffer _: Buffer) -> Event? {
         guard events.count > 0 else { return nil }
         return events.removeFirst()
     }

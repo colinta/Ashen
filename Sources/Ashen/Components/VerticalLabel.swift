@@ -17,7 +17,7 @@ public class VerticalLabelView: ComponentView {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         return DesiredSize(width: 1, height: height)
     }
 

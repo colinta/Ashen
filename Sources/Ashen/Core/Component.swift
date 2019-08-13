@@ -3,8 +3,10 @@
 //
 
 
-public class Component: Equatable {
+open class Component: Equatable {
     var id: String?
+
+    public init() {}
 
     open func messages(for _: Event) -> [AnyMessage] {
         return []
@@ -52,18 +54,18 @@ public class Component: Equatable {
     }
 }
 
-public class ComponentView: Component {
-    var location: Location = .topLeft()
-    func desiredSize() -> DesiredSize {
+open class ComponentView: Component {
+    open var location: Location = .topLeft()
+    open func desiredSize() -> DesiredSize {
         return DesiredSize()
     }
 }
 
-public class ComponentLayout: ComponentView {
-    var components: [Component] = []
-    var views: [ComponentView] { return components.compactMap { $0 as? ComponentView } }
+open class ComponentLayout: ComponentView {
+    public var components: [Component] = []
+    // public var views: [ComponentView] { return components.compactMap { $0 as? ComponentView } }
 
-    override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+    override open func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
         window.components = components.map { comp in
             return comp.map(mapper)
@@ -86,11 +88,11 @@ public class ComponentLayout: ComponentView {
         return messages
     }
 
-    override public func render(to buffer: Buffer, in rect: Rect) {
-        Window.render(views: views, to: buffer, in: rect)
+    override open func render(to buffer: Buffer, in rect: Rect) {
+        Window.render(views: components, to: buffer, in: rect)
     }
 
-    override public func shouldStopProcessing(event: Event) -> Bool {
+    override open func shouldStopProcessing(event: Event) -> Bool {
         for component in components {
             if component.shouldStopProcessing(event: event) {
                 return true
@@ -99,7 +101,7 @@ public class ComponentLayout: ComponentView {
         return false
     }
 
-    override public func shouldAlwaysProcess(event: Event) -> Bool {
+    override open func shouldAlwaysProcess(event: Event) -> Bool {
         for component in components {
             if component.shouldAlwaysProcess(event: event) {
                 return true
@@ -119,7 +121,7 @@ public class ComponentLayout: ComponentView {
     ///     - if no match is found, restore the prevIndex; the new component is
     ///       considered inserted, and not merged
     /// - if the component matches the prev component at prevIndex, merge them.
-    override public func merge(with prevComponent: Component) {
+    override open func merge(with prevComponent: Component) {
         guard let prevLayout = prevComponent as? ComponentLayout else { return }
 
         var prevIndex = 0

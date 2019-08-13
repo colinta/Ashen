@@ -40,7 +40,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         return DesiredSize(width: size.width ?? .literal(linesWidth), height: size.height ?? .literal(linesHeight))
     }
 

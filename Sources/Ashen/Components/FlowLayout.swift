@@ -42,7 +42,7 @@ public class FlowLayout: ComponentLayout {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         return size
     }
 
@@ -59,7 +59,11 @@ public class FlowLayout: ComponentLayout {
         var viewX = direction == .ltr ? 0 : rect.size.width
         var viewY = 0
         var rowHeight = 0
-        for view in views {
+        for component in components {
+            guard let view = component as? ComponentView else {
+                component.render(to: buffer, in: rect)
+                continue
+            }
             let viewSize = view.desiredSize().constrain(in: rect.size)
 
             rowHeight = max(rowHeight, viewSize.height)
@@ -94,7 +98,11 @@ public class FlowLayout: ComponentLayout {
         var viewX = direction == .ltr ? 0 : rect.size.width
         var viewY = 0
         var colWidth = 0
-        for view in views {
+        for component in components {
+            guard let view = component as? ComponentView else {
+                component.render(to: buffer, in: rect)
+                continue
+            }
             let viewSize = view.desiredSize().constrain(in: rect.size)
 
             colWidth = max(colWidth, viewSize.width)

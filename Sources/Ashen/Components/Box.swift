@@ -57,7 +57,7 @@ public class Box: ComponentLayout {
             tbSide: "─", lrSide: "│"
             )
         public static let double = Border(
-            dot: "◻︎", topCap: "╦", bottomCap: "╩", leftCap: "╠", rightCap: "╣",
+            dot: "⧈", topCap: "╦", bottomCap: "╩", leftCap: "╠", rightCap: "╣",
             tlCorner: "╔", trCorner: "╗", blCorner: "╚", brCorner: "╝",
             tbSide: "═", lrSide: "║"
             )
@@ -72,24 +72,24 @@ public class Box: ComponentLayout {
             tbSide: "━", lrSide: "┃"
             )
         public static let doubleSides = Border(
-            dot: "◻︎", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
+            dot: "◫", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
             tlCorner: "╓", trCorner: "╖", blCorner: "╙", brCorner: "╜",
             tbSide: "─", lrSide: "║"
             )
         public static let doubleTops = Border(
-            dot: "◻︎", topCap: "╤", bottomCap: "╧", leftCap: "╞", rightCap: "╡",
+            dot: "⊟", topCap: "╤", bottomCap: "╧", leftCap: "╞", rightCap: "╡",
             tlCorner: "╒", trCorner: "╕", blCorner: "╘", brCorner: "╛",
             tbSide: "═", lrSide: "│"
             )
     }
 
-    let size: Size
+    let size: DesiredSize
     let border: Border?
     let background: AttrCharType?
     let label: TextType?
     let scrollOffset: Point
 
-    public init(at location: Location = .tl(.zero), size: Size = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
+    public init(at location: Location = .tl(.zero), size: DesiredSize = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }
@@ -100,8 +100,8 @@ public class Box: ComponentLayout {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
-        return DesiredSize(size)
+    override public func desiredSize() -> DesiredSize {
+        return size
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {
@@ -205,7 +205,7 @@ public class Box: ComponentLayout {
 
         let contentSize = innerSize + scrollOffset
         buffer.push(offset: borderOffset, clip: innerSize) {
-            Window.render(views: views, to: buffer, in: Rect(origin: Point(x: scrollOffset.x, y: scrollOffset.y), size: innerSize), contentSize: contentSize)
+            Window.render(views: components, to: buffer, in: Rect(origin: Point(x: scrollOffset.x, y: scrollOffset.y), size: innerSize), contentSize: contentSize)
 
             if let background = background {
                 for y in 0 ..< innerSize.height {

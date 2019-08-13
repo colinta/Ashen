@@ -13,7 +13,7 @@ public class CanvasView: ComponentView {
         case offsetBox(Int)
         case border
 
-        func draw(in canvas: PixelCanvas, viewport: FloatFrame, pixelSize: Size) {
+        fileprivate func draw(in canvas: PixelCanvas, viewport: FloatFrame, pixelSize: Size) {
             switch self {
             case let .fn(function):
                 drawFunction(in: canvas, function, viewport: viewport, pixelSize: pixelSize)
@@ -123,7 +123,7 @@ public class CanvasView: ComponentView {
         }
     }
 
-    class PixelCanvas {
+    fileprivate class PixelCanvas {
         private var points: [Int: [Int: Bool]] = [:]
         private var maxX = 0, maxY = 0
 
@@ -188,7 +188,7 @@ public class CanvasView: ComponentView {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         return size
     }
 

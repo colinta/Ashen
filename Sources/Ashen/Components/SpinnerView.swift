@@ -109,7 +109,7 @@ public class SpinnerView: ComponentView {
         timeout = prevSpinner.timeout
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         let width = model.spinner.reduce(0) { width, str in
             return max(width, str.count)
         }

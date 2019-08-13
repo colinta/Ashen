@@ -3,8 +3,16 @@
 //
 
 
+public typealias OnMouseHandler = (MouseEvent) -> AnyMessage
+public typealias OnTickHandler = (Float) -> AnyMessage
+public typealias OnNextHandler = () -> AnyMessage
+public typealias OnKeyHandler = (KeyEvent) -> AnyMessage
+public typealias EmptyKeyHandler = () -> AnyMessage
+public typealias LogHandler = (String) -> AnyMessage
+public typealias ResizeHandler = (Size) -> AnyMessage
+
+
 public class OnTick: Component {
-    public typealias OnTickHandler = (Float) -> AnyMessage
     var onTick: OnTickHandler
     var every: Float
     var timeout: Float
@@ -50,7 +58,6 @@ public class OnTick: Component {
 }
 
 public class OnNext: Component {
-    public typealias OnNextHandler = () -> AnyMessage
     var onNext: OnNextHandler
 
     public init(_ onNext: @escaping OnNextHandler) {
@@ -76,8 +83,6 @@ public class OnNext: Component {
 }
 
 public class OnKeyPress: Component {
-    public typealias OnKeyHandler = (KeyEvent) -> AnyMessage
-    public typealias EmptyKeyHandler = () -> AnyMessage
     var onKey: OnKeyHandler
     var only: [KeyEvent]
     var except: [KeyEvent]
@@ -133,7 +138,6 @@ public class OnKeyPress: Component {
 }
 
 public class OnMouse: Component {
-    public typealias OnMouseHandler = (MouseEvent) -> AnyMessage
     var onMouse: OnMouseHandler
     var only: [MouseEvent.Event]
     var except: [MouseEvent.Event]
@@ -170,7 +174,6 @@ public class OnMouse: Component {
 }
 
 public class OnDebug: Component {
-    public typealias LogHandler = (String) -> AnyMessage
     var onLogEntry: LogHandler
 
     public init(_ onLogEntry: @escaping LogHandler) {
@@ -196,7 +199,6 @@ public class OnDebug: Component {
 }
 
 public class OnResize: Component {
-    public typealias ResizeHandler = (Size) -> AnyMessage
     var onResize: ResizeHandler
 
     public init(_ onResize: @escaping ResizeHandler) {

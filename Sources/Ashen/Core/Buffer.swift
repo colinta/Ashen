@@ -6,38 +6,38 @@ public class Buffer {
     typealias Chars = [Int: [Int: AttrCharType]]
     private(set) var chars: Chars = [:]
     private var offset: Point = .zero
-    private var zeroOffset: Point = .zero
+    private var zeroOrigin: Point = .zero
     private var size: Size
 
     init(size: Size) {
         self.size = size
     }
 
-    func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {
+    public func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {
         guard nextOffset.x < size.width, nextOffset.y < size.height else { return }
         let nextSize = Size(width: min(size.width - nextOffset.x, nextDesiredSize.width), height: min(size.height - nextOffset.y, nextDesiredSize.height))
         guard nextOffset.x + nextSize.width > 0, nextOffset.y + nextSize.height > 0 else { return }
         guard nextSize.width > 0, nextSize.height > 0 else { return }
 
         let prevOffset = offset
-        let prevZeroOffset = zeroOffset
+        let prevZeroOrigin = zeroOrigin
         let prevSize = size
         offset = Point(
             x: offset.x + nextOffset.x,
             y: offset.y + nextOffset.y
             )
-        zeroOffset = Point(
-            x: max(zeroOffset.x, offset.x),
-            y: max(zeroOffset.y, offset.y)
+        zeroOrigin = Point(
+            x: max(zeroOrigin.x, offset.x),
+            y: max(zeroOrigin.y, offset.y)
             )
         size = nextSize
         block()
         offset = prevOffset
-        zeroOffset = prevZeroOffset
+        zeroOrigin = prevZeroOrigin
         size = prevSize
     }
 
-    func write(_ attrChar: AttrCharType, x localX: Int, y localY: Int) {
+    public func write(_ attrChar: AttrCharType, x localX: Int, y localY: Int) {
         guard
             attrChar.char != "",
             localX >= 0, localY >= 0,
@@ -47,7 +47,7 @@ public class Buffer {
         let x = localX + offset.x
         let y = localY + offset.y
         guard
-            x >= 0, y >= 0, x >= zeroOffset.x, y >= zeroOffset.y
+            x >= zeroOrigin.x, y >= zeroOrigin.y
         else { return }
 
         var row = chars[y] ?? [:]

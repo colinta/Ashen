@@ -46,7 +46,6 @@ public class TermboxScreen: ScreenType {
                     let char = (attrChar.char ?? " ").unicodeScalars.first
                 else { continue }
 
-
                 let foreground = foregroundAttrs(attrChar.attrs)
                 let background = backgroundAttrs(attrChar.attrs)
                 Termbox.putc(x: Int32(x), y: Int32(y), char: char, foreground: foreground, background: background)
@@ -56,7 +55,7 @@ public class TermboxScreen: ScreenType {
         Termbox.render()
     }
 
-    public func nextEvent() -> Event? {
+    public func nextEvent(buffer: Buffer) -> Event? {
         var event: Event? = nil
         if queuedEvents.count > 0 {
             event = queuedEvents.removeFirst()

@@ -9,7 +9,7 @@ public protocol ScreenType {
     func render(buffer _: Buffer)
     func setup() throws
     func teardown()
-    func nextEvent() -> Event?
+    func nextEvent(buffer: Buffer) -> Event?
 }
 
 public extension ScreenType {

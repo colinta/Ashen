@@ -76,6 +76,11 @@ public struct Text: TextType {
     }
 }
 
+extension String: AttrCharType {
+    public var char: String? { return self }
+    public var attrs: [Attr] { return [] }
+}
+
 extension String: TextType {
     public var chars: [AttrCharType] {
         let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")

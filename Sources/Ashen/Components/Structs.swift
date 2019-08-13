@@ -54,8 +54,8 @@ public struct Point: Equatable {
 }
 
 public struct Rect {
-    var origin: Point
-    var size: Size
+    public var origin: Point
+    public var size: Size
 
     public init(origin: Point = .zero, size: Size = .zero) {
         self.origin = origin
@@ -88,6 +88,13 @@ public struct Rect {
     }
     public static func - (lhs: Rect, rhs: Point) -> Rect {
         return Rect(origin: lhs.origin - rhs, size: lhs.size)
+    }
+
+    public static func + (lhs: Rect, rhs: Size) -> Rect {
+        return Rect(origin: lhs.origin, size: lhs.size + rhs)
+    }
+    public static func - (lhs: Rect, rhs: Size) -> Rect {
+        return Rect(origin: lhs.origin, size: lhs.size - rhs)
     }
 }
 

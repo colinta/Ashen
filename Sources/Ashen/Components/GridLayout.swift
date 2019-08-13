@@ -58,7 +58,7 @@ public class GridLayout: ComponentLayout {
         self.location = location
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         return DesiredSize(size)
     }
 

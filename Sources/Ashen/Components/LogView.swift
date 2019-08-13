@@ -19,7 +19,7 @@ public class LogView: ComponentLayout {
         }
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         guard size.width == nil || size.height == nil else {
             return size
         }

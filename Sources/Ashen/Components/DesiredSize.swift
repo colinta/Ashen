@@ -6,6 +6,8 @@ public struct DesiredSize {
     public var width: Dimension?
     public var height: Dimension?
 
+    static public let zero = DesiredSize(width: 0, height: 0)
+
     public init(width: Dimension? = nil, height: Dimension? = nil) {
         self.width = width
         self.height = height
@@ -38,7 +40,9 @@ public struct DesiredSize {
     }
 
     private func constrain(_ dimension: Dimension?, in size: Int) -> Int {
-        switch dimension ?? .max {
+        guard let dimension = dimension else { return 0 }
+
+        switch dimension {
         case let .literal(literal):
             return literal
         case .max:

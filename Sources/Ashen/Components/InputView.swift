@@ -108,7 +108,7 @@ public class InputView: ComponentView {
         cursor = forceCursor ?? prevInput.cursor
     }
 
-    override func desiredSize() -> DesiredSize {
+    override public func desiredSize() -> DesiredSize {
         if let width = size.width, let height = size.height {
             return DesiredSize(width: width, height: height)
         }
@@ -183,11 +183,11 @@ public class InputView: ComponentView {
                     attrs = [.underline]
                 }
                 else {
-                    attrs = [.bold]
+                    attrs = []
                 }
             }
-            else if isFirstResponder{
-                attrs = [.bold]
+            else if isFirstResponder {
+                attrs = []
             }
             else {
                 attrs = [.underline]
@@ -235,12 +235,9 @@ public class InputView: ComponentView {
     }
 
     override public func messages(for event: Event) -> [AnyMessage] {
-        guard
-            isFirstResponder
-        else { return [] }
-
         switch event {
         case let .key(key):
+            guard isFirstResponder else { return [] }
             return keyEvent(key: key).compactMap { $0 }
         default:
             return []

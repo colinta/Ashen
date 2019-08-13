@@ -124,7 +124,7 @@ public struct App<ProgramType: Program> {
             }
             commands = []
 
-            let (events, nextTimestamp) = collectSystemEvents(prevTimestamp: prevTimestamp)
+            let (events, nextTimestamp) = collectSystemEvents(buffer: buffer, prevTimestamp: prevTimestamp)
             prevTimestamp = nextTimestamp
             var updateAndRender = false
             var rerender = false
@@ -188,9 +188,9 @@ public struct App<ProgramType: Program> {
         }
     }
 
-    private func collectSystemEvents(prevTimestamp: UInt64) -> ([Event], UInt64) {
+    private func collectSystemEvents(buffer: Buffer, prevTimestamp: UInt64) -> ([Event], UInt64) {
         var events: [Event] = []
-        while let systemEvent = screen.nextEvent() {
+        while let systemEvent = screen.nextEvent(buffer: buffer) {
             events.append(systemEvent)
             if events.count > 10 {
                 break

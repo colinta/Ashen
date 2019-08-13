@@ -27,7 +27,7 @@ class SpecsScreen: ScreenType {
         print(output)
     }
 
-    func nextEvent() -> Event? {
+    func nextEvent(buffer _: Buffer) -> Event? {
         return nil
     }
 

@@ -8,10 +8,10 @@ public struct MouseEvent {
     public let event: Event
 
     public enum Event {
-        case drag(Button)
         case click(Button)
-        case scroll(Direction)
+        case drag(Button)
         case release(Button)
+        case scroll(Direction)
     }
 
     public enum Button {
@@ -28,7 +28,7 @@ public struct MouseEvent {
 }
 
 extension MouseEvent.Event: Equatable {
-    static public func == (lhs: MouseEvent.Event, rhs: MouseEvent.Event) -> Bool {
+    public static func == (lhs: MouseEvent.Event, rhs: MouseEvent.Event) -> Bool {
         return lhs.toString == rhs.toString
     }
 }
