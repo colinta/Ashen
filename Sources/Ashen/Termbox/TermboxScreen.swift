@@ -65,7 +65,13 @@ public class TermboxScreen: ScreenType {
             event = convertTermboxEvent(termboxEvent)
         }
 
-        return event
+        if let event = event, case let .mouse(mouse) = event {
+            guard let row = buffer.mouse[mouse.y], let info = row[mouse.x] else { return nil }
+            return .mouse(mouse.on(info: info))
+        }
+        else {
+            return event
+        }
     }
 
     private func convertTermboxEvent(_ termboxEvent: TermboxEvent) -> Event? {
@@ -88,7 +94,11 @@ public class TermboxScreen: ScreenType {
     }
 
     private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse) -> MouseEvent.Event {
-        if let prevMouseClick = currentMouseClick, type != .release, type != .wheelUp, type != .wheelDown {
+        if let prevMouseClick = currentMouseClick,
+            type != .release,
+            type != .wheelUp,
+            type != .wheelDown
+        {
             if type == .left, prevMouseClick.button == .left {
                 return .drag(.left)
             }

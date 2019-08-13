@@ -6,6 +6,17 @@ public struct MouseEvent {
     public let x: Int
     public let y: Int
     public let event: Event
+    public let component: Component?
+
+    public var button: Button? {
+        switch event {
+            case let .click(button): return button
+            case let .drag(button): return button
+            case let .release(button): return button
+            default:
+                return nil
+        }
+    }
 
     public enum Event {
         case click(Button)
@@ -23,6 +34,24 @@ public struct MouseEvent {
     public enum Direction {
         case up
         case down
+    }
+
+    init(x: Int, y: Int, event: Event) {
+        self.x = x
+        self.y = y
+        self.event = event
+        self.component = nil
+    }
+
+    init(x: Int, y: Int, event: Event, component: Component) {
+        self.x = x
+        self.y = y
+        self.event = event
+        self.component = component
+    }
+
+    func on(info: (Component, Point)) -> MouseEvent {
+        return MouseEvent(x: x - info.1.x, y: y - info.1.y, event: event, component: info.0)
     }
 
 }

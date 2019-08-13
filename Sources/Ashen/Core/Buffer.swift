@@ -4,13 +4,36 @@
 
 public class Buffer {
     typealias Chars = [Int: [Int: AttrCharType]]
+    typealias Mouse = [Int: [Int: (Component, Point)]]
     private(set) var chars: Chars = [:]
+    private(set) var mouse: Mouse = [:]
     private var offset: Point = .zero
     private var zeroOrigin: Point = .zero
     private var size: Size
 
     init(size: Size) {
         self.size = size
+    }
+
+    public func claimMouse(rect: Rect, component: Component) {
+        for localY in rect.origin.y ..< rect.origin.y + rect.size.height {
+            let y = offset.y + localY
+            guard y >= zeroOrigin.y, y < offset.y + size.height else { continue }
+            var row = mouse[y] ?? [:]
+
+            for localX in rect.origin.x ..< rect.origin.x + rect.size.width {
+                let x = offset.x + localX
+                guard
+                    x >= zeroOrigin.x,
+                    x < offset.x + size.width,
+                    row[x] == nil
+                else { continue }
+
+                row[x] = (component, rect.origin + offset)
+            }
+
+            mouse[y] = row
+        }
     }
 
     public func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {

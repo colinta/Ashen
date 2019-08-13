@@ -138,11 +138,37 @@ public class OnKeyPress: Component {
 }
 
 public class OnMouse: Component {
-    var onMouse: OnMouseHandler
-    var only: [MouseEvent.Event]
-    var except: [MouseEvent.Event]
+    public struct Filter: OptionSet {
+        public let rawValue: Int
 
-    public init(_ onMouse: @escaping OnMouseHandler, only: [MouseEvent.Event] = [], except: [MouseEvent.Event] = []) {
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        public static let click = Filter(rawValue: 1 << 0)
+        public static let drag = Filter(rawValue: 1 << 1)
+        public static let release = Filter(rawValue: 1 << 2)
+        public static let scroll = Filter(rawValue: 1 << 3)
+
+        func matches(_ event: MouseEvent.Event) -> Bool {
+            switch event {
+            case .click:
+                return self.contains(.click)
+            case .drag:
+                return self.contains(.drag)
+            case .release:
+                return self.contains(.release)
+            case .scroll:
+                return self.contains(.scroll)
+            }
+        }
+    }
+
+    var onMouse: OnMouseHandler
+    var only: Filter
+    var except: Filter
+
+    public init(_ onMouse: @escaping OnMouseHandler, only: Filter = [], except: Filter = []) {
         self.onMouse = onMouse
         self.only = only
         self.except = except
@@ -159,17 +185,17 @@ public class OnMouse: Component {
     }
 
     override public func messages(for event: Event) -> [AnyMessage] {
-        switch event {
-        case let .mouse(mouse):
-            guard
-                only == [] || only.contains(mouse.event),
-                !except.contains(mouse.event)
-            else { break }
-            return [onMouse(mouse)]
-        default: break
-        }
+        guard case let .mouse(mouse) = event,
+            mouse.component == self,
+            only.isEmpty || only.matches(mouse.event),
+            !except.matches(mouse.event)
+        else { return [] }
 
-        return []
+        return [onMouse(mouse)]
+    }
+
+    override public func render(to buffer: Buffer, in rect: Rect) {
+        buffer.claimMouse(rect: rect, component: self)
     }
 }
 

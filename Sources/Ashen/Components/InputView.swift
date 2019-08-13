@@ -4,6 +4,7 @@
 
 public class InputView: ComponentView {
     public typealias OnChangeHandler = ((String) -> AnyMessage)
+    public typealias OnClickHandler = (() -> AnyMessage)
     public typealias OnCursorChangeHandler = ((Cursor) -> AnyMessage)
     public typealias OnEnterHandler = (() -> AnyMessage)
 
@@ -33,6 +34,7 @@ public class InputView: ComponentView {
     let isFirstResponder: Bool
     let isMultiline: Bool
     var onChange: OnChangeHandler
+    var onClick: OnClickHandler?
     var onCursorChange: OnCursorChangeHandler?
     var onEnter: OnEnterHandler?
 
@@ -59,12 +61,14 @@ public class InputView: ComponentView {
         isMultiline: Bool = false,
         cursor: Cursor? = nil,
         onChange: @escaping OnChangeHandler,
+        onClick: OnClickHandler? = nil,
         onCursorChange: OnCursorChangeHandler? = nil,
         onEnter: OnEnterHandler? = nil
         ) {
         self.size = size
         self.text = text
         self.onChange = onChange
+        self.onClick = onClick
         self.onCursorChange = onCursorChange
         self.onEnter = onEnter
         self.isFirstResponder = isFirstResponder
@@ -77,11 +81,20 @@ public class InputView: ComponentView {
 
     override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
+
         let myChange = self.onChange
         let onChange: OnChangeHandler = { text in
             return mapper(myChange(text) as! T)
         }
         component.onChange = onChange
+
+        if let onClick = onClick {
+            let myClick = onClick
+            let onClick: OnClickHandler = {
+                return mapper(myClick() as! T)
+            }
+            component.onClick = onClick
+        }
 
         if let onCursorChange = onCursorChange {
             let myCursorChange = onCursorChange
@@ -125,6 +138,10 @@ public class InputView: ComponentView {
 
     override public func render(to buffer: Buffer, in rect: Rect) {
         guard rect.size.width > 0 && rect.size.height > 0 else { return }
+
+        if onClick != nil {
+            buffer.claimMouse(rect: rect, component: self)
+        }
 
         let normalCursor = self.cursor.normalized
 
@@ -239,6 +256,13 @@ public class InputView: ComponentView {
         case let .key(key):
             guard isFirstResponder else { return [] }
             return keyEvent(key: key).compactMap { $0 }
+        case let .mouse(mouse):
+            guard
+                let onClick = onClick, mouse.component === self,
+                case .click(.left) = mouse.event
+            else { return [] }
+
+            return [onClick()]
         default:
             return []
         }
