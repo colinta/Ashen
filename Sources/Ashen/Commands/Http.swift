@@ -11,7 +11,7 @@ public enum HttpError: Error {
     case unknown
 }
 
-public enum HttpOptions {
+public enum HttpOption {
     // mixing concerns here, but it's easy & handy to have these as "options"
     // rather than additional arguments.  background & ephemeral control what
     // type of URLSessionConfiguration object is created.
@@ -20,7 +20,7 @@ public enum HttpOptions {
 
     // URLRequest
     case method(Http.Method)
-    case body(Data)
+    case body(Http.Body)
     case headers(Http.Headers)
     case header(String, String)
     case setHeader(String, String)
@@ -176,6 +176,20 @@ public class Http: Command {
         case options = "OPTIONS"
     }
 
+    public enum Body {
+        case string(String)
+        case data(Data)
+
+        var toData: Data? {
+            switch self {
+            case let .string(string):
+                return string.data(using: .utf8)
+            case let .data(data):
+                return data
+            }
+        }
+    }
+
     public class Delegate: NSObject {
         public typealias OnProgressHandler = ((Float) -> Void)
         public typealias OnReceivedHandler = ((Data?, Http.Headers, Error?) -> Void)
@@ -187,6 +201,7 @@ public class Http: Command {
 
     public typealias Header = (String, String)
     public typealias Headers = [Header]
+    public typealias Options = [HttpOption]
     public typealias HttpResult = Result<(Data, Headers)>
     public typealias OnProgressHandler = (Float) -> AnyMessage?
     public typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
@@ -197,33 +212,33 @@ public class Http: Command {
     var onProgress: OnProgressHandler?
     var onReceived: OnReceivedHandler
 
-    public static func get(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func get(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.get)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func post(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func post(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.post)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func put(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func put(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.put)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func patch(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func patch(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.patch)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func delete(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func delete(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.delete)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func head(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func head(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.head)] + options, onProgress: onProgress, onReceived: onReceived)
     }
-    public static func options(url: URL, options: [HttpOptions] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
+    public static func options(url: URL, options: [HttpOption] = [], onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) -> Http {
         return Http(request: URLRequest(url: url), options: [.method(.options)] + options, onProgress: onProgress, onReceived: onReceived)
     }
 
-    public convenience init(url: URL, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
+    public convenience init(url: URL, options: [HttpOption] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
         self.init(request: URLRequest(url: url), options: [.method(.options)] + options, onProgress: onProgress, onReceived: onReceived)
     }
 
-    public init(request _request: URLRequest, options: [HttpOptions] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
+    public init(request _request: URLRequest, options: [HttpOption] = [], urlSessionHandler: URLSessionHandler = .system, onProgress: OnProgressHandler? = nil, onReceived: @escaping OnReceivedHandler) {
         var request = _request
 
         var isEphemeral = false
@@ -236,6 +251,10 @@ public class Http: Command {
             }
             else if case .ephemeral = option {
                 isEphemeral = false
+                break
+            }
+            else if case let .body(body) = option {
+                request.httpBody = body.toData
                 break
             }
         }
@@ -289,6 +308,10 @@ public class Http: Command {
 
     public func start(_ done: @escaping (AnyMessage) -> Void) {
         urlSessionDelegate.onReceived = { data, headers, error in
+            debug("=============== \(#file) line \(#line) ===============")
+            debug("data: \(data)")
+            debug("headers: \(headers)")
+            debug("error: \(error)")
             let result: HttpResult
             if let data = data {
                 result = .ok((data, headers))
