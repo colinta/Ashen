@@ -83,8 +83,8 @@ public enum HttpOption {
         case let .removeHeader(key):
             request.setValue(nil, forHTTPHeaderField: key)
         case let .headers(headers):
-            for (key, value) in headers {
-                request.addValue(value, forHTTPHeaderField: key)
+            for header in headers {
+                request.addValue(header.value, forHTTPHeaderField: header.name)
             }
         default:
             break
@@ -98,9 +98,9 @@ public enum HttpOption {
 func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
     let headers: Http.Headers
     if let response = response as? HTTPURLResponse {
-        headers = response.allHeaderFields.compactMap { key, value -> Http.Header? in
-            guard let key = key as? String, let value = value as? String else { return nil }
-            return (key, value)
+        headers = response.allHeaderFields.compactMap { name, value -> Http.Header? in
+            guard let name = name as? String, let value = value as? String else { return nil }
+            return Http.Header(name: name, value: value)
         }
     }
     else {
@@ -208,7 +208,23 @@ public class Http: Command {
         var onProgress: OnProgressHandler?
     }
 
-    public typealias Header = (String, String)
+    public struct Header {
+        public let name: String
+        public let value: String
+
+        public init(name: String, value: String) {
+            self.name = name
+            self.value = value
+        }
+
+        public enum Name: String {
+            case contentType = "content-type"
+        }
+
+        public func `is`(_ other: Name) -> Bool {
+            name.lowercased() == other.rawValue
+        }
+    }
     public typealias Headers = [Header]
     public typealias Options = [HttpOption]
     public typealias HttpResult = Result<(Data, Headers)>
