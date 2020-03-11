@@ -22,12 +22,12 @@ public class GridLayout: ComponentLayout {
 
     public struct Row {
         public static func row(weight: Weight = .relative(1), _ columns: [Column] = []) -> Row {
-            return Row(weight: weight, columns: columns)
+            Row(weight: weight, columns: columns)
         }
         public static func row(weight: Weight = .relative(1), _ components: [ComponentView] = [])
             -> Row
         {
-            return Row(weight: weight, columns: components.map { .column($0) })
+            Row(weight: weight, columns: components.map { .column($0) })
         }
         let weight: Weight
         let columns: [Column]
@@ -37,7 +37,7 @@ public class GridLayout: ComponentLayout {
         public static func column(weight: Weight = .relative(1), _ component: ComponentView)
             -> Column
         {
-            return Column(weight: weight, component: component)
+            Column(weight: weight, component: component)
         }
         let weight: Weight
         let component: ComponentView
@@ -47,7 +47,7 @@ public class GridLayout: ComponentLayout {
     let size: Size
 
     private static func totalWeight(_ weights: [Weight]) -> Float {
-        return weights.reduce(0 as Float) { memo, weight in
+        weights.reduce(0 as Float) { memo, weight in
             if case let .relative(value) = weight {
                 return memo + value
             }
@@ -63,7 +63,7 @@ public class GridLayout: ComponentLayout {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return DesiredSize(size)
+        DesiredSize(size)
     }
 
     private static func calculateDimensions(screen: Int, weights: [Weight]) -> [Int] {
@@ -95,8 +95,9 @@ public class GridLayout: ComponentLayout {
                 return nil
             }
             let sortedOffsets = relativeWeights.sorted(by: { a, b in
-                return a.1 < b.1
+                a.1 < b.1
             }).map({ $0.0 })
+
             for offset in sortedOffsets {
                 guard remaining != 0 else { break }
                 if remaining > 0 {

@@ -50,7 +50,7 @@ struct SpecsProgram: Program {
     }
 
     func initial() -> (SpecsModel, [Command]) {
-        return (SpecsModel(specs), [])
+        (SpecsModel(specs), [])
     }
 
     func update(model: inout SpecsModel, message: SpecsMessage)
@@ -102,10 +102,10 @@ struct SpecsProgram: Program {
 
         if model.done {
             if onEnd == .quit {
-                components.append(OnNext({ return SpecsMessage.quit }))
+                components.append(OnNext({ SpecsMessage.quit }))
             }
             else {
-                components.append(OnKeyPress({ _ in return SpecsMessage.quit }))
+                components.append(OnKeyPress({ SpecsMessage.quit }))
             }
         }
 
@@ -121,21 +121,21 @@ extension SpecsProgram {
     static func bufferToString(_ buffer: Buffer) -> String {
         var output = ""
         let lines = buffer.chars
-            .map { y, line in return (y, line) }
-            .sorted { a, b in return a.0 < b.0 }
-            .map { _, line in return line }
+            .map { y, line in (y, line) }
+            .sorted { a, b in a.0 < b.0 }
+            .map { _, line in line }
         for line in lines {
             if output != "" {
                 output += "\n"
             }
 
-            var prevX = (line.max(by: { a, b in return a.0 > b.0 })?.0) ?? 0
+            var prevX = (line.max(by: { a, b in a.0 > b.0 })?.0) ?? 0
             let text =
                 line
                     .map { x, c in
-                        return (x, c)
+                        (x, c)
                     }
-                    .sorted { a, b in return a.0 < b.0 }
+                    .sorted { a, b in a.0 < b.0 }
             for (x, c) in text {
                 while prevX < x {
                     output += " "

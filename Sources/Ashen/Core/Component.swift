@@ -11,11 +11,11 @@ open class Component: Equatable {
     }
 
     open func messages(for _: Event) -> [AnyMessage] {
-        return []
+        []
     }
 
     func messages(for event: Event, shouldStop: Bool) -> [AnyMessage] {
-        return messages(for: event)
+        messages(for: event)
     }
 
     open func render(size: Size) -> Buffer {
@@ -28,7 +28,7 @@ open class Component: Equatable {
     }
 
     open func map<T, U>(_: @escaping (T) -> U) -> Self {
-        return self
+        self
     }
 
     open func merge(with _: Component) {
@@ -37,11 +37,11 @@ open class Component: Equatable {
     // used by ComponentLayout.messages to determine if a keyboard or mouse
     // event has been handled and should not be handed to other Components
     open func shouldStopProcessing(event: Event) -> Bool {
-        return false
+        false
     }
 
     open func shouldAlwaysProcess(event: Event) -> Bool {
-        return false
+        false
     }
 
     public static func == (lhs: Component, rhs: Component) -> Bool {
@@ -59,7 +59,7 @@ open class Component: Equatable {
 open class ComponentView: Component {
     open var location: Location = .topLeft()
     open func desiredSize() -> DesiredSize {
-        return DesiredSize()
+        DesiredSize()
     }
 }
 
@@ -70,7 +70,7 @@ open class ComponentLayout: ComponentView {
     override open func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let window = self
         window.components = components.map { comp in
-            return comp.map(mapper)
+            comp.map(mapper)
         }
         return window
     }

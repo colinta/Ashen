@@ -34,7 +34,7 @@ public struct AttrChar: AttrCharType {
 
 extension AttrChar: TextType {
     public var chars: [AttrCharType] {
-        return [self]
+        [self]
     }
 }
 
@@ -45,8 +45,8 @@ public struct AttrText: TextType {
         self.chars = content.flatMap { $0.chars }
     }
 
-    public init(_ chars: [AttrChar] = []) {
-        self.chars = chars
+    public init(_ text: TextType) {
+        self.chars = text.chars
     }
 
     public init(_ chars: [AttrCharType] = []) {
@@ -63,11 +63,11 @@ public struct Text: TextType {
     public let attrs: [Attr]
 
     public var chars: [AttrCharType] {
-        return text.map { AttrChar($0, attrs) }
+        text.map { AttrChar($0, attrs) }
     }
 
     var description: String {
-        return text
+        text
     }
 
     public init(_ text: String, _ attrs: [Attr] = []) {
@@ -77,8 +77,8 @@ public struct Text: TextType {
 }
 
 extension String: AttrCharType {
-    public var char: String? { return self }
-    public var attrs: [Attr] { return [] }
+    public var char: String? { self }
+    public var attrs: [Attr] { [] }
 }
 
 extension String: TextType {
@@ -92,18 +92,18 @@ extension String: TextType {
 }
 
 extension Character: AttrCharType {
-    public var char: String? { return String(self) }
-    public var attrs: [Attr] { return [] }
+    public var char: String? { String(self) }
+    public var attrs: [Attr] { [] }
 }
 
 public func + (lhs: AttrText, rhs: TextType) -> AttrText {
-    return AttrText(lhs.chars + rhs.chars)
+    AttrText(lhs.chars + rhs.chars)
 }
 
 public func + (lhs: AttrText, rhs: AttrText) -> AttrText {
-    return AttrText(lhs.chars + rhs.chars)
+    AttrText(lhs.chars + rhs.chars)
 }
 
 public func + (lhs: TextType, rhs: TextType) -> TextType {
-    return AttrText(lhs.chars + rhs.chars)
+    AttrText(lhs.chars + rhs.chars)
 }

@@ -21,7 +21,7 @@ struct MockProgram: Program {
     }
 
     func initial() -> (Any, [Command]) {
-        return (mockModel, [])
+        (mockModel, [])
     }
 
     func update(model: inout Any, message: Any)

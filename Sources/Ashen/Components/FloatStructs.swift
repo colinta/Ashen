@@ -26,7 +26,7 @@ public struct FloatPoint {
     public var y: Float
 
     public var round: Point {
-        return Point(
+        Point(
             x: Int(0.5 + x),
             y: Int(0.5 + y)
         )
@@ -73,6 +73,7 @@ public struct FloatFrame {
 
     func normalize(_ point: FloatPoint) -> FloatPoint? {
         guard size.width != 0 && size.height != 0 else { return nil }
+
         return FloatPoint(
             x: (point.x - origin.x) / size.width,
             y: 1 - (point.y - origin.y) / size.height
@@ -80,13 +81,13 @@ public struct FloatFrame {
     }
 
     func normalize(_ point: FloatPoint, in pixelSize: Size) -> Point? {
-        return normalize(point)?.map(to: pixelSize)
+        normalize(point)?.map(to: pixelSize)
     }
 
-    public var minX: Float { return min(origin.x, origin.x + size.width) }
-    public var maxX: Float { return max(origin.x, origin.x + size.width) }
-    public var minY: Float { return min(origin.y, origin.y + size.height) }
-    public var maxY: Float { return max(origin.y, origin.y + size.height) }
-    public var width: Float { return max(size.width, -size.width) }
-    public var height: Float { return max(size.height, -size.height) }
+    public var minX: Float { min(origin.x, origin.x + size.width) }
+    public var maxX: Float { max(origin.x, origin.x + size.width) }
+    public var minY: Float { min(origin.y, origin.y + size.height) }
+    public var maxY: Float { max(origin.y, origin.y + size.height) }
+    public var width: Float { max(size.width, -size.width) }
+    public var height: Float { max(size.height, -size.height) }
 }

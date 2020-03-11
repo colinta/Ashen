@@ -169,7 +169,7 @@ public enum KeyEvent {
 
 extension KeyEvent: Equatable {
     public static func == (lhs: KeyEvent, rhs: KeyEvent) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }
 
@@ -284,7 +284,7 @@ public extension CtrlKeyEvent {
 
 extension CtrlKeyEvent: Equatable {
     public static func == (lhs: CtrlKeyEvent, rhs: CtrlKeyEvent) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }
 
@@ -421,7 +421,7 @@ public enum AltKeyEvent {
 
 public extension AltKeyEvent {
     var isPrintable: Bool {
-        return toPrintable != ""
+        toPrintable != ""
     }
 
     var toPrintable: String {
@@ -537,7 +537,7 @@ public extension AltKeyEvent {
 
 extension AltKeyEvent: Equatable {
     public static func == (lhs: AltKeyEvent, rhs: AltKeyEvent) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }
 
@@ -565,7 +565,7 @@ public extension ShiftKeyEvent {
 
 extension ShiftKeyEvent: Equatable {
     public static func == (lhs: ShiftKeyEvent, rhs: ShiftKeyEvent) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }
 
@@ -870,25 +870,25 @@ public extension FnKeyEvent {
 }
 
 extension KeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }
 
 extension CtrlKeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }
 
 extension AltKeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }
 
 extension ShiftKeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }
 
 extension CharKeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }
 
 extension FnKeyEvent: CustomStringConvertible {
-    public var description: String { return toString }
+    public var description: String { toString }
 }

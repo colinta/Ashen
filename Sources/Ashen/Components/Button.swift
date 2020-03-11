@@ -33,7 +33,7 @@ public class Button: ComponentView {
 
         let myClick = self.onClick
         let onClick: OnClickHandler = {
-            return mapper(myClick() as! T)
+            mapper(myClick() as! T)
         }
         component.onClick = onClick
 

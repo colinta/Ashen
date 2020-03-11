@@ -6,7 +6,7 @@ import Foundation
 @testable import Ashen
 
 struct HttpSpecs: Spec {
-    var name: String { return "HttpSpecs" }
+    var name: String { "HttpSpecs" }
 
     class MockSession: URLSessionProtocol {
         var cancelled = 0
@@ -58,7 +58,7 @@ struct HttpSpecs: Spec {
                 return mockSession
             }),
             onReceived: { _ in
-                return "message!"
+                "message!"
             }
         )
         let request = subject.request

@@ -10,6 +10,6 @@ public protocol Command {
 
 extension Command {
     public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
-        return self
+        self
     }
 }

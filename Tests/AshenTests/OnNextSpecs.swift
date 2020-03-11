@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct OnNextSpecs: Spec {
-    var name: String { return "OnNextSpecs" }
+    var name: String { "OnNextSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let screen = MockScreen()

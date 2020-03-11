@@ -21,7 +21,7 @@ struct SpecRunner: Command {
     func start(_ done: @escaping (AnyMessage) -> Void) {
         let expectations = Expectations(showSuccess: verbose)
         let generator: (String) -> Expectations = { desc in
-            return expectations.describe(desc)
+            expectations.describe(desc)
         }
 
         spec.run(expect: generator) {

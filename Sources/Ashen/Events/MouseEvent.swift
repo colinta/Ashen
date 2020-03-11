@@ -51,14 +51,14 @@ public struct MouseEvent {
     }
 
     func on(info: (Component, Point)) -> MouseEvent {
-        return MouseEvent(x: x - info.1.x, y: y - info.1.y, event: event, component: info.0)
+        MouseEvent(x: x - info.1.x, y: y - info.1.y, event: event, component: info.0)
     }
 
 }
 
 extension MouseEvent.Event: Equatable {
     public static func == (lhs: MouseEvent.Event, rhs: MouseEvent.Event) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }
 
@@ -94,6 +94,6 @@ public extension MouseEvent.Event {
 
 extension MouseEvent: Equatable {
     public static func == (lhs: MouseEvent, rhs: MouseEvent) -> Bool {
-        return lhs.toString == rhs.toString
+        lhs.toString == rhs.toString
     }
 }

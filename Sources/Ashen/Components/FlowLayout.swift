@@ -26,7 +26,7 @@ public class FlowLayout: ComponentLayout {
         direction: Direction = .ltr,
         components: [Component]
     ) -> FlowLayout {
-        return FlowLayout(
+        FlowLayout(
             at: .tl(.zero),
             size: size,
             orientation: .horizontal,
@@ -40,7 +40,7 @@ public class FlowLayout: ComponentLayout {
         direction: Direction = .ltr,
         components: [Component]
     ) -> FlowLayout {
-        return FlowLayout(
+        FlowLayout(
             at: .tl(.zero),
             size: size,
             orientation: .vertical,
@@ -80,7 +80,7 @@ public class FlowLayout: ComponentLayout {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return size
+        size
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {

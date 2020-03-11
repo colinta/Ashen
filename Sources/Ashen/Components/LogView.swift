@@ -31,7 +31,7 @@ public class LogView: ComponentLayout {
         let maxSize = entries.reduce(Size.zero) { _maxSize, entry in
             let lines = entry.split(separator: "\n")
             return lines.reduce(_maxSize) { maxSize, line in
-                return Size(
+                Size(
                     width: max(maxSize.width, line.count),
                     height: maxSize.height + lines.count
                 )

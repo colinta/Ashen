@@ -36,7 +36,7 @@ public class OnTick: Component {
         let component = self
         let myHandler = self.onTick
         let onTick: OnTickHandler = { dt in
-            return mapper(myHandler(dt) as! T)
+            mapper(myHandler(dt) as! T)
         }
         component.onTick = onTick
         return component
@@ -68,7 +68,7 @@ public class OnNext: Component {
         let component = self
         let myHandler = self.onNext
         let onNext: OnNextHandler = {
-            return mapper(myHandler() as! T)
+            mapper(myHandler() as! T)
         }
         component.onNext = onNext
         return component
@@ -88,7 +88,7 @@ public class OnKeyPress: Component {
     var except: [KeyEvent]
 
     public convenience init(_ key: KeyEvent, _ onKey: @escaping EmptyKeyHandler) {
-        self.init({ _ in return onKey() }, only: [key])
+        self.init({ _ in onKey() }, only: [key])
     }
 
     public init(_ onKey: @escaping OnKeyHandler, only: [KeyEvent] = [], except: [KeyEvent] = []) {
@@ -101,7 +101,7 @@ public class OnKeyPress: Component {
         let component = self
         let myHandler = self.onKey
         let onKey: OnKeyHandler = { key in
-            return mapper(myHandler(key) as! T)
+            mapper(myHandler(key) as! T)
         }
         component.onKey = onKey
         return component
@@ -129,11 +129,11 @@ public class OnKeyPress: Component {
     }
 
     override public func shouldAlwaysProcess(event: Event) -> Bool {
-        return eventMatches(event)
+        eventMatches(event)
     }
 
     override public func shouldStopProcessing(event: Event) -> Bool {
-        return eventMatches(event)
+        eventMatches(event)
     }
 }
 
@@ -178,7 +178,7 @@ public class OnMouse: Component {
         let component = self
         let myHandler = self.onMouse
         let onMouse: OnMouseHandler = { key in
-            return mapper(myHandler(key) as! T)
+            mapper(myHandler(key) as! T)
         }
         component.onMouse = onMouse
         return component
@@ -210,7 +210,7 @@ public class OnDebug: Component {
         let component = self
         let myHandler = self.onLogEntry
         let onLogEntry: LogHandler = { entry in
-            return mapper(myHandler(entry) as! T)
+            mapper(myHandler(entry) as! T)
         }
         component.onLogEntry = onLogEntry
         return component
@@ -235,7 +235,7 @@ public class OnWindowResize: Component {
         let component = self
         let myHandler = self.onResize
         let onResize: ResizeHandler = { size in
-            return mapper(myHandler(size) as! T)
+            mapper(myHandler(size) as! T)
         }
         component.onResize = onResize
         return component

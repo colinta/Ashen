@@ -7,7 +7,7 @@ import Termbox
 
 
 public class TermboxScreen: ScreenType {
-    public var size: Size { return Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
+    public var size: Size { Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
     private var queuedEvents: [Event] = []
     private var currentMouseClick: (x: UInt16, y: UInt16, button: MouseEvent.Button)?
 

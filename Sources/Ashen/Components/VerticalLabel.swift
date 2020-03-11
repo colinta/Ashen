@@ -7,7 +7,7 @@ public class VerticalLabelView: ComponentView {
     let height: Dimension
     let chars: [AttrCharType]
 
-    var linesHeight: Int { return chars.count }
+    var linesHeight: Int { chars.count }
 
     public init(at location: Location = .tl(.zero), _ height: Dimension = .max, text: TextType) {
         self.height = height
@@ -18,7 +18,7 @@ public class VerticalLabelView: ComponentView {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return DesiredSize(width: 1, height: height)
+        DesiredSize(width: 1, height: height)
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {

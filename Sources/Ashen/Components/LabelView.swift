@@ -11,7 +11,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     let linesWidth: Int
 
     public var debugDescription: String {
-        return "LabelView(\(chars))"
+        "LabelView(\(chars))"
     }
 
     public init(
@@ -45,7 +45,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return DesiredSize(
+        DesiredSize(
             width: size.width ?? .literal(linesWidth),
             height: size.height ?? .literal(linesHeight)
         )

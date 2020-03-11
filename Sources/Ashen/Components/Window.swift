@@ -11,7 +11,7 @@ public class Window: ComponentLayout {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return DesiredSize(width: .max, height: .max)
+        DesiredSize(width: .max, height: .max)
     }
 
     static func render(

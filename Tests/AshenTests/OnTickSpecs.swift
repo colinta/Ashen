@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct OnTickSpecs: Spec {
-    var name: String { return "OnTickSpecs" }
+    var name: String { "OnTickSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let screen = MockScreen()

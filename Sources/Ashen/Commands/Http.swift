@@ -121,7 +121,7 @@ extension URLSession: URLSessionProtocol {
         with request: URLRequest,
         completionHandler: Http.Delegate.OnReceivedHandler?
     ) -> URLSessionTaskProtocol {
-        return dataTask(with: request) { data, response, error in
+        dataTask(with: request) { data, response, error in
             completionHandler?(data, responseToHeaders(response), error)
         }
     }
@@ -130,7 +130,7 @@ extension URLSession: URLSessionProtocol {
         with request: URLRequest,
         completionHandler: Http.Delegate.OnReceivedHandler?
     ) -> URLSessionTaskProtocol {
-        return downloadTask(with: request) { url, response, error in
+        downloadTask(with: request) { url, response, error in
             if let url = url,
                 let data = try? Data(contentsOf: url, options: [])
             {
@@ -243,7 +243,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.get)] + options,
             onProgress: onProgress,
@@ -256,7 +256,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.post)] + options,
             onProgress: onProgress,
@@ -269,7 +269,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.put)] + options,
             onProgress: onProgress,
@@ -282,7 +282,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.patch)] + options,
             onProgress: onProgress,
@@ -295,7 +295,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.delete)] + options,
             onProgress: onProgress,
@@ -308,7 +308,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.head)] + options,
             onProgress: onProgress,
@@ -321,7 +321,7 @@ public class Http: Command {
         onProgress: OnProgressHandler? = nil,
         onReceived: @escaping OnReceivedHandler
     ) -> Http {
-        return Http(
+        Http(
             request: URLRequest(url: url),
             options: [.method(.options)] + options,
             onProgress: onProgress,
@@ -400,13 +400,13 @@ public class Http: Command {
         let command = self
         let myReceived = self.onReceived
         let onReceived: (HttpResult) -> U? = { result in
-            return myReceived(result).map { mapper($0 as! T) }
+            myReceived(result).map { mapper($0 as! T) }
         }
         command.onReceived = onReceived
 
         if let myProgress = self.onProgress {
             let onProgress: (Float) -> U? = { result in
-                return myProgress(result).map { mapper($0 as! T) }
+                myProgress(result).map { mapper($0 as! T) }
             }
             command.onProgress = onProgress
         }

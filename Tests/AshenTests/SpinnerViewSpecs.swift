@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct SpinnerViewSpecs: Spec {
-    var name: String { return "SpinnerViewSpecs" }
+    var name: String { "SpinnerViewSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let subject = SpinnerView(

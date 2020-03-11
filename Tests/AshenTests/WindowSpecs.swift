@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct WindowSpecs: Spec {
-    var name: String { return "WindowSpecs" }
+    var name: String { "WindowSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let spinnerA = SpinnerView(at: .topLeft())

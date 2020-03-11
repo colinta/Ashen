@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct InputViewSpecs: Spec {
-    var name: String { return "InputViewSpecs" }
+    var name: String { "InputViewSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         withText(expect, "test", startingAt: (3, 0), pressing: .underscore, goesTo: (4, 0), "tes_t")

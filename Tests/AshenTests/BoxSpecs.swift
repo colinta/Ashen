@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct BoxSpecs: Spec {
-    var name: String { return "BoxSpecs" }
+    var name: String { "BoxSpecs" }
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {
         let border = Box.Border(

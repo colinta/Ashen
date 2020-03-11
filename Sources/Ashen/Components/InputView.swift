@@ -10,7 +10,7 @@ public class InputView: ComponentView {
 
     public struct Cursor {
         static func `default`(for text: String) -> Cursor {
-            return Cursor(at: text.count, selection: 0)
+            Cursor(at: text.count, selection: 0)
         }
 
         let at: Int
@@ -85,14 +85,14 @@ public class InputView: ComponentView {
 
         let myChange = self.onChange
         let onChange: OnChangeHandler = { text in
-            return mapper(myChange(text) as! T)
+            mapper(myChange(text) as! T)
         }
         component.onChange = onChange
 
         if let onClick = onClick {
             let myClick = onClick
             let onClick: OnClickHandler = {
-                return mapper(myClick() as! T)
+                mapper(myClick() as! T)
             }
             component.onClick = onClick
         }
@@ -100,7 +100,7 @@ public class InputView: ComponentView {
         if let onCursorChange = onCursorChange {
             let myCursorChange = onCursorChange
             let onCursorChange: OnCursorChangeHandler = { cursor in
-                return mapper(myCursorChange(cursor) as! T)
+                mapper(myCursorChange(cursor) as! T)
             }
             component.onCursorChange = onCursorChange
         }
@@ -108,7 +108,7 @@ public class InputView: ComponentView {
         if let onEnter = onEnter {
             let myEnter = onEnter
             let onEnter: OnEnterHandler = {
-                return mapper(myEnter() as! T)
+                mapper(myEnter() as! T)
             }
             component.onEnter = onEnter
         }

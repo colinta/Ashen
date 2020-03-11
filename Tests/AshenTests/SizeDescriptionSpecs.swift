@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct SizeDescriptionSpecs: Spec {
-    var name: String { return "SizeDescriptionSpecs" }
+    var name: String { "SizeDescriptionSpecs" }
     let parentSize = Size(width: 20, height: 40)
     let sizeZeroDescription = SizeDescription(
         multiplier: FloatSize(width: 0, height: 0),

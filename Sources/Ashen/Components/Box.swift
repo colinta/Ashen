@@ -170,7 +170,7 @@ public class Box: ComponentLayout {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return size
+        size
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {

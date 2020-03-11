@@ -5,7 +5,7 @@
 @testable import Ashen
 
 struct ScreenSpecs: Spec {
-    var name: String { return "ScreenSpecs" }
+    var name: String { "ScreenSpecs" }
     struct ScreenModel {}
 
     func run(expect: (String) -> Expectations, done: @escaping () -> Void) {

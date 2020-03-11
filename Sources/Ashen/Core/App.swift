@@ -21,7 +21,7 @@ public enum LoopState {
     case `continue`
 
     var shouldQuit: Bool {
-        return self != .continue
+        self != .continue
     }
 
     var appState: AppState {
@@ -218,7 +218,7 @@ public struct App<ProgramType: Program> {
     }
 
     private func convertDt(now currentTime: UInt64, prevTimestamp: UInt64) -> Float {
-        return Float((currentTime - prevTimestamp)) * timeFactor
+        Float((currentTime - prevTimestamp)) * timeFactor
     }
 
 }

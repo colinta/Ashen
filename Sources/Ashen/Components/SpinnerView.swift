@@ -18,7 +18,7 @@ private let spinners = [
 
 public class SpinnerView: ComponentView {
     public struct Model {
-        public static var availableSpinners: Int { return spinners.count }
+        public static var availableSpinners: Int { spinners.count }
         public static let heroku: Model = Model(spinner: spinners[0])
         public static let dot: Model = Model(spinner: spinners[1])
         public static let snake: Model = Model(spinner: spinners[2])
@@ -74,7 +74,7 @@ public class SpinnerView: ComponentView {
             return Model(spinner: spinner)
         }
 
-        func content(index: Int) -> String { return spinner[index] }
+        func content(index: Int) -> String { spinner[index] }
         let spinner: [String]
 
         public init(spinner spinnerIndex: Int) {
@@ -120,7 +120,7 @@ public class SpinnerView: ComponentView {
 
     override public func desiredSize() -> DesiredSize {
         let width = model.spinner.reduce(0) { width, str in
-            return max(width, str.count)
+            max(width, str.count)
         }
         return DesiredSize(width: width, height: 1)
     }
