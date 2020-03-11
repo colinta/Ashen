@@ -103,27 +103,43 @@ public enum Location {
     public static func at(_ point: Point) -> Location { return .tl(point) }
     public static func topLeft(x: Int = 0, y: Int = 0) -> Location { return .tl(Point(x: x, y: y)) }
     public static func topLeft(_ point: Point) -> Location { return .tl(point) }
-    public static func topCenter(x: Int = 0, y: Int = 0) -> Location { return .tc(Point(x: x, y: y)) }
+    public static func topCenter(x: Int = 0, y: Int = 0) -> Location {
+        return .tc(Point(x: x, y: y))
+    }
     public static func top(x: Int = 0, y: Int = 0) -> Location { return .tc(Point(x: x, y: y)) }
     public static func topCenter(_ point: Point) -> Location { return .tc(point) }
     public static func top(_ point: Point) -> Location { return .tc(point) }
-    public static func topRight(x: Int = 0, y: Int = 0) -> Location { return .tr(Point(x: x, y: y)) }
+    public static func topRight(x: Int = 0, y: Int = 0) -> Location {
+        return .tr(Point(x: x, y: y))
+    }
     public static func topRight(_ point: Point) -> Location { return .tr(point) }
-    public static func middleLeft(x: Int = 0, y: Int = 0) -> Location { return .ml(Point(x: x, y: y)) }
+    public static func middleLeft(x: Int = 0, y: Int = 0) -> Location {
+        return .ml(Point(x: x, y: y))
+    }
     public static func middleLeft(_ point: Point) -> Location { return .ml(point) }
-    public static func middleCenter(x: Int = 0, y: Int = 0) -> Location { return .mc(Point(x: x, y: y)) }
+    public static func middleCenter(x: Int = 0, y: Int = 0) -> Location {
+        return .mc(Point(x: x, y: y))
+    }
     public static func center(x: Int = 0, y: Int = 0) -> Location { return .mc(Point(x: x, y: y)) }
     public static func middleCenter(_ point: Point) -> Location { return .mc(point) }
     public static func center(_ point: Point) -> Location { return .mc(point) }
-    public static func middleRight(x: Int = 0, y: Int = 0) -> Location { return .mr(Point(x: x, y: y)) }
+    public static func middleRight(x: Int = 0, y: Int = 0) -> Location {
+        return .mr(Point(x: x, y: y))
+    }
     public static func middleRight(_ point: Point) -> Location { return .mr(point) }
-    public static func bottomLeft(x: Int = 0, y: Int = 0) -> Location { return .bl(Point(x: x, y: y)) }
+    public static func bottomLeft(x: Int = 0, y: Int = 0) -> Location {
+        return .bl(Point(x: x, y: y))
+    }
     public static func bottomLeft(_ point: Point) -> Location { return .bl(point) }
-    public static func bottomCenter(x: Int = 0, y: Int = 0) -> Location { return .bc(Point(x: x, y: y)) }
+    public static func bottomCenter(x: Int = 0, y: Int = 0) -> Location {
+        return .bc(Point(x: x, y: y))
+    }
     public static func bottom(x: Int = 0, y: Int = 0) -> Location { return .bc(Point(x: x, y: y)) }
     public static func bottomCenter(_ point: Point) -> Location { return .bc(point) }
     public static func bottom(_ point: Point) -> Location { return .bc(point) }
-    public static func bottomRight(x: Int = 0, y: Int = 0) -> Location { return .br(Point(x: x, y: y)) }
+    public static func bottomRight(x: Int = 0, y: Int = 0) -> Location {
+        return .br(Point(x: x, y: y))
+    }
     public static func bottomRight(_ point: Point) -> Location { return .br(point) }
 
     case tl(Point)
@@ -141,12 +157,29 @@ public enum Location {
         case let .tl(point): return point
         case let .tc(point): return Point(x: point.x + (size.width - mySize.width) / 2, y: point.y)
         case let .tr(point): return Point(x: point.x + size.width - mySize.width, y: point.y)
-        case let .ml(point): return Point(x: point.x, y: point.y + (size.height - mySize.height) / 2)
-        case let .mc(point): return Point(x: point.x + (size.width - mySize.width) / 2, y: point.y + (size.height - mySize.height) / 2)
-        case let .mr(point): return Point(x: point.x + size.width - mySize.width, y: point.y + (size.height - mySize.height) / 2)
+        case let .ml(point):
+            return Point(x: point.x, y: point.y + (size.height - mySize.height) / 2)
+        case let .mc(point):
+            return Point(
+                x: point.x + (size.width - mySize.width) / 2,
+                y: point.y + (size.height - mySize.height) / 2
+            )
+        case let .mr(point):
+            return Point(
+                x: point.x + size.width - mySize.width,
+                y: point.y + (size.height - mySize.height) / 2
+            )
         case let .bl(point): return Point(x: point.x, y: point.y + size.height - mySize.height)
-        case let .bc(point): return Point(x: point.x + (size.width - mySize.width) / 2, y: point.y + size.height - mySize.height)
-        case let .br(point): return Point(x: point.x + size.width - mySize.width, y: point.y + size.height - mySize.height)
+        case let .bc(point):
+            return Point(
+                x: point.x + (size.width - mySize.width) / 2,
+                y: point.y + size.height - mySize.height
+            )
+        case let .br(point):
+            return Point(
+                x: point.x + size.width - mySize.width,
+                y: point.y + size.height - mySize.height
+            )
         }
     }
 }

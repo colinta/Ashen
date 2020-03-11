@@ -83,7 +83,10 @@ extension String: AttrCharType {
 
 extension String: TextType {
     public var chars: [AttrCharType] {
-        let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let text = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(
+            of: "\r",
+            with: "\n"
+        )
         return Array(text)
     }
 }

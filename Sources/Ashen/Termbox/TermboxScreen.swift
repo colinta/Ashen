@@ -43,12 +43,18 @@ public class TermboxScreen: ScreenType {
             for (x, attrChar) in row {
                 guard
                     x >= 0, x < size.width,
-                    let char = (attrChar.char ?? " ").unicodeScalars.first
+                        let char = (attrChar.char ?? " ").unicodeScalars.first
                 else { continue }
 
                 let foreground = foregroundAttrs(attrChar.attrs)
                 let background = backgroundAttrs(attrChar.attrs)
-                Termbox.putc(x: Int32(x), y: Int32(y), char: char, foreground: foreground, background: background)
+                Termbox.putc(
+                    x: Int32(x),
+                    y: Int32(y),
+                    char: char,
+                    foreground: foreground,
+                    background: background
+                )
             }
         }
 
@@ -93,7 +99,9 @@ public class TermboxScreen: ScreenType {
         return nil
     }
 
-    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse) -> MouseEvent.Event {
+    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse) -> MouseEvent
+        .Event
+    {
         if let prevMouseClick = currentMouseClick,
             type != .release,
             type != .wheelUp,

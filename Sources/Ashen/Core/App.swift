@@ -109,7 +109,10 @@ public struct App<ProgramType: Program> {
         var buffer = screen.render(window: window)
 
         var messageQueue: [ProgramType.MessageType] = []
-        let commandBackgroundThread = DispatchQueue(label: "commandBackgroundThread", qos: .background)
+        let commandBackgroundThread = DispatchQueue(
+            label: "commandBackgroundThread",
+            qos: .background
+        )
         while true {
             for command in commands {
                 commandBackgroundThread.async {
@@ -124,7 +127,10 @@ public struct App<ProgramType: Program> {
             }
             commands = []
 
-            let (events, nextTimestamp) = collectSystemEvents(buffer: buffer, prevTimestamp: prevTimestamp)
+            let (events, nextTimestamp) = collectSystemEvents(
+                buffer: buffer,
+                prevTimestamp: prevTimestamp
+            )
             prevTimestamp = nextTimestamp
             var updateAndRender = false
             var rerender = false

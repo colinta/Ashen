@@ -29,7 +29,12 @@ struct SpecRunner: Command {
             for message in expectations.messages {
                 done(SpecsProgram.SpecsMessage.specLog("\(message)"))
             }
-            done(SpecsProgram.SpecsMessage.expectations(expectations.totalPassed, expectations.totalFailed))
+            done(
+                SpecsProgram.SpecsMessage.expectations(
+                    expectations.totalPassed,
+                    expectations.totalFailed
+                )
+            )
         }
     }
 }

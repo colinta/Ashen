@@ -15,7 +15,12 @@ public class Button: ComponentView {
         case ignore
     }
 
-    public init(at location: Location = .tl(.zero), size: DesiredSize? = nil, onClick: @escaping OnClickHandler, content: ComponentView) {
+    public init(
+        at location: Location = .tl(.zero),
+        size: DesiredSize? = nil,
+        onClick: @escaping OnClickHandler,
+        content: ComponentView
+    ) {
         self.size = size
         self.content = content
         self.onClick = onClick

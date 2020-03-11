@@ -59,7 +59,8 @@ class Expectations {
     }
 
     @discardableResult
-    func assertRenders(_ lhs: ComponentView, _ rhs: String, _ addlDescription: String = "") -> Self {
+    func assertRenders(_ lhs: ComponentView, _ rhs: String, _ addlDescription: String = "") -> Self
+    {
         let viewSize = lhs.desiredSize().constrain(in: Size.max)
         let buffer = lhs.render(size: viewSize)
         let rendered = SpecsProgram.bufferToString(buffer)
@@ -77,9 +78,17 @@ class Expectations {
         }
 
         if !isEqual, let description = description {
-            let lhsDesc: String = (lhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
-            let rhsDesc: String = (rhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(of: "\n", with: "\\n")
-            self.description = "\(description) (" + (addlDescription == "" ? "" : "\(addlDescription): ") + "\(lhsDesc) != \(rhsDesc))"
+            let lhsDesc: String = (lhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(
+                of: "\n",
+                with: "\\n"
+            )
+            let rhsDesc: String = (rhs.map { "\"\($0)\"" } ?? "nil").replacingOccurrences(
+                of: "\n",
+                with: "\\n"
+            )
+            self.description = "\(description) (" + (
+                addlDescription == "" ? "" : "\(addlDescription): "
+            ) + "\(lhsDesc) != \(rhsDesc))"
         }
         assert(isEqual)
         return self

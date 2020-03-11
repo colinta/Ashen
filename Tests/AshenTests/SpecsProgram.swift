@@ -130,11 +130,12 @@ extension SpecsProgram {
             }
 
             var prevX = (line.max(by: { a, b in return a.0 > b.0 })?.0) ?? 0
-            let text = line
-                .map { x, c in
-                    return (x, c)
-                }
-                .sorted { a, b in return a.0 < b.0 }
+            let text =
+                line
+                    .map { x, c in
+                        return (x, c)
+                    }
+                    .sorted { a, b in return a.0 < b.0 }
             for (x, c) in text {
                 while prevX < x {
                     output += " "

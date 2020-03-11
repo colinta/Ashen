@@ -10,11 +10,11 @@ public struct MouseEvent {
 
     public var button: Button? {
         switch event {
-            case let .click(button): return button
-            case let .drag(button): return button
-            case let .release(button): return button
-            default:
-                return nil
+        case let .click(button): return button
+        case let .drag(button): return button
+        case let .release(button): return button
+        default:
+            return nil
         }
     }
 

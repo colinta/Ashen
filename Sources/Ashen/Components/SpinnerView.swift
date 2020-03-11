@@ -10,7 +10,10 @@ private let spinners = [
     ["⠁", "⠈", "⠐", "⠠", "⢀", "⡀", "⠄", "⠂"],
     ["⠉", "⠘", "⠰", "⢠", "⣀", "⡄", "⠆", "⠃"],
     ["⠉", "⠑", "⠒", "⠔", "⠤", "⢄", "⣀", "⡠", "⠤", "⠢", "⠒", "⠊"],
-    ["⠉", "⠑", "⠃", "⠊", "⠒", "⠢", "⠆", "⠔", "⠤", "⢄", "⡄", "⡠", "⣀", "⢄", "⢠", "⡠", "⠤", "⠢", "⠰", "⠔", "⠒", "⠑", "⠘", "⠊"],
+    [
+        "⠉", "⠑", "⠃", "⠊", "⠒", "⠢", "⠆", "⠔", "⠤", "⢄", "⡄", "⡠", "⣀", "⢄", "⢠", "⡠", "⠤", "⠢",
+        "⠰", "⠔", "⠒", "⠑", "⠘", "⠊"
+    ],
 ]
 
 public class SpinnerView: ComponentView {
@@ -29,7 +32,7 @@ public class SpinnerView: ComponentView {
             var rPad = 0
             var spinner: [String] = []
             var content = ""
-            for x in 0 ..< width {
+            for x in 0..<width {
                 lPad = x
                 rPad = width - lPad - 1
                 if lPad > 0 {
@@ -49,7 +52,7 @@ public class SpinnerView: ComponentView {
             spinner.append(String(repeating: " ", count: lPad) + "⠰")
             spinner.append(String(repeating: " ", count: lPad) + "⢠")
 
-            for x in 0 ..< width {
+            for x in 0..<width {
                 rPad = x
                 lPad = width - rPad - 1
                 if lPad > 0 {
@@ -92,7 +95,13 @@ public class SpinnerView: ComponentView {
     let background: Color?
     let isAnimating: Bool
 
-    public init(at location: Location = .mc(.zero), model: Model = Model.default, foreground: Color? = nil, background: Color? = nil, isAnimating: Bool = true) {
+    public init(
+        at location: Location = .mc(.zero),
+        model: Model = Model.default,
+        foreground: Color? = nil,
+        background: Color? = nil,
+        isAnimating: Bool = true
+    ) {
         self.model = model
         self.index = nil
         self.foreground = foreground

@@ -12,12 +12,18 @@ struct HttpSpecs: Spec {
         var cancelled = 0
         var request: URLRequest?
 
-        func ashenDataTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+        func ashenDataTask(
+            with request: URLRequest,
+            completionHandler: Http.Delegate.OnReceivedHandler?
+        ) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
 
-        func ashenDownloadTask(with request: URLRequest, completionHandler: Http.Delegate.OnReceivedHandler?) -> URLSessionTaskProtocol {
+        func ashenDownloadTask(
+            with request: URLRequest,
+            completionHandler: Http.Delegate.OnReceivedHandler?
+        ) -> URLSessionTaskProtocol {
             self.request = request
             return MockSessionTask()
         }
@@ -46,14 +52,15 @@ struct HttpSpecs: Spec {
                 .method(.post),
                 .timeout(1),
                 .header("Bearer-Token", "abcdef")
-                ],
+            ],
             urlSessionHandler: .mock({ newConfig in
                 config = newConfig
                 return mockSession
             }),
             onReceived: { _ in
                 return "message!"
-            })
+            }
+        )
         let request = subject.request
         expect("configures timeout")
             .assert(config != nil)

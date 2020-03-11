@@ -29,7 +29,7 @@ public struct FloatPoint {
         return Point(
             x: Int(0.5 + x),
             y: Int(0.5 + y)
-            )
+        )
     }
 
     public static let zero = FloatPoint(x: 0, y: 0)
@@ -45,7 +45,7 @@ public struct FloatPoint {
         return FloatPoint(
             x: Float(canvasSize.width - 1) * x,
             y: Float(canvasSize.height - 1) * y
-            )
+        )
     }
 
     func map(to pixelSize: Size) -> Point? {
@@ -54,7 +54,7 @@ public struct FloatPoint {
         return Point(
             x: Int(0.5 + Float(pixelSize.width - 1) * x),
             y: Int(0.5 + Float(pixelSize.height - 1) * y)
-            )
+        )
     }
 }
 
@@ -76,7 +76,7 @@ public struct FloatFrame {
         return FloatPoint(
             x: (point.x - origin.x) / size.width,
             y: 1 - (point.y - origin.y) / size.height
-            )
+        )
     }
 
     func normalize(_ point: FloatPoint, in pixelSize: Size) -> Point? {

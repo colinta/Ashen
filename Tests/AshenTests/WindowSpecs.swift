@@ -26,8 +26,14 @@ struct WindowSpecs: Spec {
         subject.merge(with: prevWindow)
         let spinnerAFinal = subject.components[1] as! SpinnerView
         let spinnerBFinal = subject.components[3] as! SpinnerView
-        expect("spinnerA updates index").assertEqual(spinnerA.index ?? -1, spinnerAFinal.index ?? -1)
-        expect("spinnerB updates index").assertEqual(spinnerB.index ?? -1, spinnerBFinal.index ?? -1)
+        expect("spinnerA updates index").assertEqual(
+            spinnerA.index ?? -1,
+            spinnerAFinal.index ?? -1
+        )
+        expect("spinnerB updates index").assertEqual(
+            spinnerB.index ?? -1,
+            spinnerBFinal.index ?? -1
+        )
         done()
     }
 }

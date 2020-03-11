@@ -24,7 +24,9 @@ public class GridLayout: ComponentLayout {
         public static func row(weight: Weight = .relative(1), _ columns: [Column] = []) -> Row {
             return Row(weight: weight, columns: columns)
         }
-        public static func row(weight: Weight = .relative(1), _ components: [ComponentView] = []) -> Row {
+        public static func row(weight: Weight = .relative(1), _ components: [ComponentView] = [])
+            -> Row
+        {
             return Row(weight: weight, columns: components.map { .column($0) })
         }
         let weight: Weight
@@ -32,7 +34,9 @@ public class GridLayout: ComponentLayout {
     }
 
     public struct Column {
-        public static func column(weight: Weight = .relative(1), _ component: ComponentView) -> Column {
+        public static func column(weight: Weight = .relative(1), _ component: ComponentView)
+            -> Column
+        {
             return Column(weight: weight, component: component)
         }
         let weight: Weight
@@ -85,7 +89,8 @@ public class GridLayout: ComponentLayout {
         }
 
         if remaining != 0 {
-            let relativeWeights = weights.enumerated().compactMap { (offset, weight) -> (Int, Float)? in
+            let relativeWeights = weights.enumerated().compactMap {
+                (offset, weight) -> (Int, Float)? in
                 if case let .relative(value) = weight { return (offset, value) }
                 return nil
             }
@@ -110,12 +115,18 @@ public class GridLayout: ComponentLayout {
 
     override public func render(to buffer: Buffer, in rect: Rect) {
         var offset: Point = .zero
-        let calculatedRowHeights = GridLayout.calculateDimensions(screen: rect.size.height, weights: rows.map { $0.weight })
+        let calculatedRowHeights = GridLayout.calculateDimensions(
+            screen: rect.size.height,
+            weights: rows.map { $0.weight }
+        )
         for (rowIndex, row) in rows.enumerated() {
             let rowHeight = calculatedRowHeights[rowIndex]
             guard rowHeight > 0 else { continue }
 
-            let calculatedColWidths = GridLayout.calculateDimensions(screen: rect.size.width, weights: row.columns.map { $0.weight })
+            let calculatedColWidths = GridLayout.calculateDimensions(
+                screen: rect.size.width,
+                weights: row.columns.map { $0.weight }
+            )
             for (colIndex, column) in row.columns.enumerated() {
                 let colWidth = calculatedColWidths[colIndex]
                 guard colWidth > 0 else { continue }

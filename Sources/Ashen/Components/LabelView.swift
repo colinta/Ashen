@@ -14,7 +14,11 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
         return "LabelView(\(chars))"
     }
 
-    public init(at location: Location = .tl(.zero), size: DesiredSize = DesiredSize(), text: TextType) {
+    public init(
+        at location: Location = .tl(.zero),
+        size: DesiredSize = DesiredSize(),
+        text: TextType
+    ) {
         self.size = size
 
         let chars = text.chars
@@ -41,7 +45,10 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     }
 
     override public func desiredSize() -> DesiredSize {
-        return DesiredSize(width: size.width ?? .literal(linesWidth), height: size.height ?? .literal(linesHeight))
+        return DesiredSize(
+            width: size.width ?? .literal(linesWidth),
+            height: size.height ?? .literal(linesHeight)
+        )
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {

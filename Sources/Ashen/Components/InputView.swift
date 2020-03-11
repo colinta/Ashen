@@ -54,7 +54,8 @@ public class InputView: ComponentView {
         return lines
     }
 
-    public init(at location: Location = .tl(.zero),
+    public init(
+        at location: Location = .tl(.zero),
         size: DesiredSize = DesiredSize(),
         text: String = "",
         isFirstResponder: Bool = false,
@@ -64,7 +65,7 @@ public class InputView: ComponentView {
         onClick: OnClickHandler? = nil,
         onCursorChange: OnCursorChangeHandler? = nil,
         onEnter: OnEnterHandler? = nil
-        ) {
+    ) {
         self.size = size
         self.text = text
         self.onChange = onChange
@@ -133,7 +134,10 @@ public class InputView: ComponentView {
             calcHeight += 1
         }
 
-        return DesiredSize(width: size.width ?? .literal(calcWidth), height: size.height ?? .literal(max(1, calcHeight)))
+        return DesiredSize(
+            width: size.width ?? .literal(calcWidth),
+            height: size.height ?? .literal(max(1, calcHeight))
+        )
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {
@@ -192,7 +196,9 @@ public class InputView: ComponentView {
 
         for char in text {
             var attrs: [Attr]
-            if normalCursor.selection > 0 && cOffset >= normalCursor.at && cOffset < normalCursor.at + normalCursor.selection {
+            if normalCursor.selection > 0 && cOffset >= normalCursor.at
+                && cOffset < normalCursor.at + normalCursor.selection
+            {
                 attrs = [.reverse]
             }
             else if cOffset == normalCursor.at {
@@ -214,19 +220,19 @@ public class InputView: ComponentView {
             switch char {
             case "\n":
                 printableChar = " "
-            case "󰀀": // uF0000
+            case "󰀀":  // uF0000
                 printableChar = "´"
                 attrs.append(.reverse)
-            case "󰀁": // uF0001
+            case "󰀁":  // uF0001
                 printableChar = "ˆ"
                 attrs.append(.reverse)
-            case "󰀂": // uF0002
+            case "󰀂":  // uF0002
                 printableChar = "˜"
                 attrs.append(.reverse)
-            case "󰀃": // uF0003
+            case "󰀃":  // uF0003
                 printableChar = "¨"
                 attrs.append(.reverse)
-            case "󰀄": // uF0004
+            case "󰀄":  // uF0004
                 printableChar = "`"
                 attrs.append(.reverse)
             default:
@@ -259,7 +265,7 @@ public class InputView: ComponentView {
         case let .mouse(mouse):
             guard
                 let onClick = onClick, mouse.component === self,
-                case .click(.left) = mouse.event
+                    case .click(.left) = mouse.event
             else { return [] }
 
             return [onClick()]
@@ -281,7 +287,7 @@ public class InputView: ComponentView {
         else if key == .backspace {
             return backspace()
         }
-        else if key == .signalEot { // ctrl+d == delete
+        else if key == .signalEot {  // ctrl+d == delete
             return delete()
         }
         else if key == .left {
@@ -346,12 +352,12 @@ public class InputView: ComponentView {
         let range: Range<String.Index>
         if normalCursor.selection == 0 {
             let prev = text.index(cursorStart, offsetBy: -1)
-            range = prev ..< cursorStart
+            range = prev..<cursorStart
             cursor = Cursor(at: normalCursor.at - 1, selection: 0)
         }
         else {
             let end = text.index(cursorStart, offsetBy: normalCursor.selection)
-            range = cursorStart ..< end
+            range = cursorStart..<end
             cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
@@ -367,12 +373,12 @@ public class InputView: ComponentView {
         let range: Range<String.Index>
         if normalCursor.selection == 0 {
             let next = text.index(cursorStart, offsetBy: 1)
-            range = cursorStart ..< next
+            range = cursorStart..<next
             cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         else {
             let end = text.index(cursorStart, offsetBy: normalCursor.selection)
-            range = cursorStart ..< end
+            range = cursorStart..<end
             cursor = Cursor(at: normalCursor.at, selection: 0)
         }
         let nextText = text.replacingCharacters(in: range, with: "")
@@ -530,25 +536,11 @@ public class InputView: ComponentView {
             case let .key(key) = event
         else { return false }
 
-        if key.isPrintable ||
-            (isMultiline && key == .enter) ||
-            key == .backspace ||
-            key == .signalEot ||
-            key == .left ||
-            key == .right ||
-            key == .shift(.left) ||
-            key == .shift(.right) ||
-            key == .up ||
-            key == .shift(.up) ||
-            key == .shift(.up) ||
-            key == .down ||
-            key == .shift(.down) ||
-            key == .shift(.down) ||
-            key == .enter ||
-            key == .home ||
-            key == .end ||
-            key == .ctrl(.a) ||
-            key == .ctrl(.e)
+        if key.isPrintable || (isMultiline && key == .enter) || key == .backspace
+            || key == .signalEot || key == .left || key == .right || key == .shift(.left)
+            || key == .shift(.right) || key == .up || key == .shift(.up) || key == .shift(.up)
+            || key == .down || key == .shift(.down) || key == .shift(.down) || key == .enter
+            || key == .home || key == .end || key == .ctrl(.a) || key == .ctrl(.e)
         {
             return true
         }
@@ -558,123 +550,127 @@ public class InputView: ComponentView {
 }
 
 private func fixDiacritics(_ text: String, cursor: InputView.Cursor) -> (String, InputView.Cursor) {
-    let newText = text
+    let newText =
+        text
         // ´ áéíóú
-        .replacingOccurrences(of: "󰀀A", with: "Á")
-        .replacingOccurrences(of: "󰀀E", with: "É")
-        .replacingOccurrences(of: "󰀀I", with: "Í")
-        .replacingOccurrences(of: "󰀀O", with: "Ó")
-        .replacingOccurrences(of: "󰀀U", with: "Ú")
-        .replacingOccurrences(of: "󰀀Y", with: "Ý")
-        .replacingOccurrences(of: "󰀀a", with: "á")
-        .replacingOccurrences(of: "󰀀e", with: "é")
-        .replacingOccurrences(of: "󰀀i", with: "í")
-        .replacingOccurrences(of: "󰀀o", with: "ó")
-        .replacingOccurrences(of: "󰀀u", with: "ú")
-        .replacingOccurrences(of: "󰀀y", with: "ý")
-        .replacingOccurrences(of: "󰀀C", with: "Ć")
-        .replacingOccurrences(of: "󰀀c", with: "ć")
-        .replacingOccurrences(of: "󰀀L", with: "Ĺ")
-        .replacingOccurrences(of: "󰀀l", with: "ĺ")
-        .replacingOccurrences(of: "󰀀N", with: "Ń")
-        .replacingOccurrences(of: "󰀀n", with: "ń")
-        .replacingOccurrences(of: "󰀀R", with: "Ŕ")
-        .replacingOccurrences(of: "󰀀r", with: "ŕ")
-        .replacingOccurrences(of: "󰀀S", with: "Ś")
-        .replacingOccurrences(of: "󰀀s", with: "ś")
-        .replacingOccurrences(of: "󰀀Z", with: "Ź")
-        .replacingOccurrences(of: "󰀀z", with: "ź")
-        .replacingOccurrences(of: "󰀀G", with: "Ǵ")
-        .replacingOccurrences(of: "󰀀g", with: "ǵ")
-        .replacingOccurrences(of: "󰀀Æ", with: "Ǽ")
-        .replacingOccurrences(of: "󰀀æ", with: "ǽ")
-        .replacingOccurrences(of: "󰀀K", with: "Ḱ")
-        .replacingOccurrences(of: "󰀀k", with: "ḱ")
-        .replacingOccurrences(of: "󰀀M", with: "Ḿ")
-        .replacingOccurrences(of: "󰀀m", with: "ḿ")
-        .replacingOccurrences(of: "󰀀P", with: "Ṕ")
-        .replacingOccurrences(of: "󰀀p", with: "ṕ")
-        .replacingOccurrences(of: "󰀀W", with: "Ẃ")
-        .replacingOccurrences(of: "󰀀w", with: "ẃ")
-        // ˆ âêîôû
-        .replacingOccurrences(of: "󰀁A", with: "Â")
-        .replacingOccurrences(of: "󰀁E", with: "Ê")
-        .replacingOccurrences(of: "󰀁I", with: "Î")
-        .replacingOccurrences(of: "󰀁O", with: "Ô")
-        .replacingOccurrences(of: "󰀁U", with: "Û")
-        .replacingOccurrences(of: "󰀁a", with: "â")
-        .replacingOccurrences(of: "󰀁e", with: "ê")
-        .replacingOccurrences(of: "󰀁i", with: "î")
-        .replacingOccurrences(of: "󰀁o", with: "ô")
-        .replacingOccurrences(of: "󰀁u", with: "û")
-        .replacingOccurrences(of: "󰀁C", with: "Ĉ")
-        .replacingOccurrences(of: "󰀁c", with: "ĉ")
-        .replacingOccurrences(of: "󰀁G", with: "Ĝ")
-        .replacingOccurrences(of: "󰀁g", with: "ĝ")
-        .replacingOccurrences(of: "󰀁H", with: "Ĥ")
-        .replacingOccurrences(of: "󰀁h", with: "ĥ")
-        .replacingOccurrences(of: "󰀁J", with: "Ĵ")
-        .replacingOccurrences(of: "󰀁j", with: "ĵ")
-        .replacingOccurrences(of: "󰀁S", with: "Ŝ")
-        .replacingOccurrences(of: "󰀁s", with: "ŝ")
-        .replacingOccurrences(of: "󰀁W", with: "Ŵ")
-        .replacingOccurrences(of: "󰀁w", with: "ŵ")
-        .replacingOccurrences(of: "󰀁Y", with: "Ŷ")
-        .replacingOccurrences(of: "󰀁y", with: "ŷ")
-        // ˜ ñãõ
-        .replacingOccurrences(of: "󰀂A", with: "Ã")
-        .replacingOccurrences(of: "󰀂N", with: "Ñ")
-        .replacingOccurrences(of: "󰀂O", with: "Õ")
-        .replacingOccurrences(of: "󰀂a", with: "ã")
-        .replacingOccurrences(of: "󰀂n", with: "ñ")
-        .replacingOccurrences(of: "󰀂o", with: "õ")
-        .replacingOccurrences(of: "󰀂I", with: "Ĩ")
-        .replacingOccurrences(of: "󰀂i", with: "ĩ")
-        .replacingOccurrences(of: "󰀂U", with: "Ũ")
-        .replacingOccurrences(of: "󰀂u", with: "ũ")
-        // ¨ äëïöü
-        .replacingOccurrences(of: "󰀃A", with: "Ä")
-        .replacingOccurrences(of: "󰀃E", with: "Ë")
-        .replacingOccurrences(of: "󰀃I", with: "Ï")
-        .replacingOccurrences(of: "󰀃O", with: "Ö")
-        .replacingOccurrences(of: "󰀃U", with: "Ü")
-        .replacingOccurrences(of: "󰀃a", with: "ä")
-        .replacingOccurrences(of: "󰀃e", with: "ë")
-        .replacingOccurrences(of: "󰀃i", with: "ï")
-        .replacingOccurrences(of: "󰀃o", with: "ö")
-        .replacingOccurrences(of: "󰀃u", with: "ü")
-        .replacingOccurrences(of: "󰀃Y", with: "Ÿ")
-        .replacingOccurrences(of: "󰀃y", with: "ÿ")
-        .replacingOccurrences(of: "󰀃W", with: "Ẅ")
-        .replacingOccurrences(of: "󰀃w", with: "ẅ")
-        .replacingOccurrences(of: "󰀃X", with: "Ẍ")
-        .replacingOccurrences(of: "󰀃x", with: "ẍ")
-        .replacingOccurrences(of: "󰀃t", with: "ẗ")
-        .replacingOccurrences(of: "󰀃H", with: "Ḧ")
-        .replacingOccurrences(of: "󰀃h", with: "ḧ")
-        .replacingOccurrences(of: "󰀃3", with: "Ӟ")
-        // ` àèìòù
-        .replacingOccurrences(of: "󰀄A", with: "À")
-        .replacingOccurrences(of: "󰀄E", with: "È")
-        .replacingOccurrences(of: "󰀄I", with: "Ì")
-        .replacingOccurrences(of: "󰀄O", with: "Ò")
-        .replacingOccurrences(of: "󰀄U", with: "Ù")
-        .replacingOccurrences(of: "󰀄a", with: "à")
-        .replacingOccurrences(of: "󰀄e", with: "è")
-        .replacingOccurrences(of: "󰀄i", with: "ì")
-        .replacingOccurrences(of: "󰀄o", with: "ò")
-        .replacingOccurrences(of: "󰀄u", with: "ù")
-        .replacingOccurrences(of: "󰀄N", with: "Ǹ")
-        .replacingOccurrences(of: "󰀄n", with: "ǹ")
-        .replacingOccurrences(of: "󰀄W", with: "Ẁ")
-        .replacingOccurrences(of: "󰀄w", with: "ẁ")
-        .replacingOccurrences(of: "󰀄Y", with: "Ỳ")
-        .replacingOccurrences(of: "󰀄y", with: "ỳ")
+            .replacingOccurrences(of: "󰀀A", with: "Á")
+            .replacingOccurrences(of: "󰀀E", with: "É")
+            .replacingOccurrences(of: "󰀀I", with: "Í")
+            .replacingOccurrences(of: "󰀀O", with: "Ó")
+            .replacingOccurrences(of: "󰀀U", with: "Ú")
+            .replacingOccurrences(of: "󰀀Y", with: "Ý")
+            .replacingOccurrences(of: "󰀀a", with: "á")
+            .replacingOccurrences(of: "󰀀e", with: "é")
+            .replacingOccurrences(of: "󰀀i", with: "í")
+            .replacingOccurrences(of: "󰀀o", with: "ó")
+            .replacingOccurrences(of: "󰀀u", with: "ú")
+            .replacingOccurrences(of: "󰀀y", with: "ý")
+            .replacingOccurrences(of: "󰀀C", with: "Ć")
+            .replacingOccurrences(of: "󰀀c", with: "ć")
+            .replacingOccurrences(of: "󰀀L", with: "Ĺ")
+            .replacingOccurrences(of: "󰀀l", with: "ĺ")
+            .replacingOccurrences(of: "󰀀N", with: "Ń")
+            .replacingOccurrences(of: "󰀀n", with: "ń")
+            .replacingOccurrences(of: "󰀀R", with: "Ŕ")
+            .replacingOccurrences(of: "󰀀r", with: "ŕ")
+            .replacingOccurrences(of: "󰀀S", with: "Ś")
+            .replacingOccurrences(of: "󰀀s", with: "ś")
+            .replacingOccurrences(of: "󰀀Z", with: "Ź")
+            .replacingOccurrences(of: "󰀀z", with: "ź")
+            .replacingOccurrences(of: "󰀀G", with: "Ǵ")
+            .replacingOccurrences(of: "󰀀g", with: "ǵ")
+            .replacingOccurrences(of: "󰀀Æ", with: "Ǽ")
+            .replacingOccurrences(of: "󰀀æ", with: "ǽ")
+            .replacingOccurrences(of: "󰀀K", with: "Ḱ")
+            .replacingOccurrences(of: "󰀀k", with: "ḱ")
+            .replacingOccurrences(of: "󰀀M", with: "Ḿ")
+            .replacingOccurrences(of: "󰀀m", with: "ḿ")
+            .replacingOccurrences(of: "󰀀P", with: "Ṕ")
+            .replacingOccurrences(of: "󰀀p", with: "ṕ")
+            .replacingOccurrences(of: "󰀀W", with: "Ẃ")
+            .replacingOccurrences(of: "󰀀w", with: "ẃ")
+            // ˆ âêîôû
+            .replacingOccurrences(of: "󰀁A", with: "Â")
+            .replacingOccurrences(of: "󰀁E", with: "Ê")
+            .replacingOccurrences(of: "󰀁I", with: "Î")
+            .replacingOccurrences(of: "󰀁O", with: "Ô")
+            .replacingOccurrences(of: "󰀁U", with: "Û")
+            .replacingOccurrences(of: "󰀁a", with: "â")
+            .replacingOccurrences(of: "󰀁e", with: "ê")
+            .replacingOccurrences(of: "󰀁i", with: "î")
+            .replacingOccurrences(of: "󰀁o", with: "ô")
+            .replacingOccurrences(of: "󰀁u", with: "û")
+            .replacingOccurrences(of: "󰀁C", with: "Ĉ")
+            .replacingOccurrences(of: "󰀁c", with: "ĉ")
+            .replacingOccurrences(of: "󰀁G", with: "Ĝ")
+            .replacingOccurrences(of: "󰀁g", with: "ĝ")
+            .replacingOccurrences(of: "󰀁H", with: "Ĥ")
+            .replacingOccurrences(of: "󰀁h", with: "ĥ")
+            .replacingOccurrences(of: "󰀁J", with: "Ĵ")
+            .replacingOccurrences(of: "󰀁j", with: "ĵ")
+            .replacingOccurrences(of: "󰀁S", with: "Ŝ")
+            .replacingOccurrences(of: "󰀁s", with: "ŝ")
+            .replacingOccurrences(of: "󰀁W", with: "Ŵ")
+            .replacingOccurrences(of: "󰀁w", with: "ŵ")
+            .replacingOccurrences(of: "󰀁Y", with: "Ŷ")
+            .replacingOccurrences(of: "󰀁y", with: "ŷ")
+            // ˜ ñãõ
+            .replacingOccurrences(of: "󰀂A", with: "Ã")
+            .replacingOccurrences(of: "󰀂N", with: "Ñ")
+            .replacingOccurrences(of: "󰀂O", with: "Õ")
+            .replacingOccurrences(of: "󰀂a", with: "ã")
+            .replacingOccurrences(of: "󰀂n", with: "ñ")
+            .replacingOccurrences(of: "󰀂o", with: "õ")
+            .replacingOccurrences(of: "󰀂I", with: "Ĩ")
+            .replacingOccurrences(of: "󰀂i", with: "ĩ")
+            .replacingOccurrences(of: "󰀂U", with: "Ũ")
+            .replacingOccurrences(of: "󰀂u", with: "ũ")
+            // ¨ äëïöü
+            .replacingOccurrences(of: "󰀃A", with: "Ä")
+            .replacingOccurrences(of: "󰀃E", with: "Ë")
+            .replacingOccurrences(of: "󰀃I", with: "Ï")
+            .replacingOccurrences(of: "󰀃O", with: "Ö")
+            .replacingOccurrences(of: "󰀃U", with: "Ü")
+            .replacingOccurrences(of: "󰀃a", with: "ä")
+            .replacingOccurrences(of: "󰀃e", with: "ë")
+            .replacingOccurrences(of: "󰀃i", with: "ï")
+            .replacingOccurrences(of: "󰀃o", with: "ö")
+            .replacingOccurrences(of: "󰀃u", with: "ü")
+            .replacingOccurrences(of: "󰀃Y", with: "Ÿ")
+            .replacingOccurrences(of: "󰀃y", with: "ÿ")
+            .replacingOccurrences(of: "󰀃W", with: "Ẅ")
+            .replacingOccurrences(of: "󰀃w", with: "ẅ")
+            .replacingOccurrences(of: "󰀃X", with: "Ẍ")
+            .replacingOccurrences(of: "󰀃x", with: "ẍ")
+            .replacingOccurrences(of: "󰀃t", with: "ẗ")
+            .replacingOccurrences(of: "󰀃H", with: "Ḧ")
+            .replacingOccurrences(of: "󰀃h", with: "ḧ")
+            .replacingOccurrences(of: "󰀃3", with: "Ӟ")
+            // ` àèìòù
+            .replacingOccurrences(of: "󰀄A", with: "À")
+            .replacingOccurrences(of: "󰀄E", with: "È")
+            .replacingOccurrences(of: "󰀄I", with: "Ì")
+            .replacingOccurrences(of: "󰀄O", with: "Ò")
+            .replacingOccurrences(of: "󰀄U", with: "Ù")
+            .replacingOccurrences(of: "󰀄a", with: "à")
+            .replacingOccurrences(of: "󰀄e", with: "è")
+            .replacingOccurrences(of: "󰀄i", with: "ì")
+            .replacingOccurrences(of: "󰀄o", with: "ò")
+            .replacingOccurrences(of: "󰀄u", with: "ù")
+            .replacingOccurrences(of: "󰀄N", with: "Ǹ")
+            .replacingOccurrences(of: "󰀄n", with: "ǹ")
+            .replacingOccurrences(of: "󰀄W", with: "Ẁ")
+            .replacingOccurrences(of: "󰀄w", with: "ẁ")
+            .replacingOccurrences(of: "󰀄Y", with: "Ỳ")
+            .replacingOccurrences(of: "󰀄y", with: "ỳ")
     if newText != text {
-        return (newText, InputView.Cursor(
-            at: cursor.at - text.count + newText.count,
-            selection: 0
-            ))
+        return (
+            newText,
+            InputView.Cursor(
+                at: cursor.at - text.count + newText.count,
+                selection: 0
+            )
+        )
     }
     else {
         return (text, cursor)

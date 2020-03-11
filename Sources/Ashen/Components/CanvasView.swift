@@ -24,7 +24,10 @@ public class CanvasView: ComponentView {
             case let .absBox(origin, size):
                 drawAbsBox(in: canvas, origin, size)
             case let .offsetBox(margin):
-                let size = Size(width: pixelSize.width - 2 * margin - 1, height: pixelSize.height - 2 * margin - 1)
+                let size = Size(
+                    width: pixelSize.width - 2 * margin - 1,
+                    height: pixelSize.height - 2 * margin - 1
+                )
                 guard size.width > 0, size.height > 0 else { return }
 
                 let origin = Point(x: margin, y: margin)
@@ -34,7 +37,12 @@ public class CanvasView: ComponentView {
             }
         }
 
-        private func drawFunction(in canvas: PixelCanvas, _ function: (Float) -> Float, viewport: FloatFrame, pixelSize: Size) {
+        private func drawFunction(
+            in canvas: PixelCanvas,
+            _ function: (Float) -> Float,
+            viewport: FloatFrame,
+            pixelSize: Size
+        ) {
             let x0 = viewport.minX
             let x1 = viewport.maxX
             let dx = viewport.width / Float(pixelSize.width - 1)
@@ -49,10 +57,16 @@ public class CanvasView: ComponentView {
             }
         }
 
-        private func drawLine(in canvas: PixelCanvas, _ a: FloatPoint, _ b: FloatPoint, viewport: FloatFrame, pixelSize: Size) {
+        private func drawLine(
+            in canvas: PixelCanvas,
+            _ a: FloatPoint,
+            _ b: FloatPoint,
+            viewport: FloatFrame,
+            pixelSize: Size
+        ) {
             guard
-                let pa: FloatPoint = viewport.normalize(a)?.map(to: FloatSize(pixelSize)),
-                let pb: FloatPoint = viewport.normalize(b)?.map(to: FloatSize(pixelSize))
+                let pa:FloatPoint = viewport.normalize(a)?.map(to: FloatSize(pixelSize)),
+                let pb:FloatPoint = viewport.normalize(b)?.map(to: FloatSize(pixelSize))
             else { return }
 
             let width = abs(pb.x - pa.x)
@@ -92,30 +106,47 @@ public class CanvasView: ComponentView {
             }
         }
 
-        private func drawBox(in canvas: PixelCanvas, _ origin: FloatPoint, _ size: FloatSize, viewport: FloatFrame, pixelSize: Size) {
+        private func drawBox(
+            in canvas: PixelCanvas,
+            _ origin: FloatPoint,
+            _ size: FloatSize,
+            viewport: FloatFrame,
+            pixelSize: Size
+        ) {
             guard size.width > 0 && size.height > 0 else { return }
 
             guard
-                let p0: Point = viewport.normalize(origin, in: pixelSize),
-                let p1: Point = viewport.normalize(FloatPoint(x: origin.x + size.width, y: origin.y + size.height), in: pixelSize)
+                let p0:Point = viewport.normalize(origin, in: pixelSize),
+                let p1:Point = viewport.normalize(
+                    FloatPoint(x: origin.x + size.width, y: origin.y + size.height),
+                    in: pixelSize
+                )
             else { return }
 
-            return drawAbsBox(in: canvas, Point(x: p0.x, y: p0.y), Size(width: p1.x - p0.x, height: p1.y - p0.y))
+            return drawAbsBox(
+                in: canvas,
+                Point(x: p0.x, y: p0.y),
+                Size(width: p1.x - p0.x, height: p1.y - p0.y)
+            )
         }
 
         private func drawAbsBox(in canvas: PixelCanvas, _ origin: Point, _ size: Size) {
-            let (x0, y0) = (min(origin.x, origin.x + size.width), min(origin.y, origin.y + size.height))
-            let (x1, y1) = (max(origin.x, origin.x + size.width), max(origin.y, origin.y + size.height))
+            let (x0, y0) = (
+                min(origin.x, origin.x + size.width), min(origin.y, origin.y + size.height)
+            )
+            let (x1, y1) = (
+                max(origin.x, origin.x + size.width), max(origin.y, origin.y + size.height)
+            )
 
             if size.height > 0 {
-                for y in y0 ... y1 {
+                for y in y0...y1 {
                     canvas.on(Point(x: x0, y: y))
                     canvas.on(Point(x: x1, y: y))
                 }
             }
 
             if size.width > 2 {
-                for x in (x0 + 1) ... (x1 - 1) {
+                for x in (x0 + 1)...(x1 - 1) {
                     canvas.on(Point(x: x, y: y0))
                     canvas.on(Point(x: x, y: y1))
                 }
@@ -160,9 +191,12 @@ public class CanvasView: ComponentView {
                     let b6 = status(px + 1, py + 2)
                     let b7 = status(px, py + 3)
                     let b8 = status(px + 1, py + 3)
-                    let unicode = b1 + b2 << 1 + b3 << 2 + b4 << 3 + b5 << 4 + b6 << 5 + b7 << 6 + b8 << 7
+                    let unicode = b1 + b2 << 1 + b3 << 2 + b4 << 3 + b5 << 4 + b6 << 5 + b7 << 6
+                        + b8 << 7
                     if unicode > 0,
-                        let char = UnicodeScalar(BRAILLE_START + unicode).map({ String(describing: $0) })
+                        let char = UnicodeScalar(BRAILLE_START + unicode).map({
+                            String(describing: $0)
+                        })
                     {
                         buffer.write(AttrChar(char), x: sx, y: sy)
                     }
@@ -180,7 +214,12 @@ public class CanvasView: ComponentView {
     let viewport: FloatFrame
     let drawables: [Drawable]
 
-    public init(at location: Location = .tl(.zero), size: DesiredSize, viewport: FloatFrame, drawables: [Drawable]) {
+    public init(
+        at location: Location = .tl(.zero),
+        size: DesiredSize,
+        viewport: FloatFrame,
+        drawables: [Drawable]
+    ) {
         self.size = size
         self.viewport = viewport
         self.drawables = drawables
@@ -194,9 +233,9 @@ public class CanvasView: ComponentView {
 
     override public func render(to buffer: Buffer, in rect: Rect) {
         let drawSize = Size(
-            width: rect.size.width * 2, // braille characters are 2 columns
-            height: rect.size.height * 4 // and 4 rows
-            )
+            width: rect.size.width * 2,  // braille characters are 2 columns
+            height: rect.size.height * 4  // and 4 rows
+        )
         let canvas = PixelCanvas()
         for drawable in drawables {
             drawable.draw(in: canvas, viewport: viewport, pixelSize: drawSize)

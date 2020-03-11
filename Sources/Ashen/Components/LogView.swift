@@ -6,7 +6,11 @@ public class LogView: ComponentLayout {
     let size: DesiredSize
     let entries: [String]
 
-    public init(at location: Location = .tl(.zero), size: DesiredSize = DesiredSize(), entries: [String]) {
+    public init(
+        at location: Location = .tl(.zero),
+        size: DesiredSize = DesiredSize(),
+        entries: [String]
+    ) {
         self.entries = entries
         self.size = size
         super.init()
@@ -30,7 +34,7 @@ public class LogView: ComponentLayout {
                 return Size(
                     width: max(maxSize.width, line.count),
                     height: maxSize.height + lines.count
-                    )
+                )
             }
         }
 
@@ -48,7 +52,7 @@ public class LogView: ComponentLayout {
         let innerRect = Rect(
             origin: rect.origin + Point(y: offset),
             size: rect.size
-            )
+        )
         super.render(to: buffer, in: innerRect)
     }
 }

@@ -21,12 +21,22 @@ public class Box: ComponentLayout {
         let lrSide: String
 
         public init(
-            dot: String? = nil, topCap: String? = nil, bottomCap: String? = nil, leftCap: String? = nil, rightCap: String? = nil,
-            tlCorner: String, trCorner: String, blCorner: String, brCorner: String,
-            tbSide: String, topSide: String? = nil, bottomSide: String? = nil,
-            lrSide: String, leftSide: String? = nil, rightSide: String? = nil
-            )
-        {
+            dot: String? = nil,
+            topCap: String? = nil,
+            bottomCap: String? = nil,
+            leftCap: String? = nil,
+            rightCap: String? = nil,
+            tlCorner: String,
+            trCorner: String,
+            blCorner: String,
+            brCorner: String,
+            tbSide: String,
+            topSide: String? = nil,
+            bottomSide: String? = nil,
+            lrSide: String,
+            leftSide: String? = nil,
+            rightSide: String? = nil
+        ) {
             self.tlCorner = tlCorner
             self.trCorner = trCorner
             self.blCorner = blCorner
@@ -47,40 +57,91 @@ public class Box: ComponentLayout {
         }
 
         public static let lame = Border(
-            tlCorner: "+", trCorner: "+", blCorner: "+", brCorner: "+",
+            tlCorner: "+",
+            trCorner: "+",
+            blCorner: "+",
+            brCorner: "+",
             tbSide: "-",
             lrSide: "|"
-            )
+        )
         public static let single = Border(
-            dot: "◻︎", topCap: "┬", bottomCap: "┴", leftCap: "├", rightCap: "┤",
-            tlCorner: "┌", trCorner: "┐", blCorner: "└", brCorner: "┘",
-            tbSide: "─", lrSide: "│"
-            )
+            dot: "◻︎",
+            topCap: "┬",
+            bottomCap: "┴",
+            leftCap: "├",
+            rightCap: "┤",
+            tlCorner: "┌",
+            trCorner: "┐",
+            blCorner: "└",
+            brCorner: "┘",
+            tbSide: "─",
+            lrSide: "│"
+        )
         public static let double = Border(
-            dot: "⧈", topCap: "╦", bottomCap: "╩", leftCap: "╠", rightCap: "╣",
-            tlCorner: "╔", trCorner: "╗", blCorner: "╚", brCorner: "╝",
-            tbSide: "═", lrSide: "║"
-            )
+            dot: "⧈",
+            topCap: "╦",
+            bottomCap: "╩",
+            leftCap: "╠",
+            rightCap: "╣",
+            tlCorner: "╔",
+            trCorner: "╗",
+            blCorner: "╚",
+            brCorner: "╝",
+            tbSide: "═",
+            lrSide: "║"
+        )
         public static let rounded = Border(
-            dot: "▢", topCap: "╷", bottomCap: "╵", leftCap: "╶", rightCap: "╴",
-            tlCorner: "╭", trCorner: "╮", blCorner: "╰", brCorner: "╯",
-            tbSide: "─", lrSide: "│"
-            )
+            dot: "▢",
+            topCap: "╷",
+            bottomCap: "╵",
+            leftCap: "╶",
+            rightCap: "╴",
+            tlCorner: "╭",
+            trCorner: "╮",
+            blCorner: "╰",
+            brCorner: "╯",
+            tbSide: "─",
+            lrSide: "│"
+        )
         public static let bold = Border(
-            dot: "◼︎", topCap: "┳", bottomCap: "┻", leftCap: "┣", rightCap: "┫",
-            tlCorner: "┏", trCorner: "┓", blCorner: "┗", brCorner: "┛",
-            tbSide: "━", lrSide: "┃"
-            )
+            dot: "◼︎",
+            topCap: "┳",
+            bottomCap: "┻",
+            leftCap: "┣",
+            rightCap: "┫",
+            tlCorner: "┏",
+            trCorner: "┓",
+            blCorner: "┗",
+            brCorner: "┛",
+            tbSide: "━",
+            lrSide: "┃"
+        )
         public static let doubleSides = Border(
-            dot: "◫", topCap: "╥", bottomCap: "╨", leftCap: "╟", rightCap: "╢",
-            tlCorner: "╓", trCorner: "╖", blCorner: "╙", brCorner: "╜",
-            tbSide: "─", lrSide: "║"
-            )
+            dot: "◫",
+            topCap: "╥",
+            bottomCap: "╨",
+            leftCap: "╟",
+            rightCap: "╢",
+            tlCorner: "╓",
+            trCorner: "╖",
+            blCorner: "╙",
+            brCorner: "╜",
+            tbSide: "─",
+            lrSide: "║"
+        )
         public static let doubleTops = Border(
-            dot: "⊟", topCap: "╤", bottomCap: "╧", leftCap: "╞", rightCap: "╡",
-            tlCorner: "╒", trCorner: "╕", blCorner: "╘", brCorner: "╛",
-            tbSide: "═", lrSide: "│"
-            )
+            dot: "⊟",
+            topCap: "╤",
+            bottomCap: "╧",
+            leftCap: "╞",
+            rightCap: "╡",
+            tlCorner: "╒",
+            trCorner: "╕",
+            blCorner: "╘",
+            brCorner: "╛",
+            tbSide: "═",
+            lrSide: "│"
+        )
     }
 
     let size: DesiredSize
@@ -89,7 +150,15 @@ public class Box: ComponentLayout {
     let label: TextType?
     let scrollOffset: Point
 
-    public init(at location: Location = .tl(.zero), size: DesiredSize = .zero, border: Border? = nil, background: TextType? = nil, label: TextType? = nil, components: [Component] = [], scrollOffset: Point = .zero) {
+    public init(
+        at location: Location = .tl(.zero),
+        size: DesiredSize = .zero,
+        border: Border? = nil,
+        background: TextType? = nil,
+        label: TextType? = nil,
+        components: [Component] = [],
+        scrollOffset: Point = .zero
+    ) {
         self.size = size
         self.border = border
         self.background = background.flatMap { $0.chars.first }
@@ -155,7 +224,10 @@ public class Box: ComponentLayout {
             }
 
             borderOffset = Point(x: borderX, y: borderY)
-            innerSize = Size(width: max(0, rect.size.width - widthClip), height: max(0, rect.size.height - heightClip))
+            innerSize = Size(
+                width: max(0, rect.size.width - widthClip),
+                height: max(0, rect.size.height - heightClip)
+            )
 
             // draw the border
             let minX = 0, maxX = rect.size.width - 1
@@ -167,7 +239,7 @@ public class Box: ComponentLayout {
                 buffer.write(AttrChar(border.leftCap), x: minX, y: minY)
                 buffer.write(AttrChar(border.rightCap), x: maxX, y: minY)
                 if rect.size.width > 2 {
-                    for x in 1 ..< maxX {
+                    for x in 1..<maxX {
                         buffer.write(AttrChar(border.tbSide), x: x, y: minY)
                     }
                 }
@@ -175,7 +247,7 @@ public class Box: ComponentLayout {
                 buffer.write(AttrChar(border.topCap), x: minX, y: minY)
                 buffer.write(AttrChar(border.bottomCap), x: minX, y: maxY)
                 if rect.size.height > 2 {
-                    for y in 1 ..< maxY {
+                    for y in 1..<maxY {
                         buffer.write(AttrChar(border.lrSide), x: minX, y: y)
                     }
                 }
@@ -185,13 +257,13 @@ public class Box: ComponentLayout {
                 buffer.write(AttrChar(border.blCorner), x: minX, y: maxY)
                 buffer.write(AttrChar(border.brCorner), x: maxX, y: maxY)
                 if rect.size.width > 2 {
-                    for x in 1 ..< maxX {
+                    for x in 1..<maxX {
                         buffer.write(AttrChar(border.topSide), x: x, y: minY)
                         buffer.write(AttrChar(border.bottomSide), x: x, y: maxY)
                     }
                 }
                 if rect.size.height > 2 {
-                    for y in 1 ..< maxY {
+                    for y in 1..<maxY {
                         buffer.write(AttrChar(border.leftSide), x: minX, y: y)
                         buffer.write(AttrChar(border.rightSide), x: maxX, y: y)
                     }
@@ -205,11 +277,16 @@ public class Box: ComponentLayout {
 
         let contentSize = innerSize + scrollOffset
         buffer.push(offset: borderOffset, clip: innerSize) {
-            Window.render(views: components, to: buffer, in: Rect(origin: Point(x: scrollOffset.x, y: scrollOffset.y), size: innerSize), contentSize: contentSize)
+            Window.render(
+                views: components,
+                to: buffer,
+                in: Rect(origin: Point(x: scrollOffset.x, y: scrollOffset.y), size: innerSize),
+                contentSize: contentSize
+            )
 
             if let background = background {
-                for y in 0 ..< innerSize.height {
-                    for x in 0 ..< innerSize.width {
+                for y in 0..<innerSize.height {
+                    for x in 0..<innerSize.width {
                         buffer.write(background, x: x, y: y)
                     }
                 }

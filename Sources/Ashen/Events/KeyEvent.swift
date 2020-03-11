@@ -430,29 +430,29 @@ public extension AltKeyEvent {
         case .char(.b): return "∫"
         case .char(.c): return "ç"
         case .char(.d): return "∂"
-        case .char(.e): return "󰀀" // uF0000, combining ´
+        case .char(.e): return "󰀀"  // uF0000, combining ´
         case .char(.f): return "ƒ"
         case .char(.g): return "©"
         case .char(.h): return "˙"
-        case .char(.i): return "󰀁" // uF0001, combining ˆ
+        case .char(.i): return "󰀁"  // uF0001, combining ˆ
         case .char(.j): return "∆"
         case .char(.k): return "˚"
         case .char(.l): return "¬"
         case .char(.m): return "µ"
-        case .char(.n): return "󰀂" // uF0002, combining ˜
+        case .char(.n): return "󰀂"  // uF0002, combining ˜
         case .char(.o): return "ø"
         case .char(.p): return "π"
         case .char(.q): return "œ"
         case .char(.r): return "®"
         case .char(.s): return "ß"
         case .char(.t): return "†"
-        case .char(.u): return "󰀃" // uF0003, combining ¨
+        case .char(.u): return "󰀃"  // uF0003, combining ¨
         case .char(.v): return "√"
         case .char(.w): return "∑"
         case .char(.x): return "≈"
         case .char(.y): return "¥"
         case .char(.z): return "Ω"
-        case .char(.backtick): return "󰀄" // uF0004, combining `
+        case .char(.backtick): return "󰀄"  // uF0004, combining `
         case .char(.number1): return "¡"
         case .char(.number2): return "™"
         case .char(.number3): return "£"
