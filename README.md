@@ -1,9 +1,9 @@
 # Ashen
 
-A framework for writing terminal applications in Swift. Based on [Elm][].
+A framework for writing terminal applications in Swift. Based on [The Elm Architecture][Elm].
 
-As a tutorial of Ashen, let's consider an application that fetches some content
-and renders them as a list.
+As a tutorial of Ashen, let's consider an application that fetches some todo
+items and renders them as a list.
 
 ### Browsing
 
@@ -36,7 +36,7 @@ func loaded(data: [Thing]) {
 }
 
 func cellForRow(row: Thing) -> Component {
-    return LabelView(text: row.title)
+    LabelView(text: row.title)
 }
 ```
 
@@ -66,11 +66,14 @@ func render(model: Model, in screenSize: Size) -> Component {
     return Window(components: [
         LabelView(text: "Our things"),
         OptimizedListView(dataList: data, rowHeight: rowHeight) { row in
-            return LabelView(text: row.title)
+            LabelView(text: row.title)
         }
         // 👆 this view is similar to how UITableView renders cells - only
         // the rows that are visible will be rendered. rowHeight can also be
         // assigned a function, btw, to support dynamic heights.
+        //
+        // Also, this view is not done yet! Sorry - but it'll look something
+        // like this.
     ])
 }
 ```
@@ -137,7 +140,7 @@ struct SpinnersDemo: Program {
     // persist your application to the database you could load that here, either
     // synchronously or via a `Command`.
     func initial() -> (Model, [Command]) {
-        return Model()
+        Model()
     }
 
     // Ashen will call this method with the current model, and a message that
@@ -152,7 +155,7 @@ struct SpinnersDemo: Program {
     func update(model: inout Model, message: Message)
         -> (Model, [Command], AnyMessage?)
     {
-        return (model, [], SystemMessage.quit)
+        (model, [], SystemMessage.quit)
     }
 
     // Finally the render() method is given a model and a size, and you return
@@ -161,11 +164,11 @@ struct SpinnersDemo: Program {
     // is also called when the window is resized.
     func render(model: Model, in screenSize: Size) -> Component {
         let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
-            return SpinnerView(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
+            SpinnerView(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
         }
         return Window(
             components: spinners + [
-                OnKeyPress(.enter, { return Message.quit }),
+                OnKeyPress(.enter, { Message.quit }),
             ])
     }
 
@@ -219,9 +222,9 @@ container.  There are nine locations:
 ###### Examples:
 
 ```swift
-LabelView(.at(5, 10))  // label at x: 5, y: 10
-LabelView(.middleCenter())
-LabelView(.bottomRight(y: -1))  // in bottomRight corner, and up 1 row
+LabelView(at: .at(5, 10))  // label at x: 5, y: 10
+LabelView(at: .middleCenter())
+LabelView(at: .bottomRight(y: -1))  // in bottomRight corner, and up 1 row
 ```
 
 Sizes can be defined absolutely, or relative to the parent view, and with positive
@@ -229,9 +232,9 @@ or negative offsets.  They are also chainable, for a more descriptive API.
 
 ```swift
 // assume the parent container is width: 80, height: 30
-LabelView(.size(5, 10))  // width: 5, height: 10
-LabelView(.width(10).height(percent: 100))  // width: 10, height: 30
-LabelView(.fullWidth(minus: 4).height(times: 0.5, plus: 5))  // width: 76, height: 20
+LabelView(size: .size(5, 10))  // width: 5, height: 10
+LabelView(size: .width(10).height(percent: 100))  // width: 10, height: 30
+LabelView(size: .fullWidth(minus: 4).height(times: 0.5, plus: 5))  // width: 76, height: 20
 ```
 
 ###### Available size functions:
