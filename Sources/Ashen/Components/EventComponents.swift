@@ -224,7 +224,7 @@ public class OnDebug: Component {
     }
 }
 
-public class OnResize: Component {
+public class OnWindowResize: Component {
     var onResize: ResizeHandler
 
     public init(_ onResize: @escaping ResizeHandler) {
@@ -246,5 +246,50 @@ public class OnResize: Component {
         case let .window(width, height): return [onResize(Size(width: width, height: height))]
         default: return []
         }
+    }
+}
+
+public class OnComponentResize: ComponentView {
+    var onResize: ResizeHandler
+    var prevSize: Size?
+    var size: Size?
+
+    public init(_ onResize: @escaping ResizeHandler) {
+        self.onResize = onResize
+    }
+
+    override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
+        let component = self
+        let myHandler = self.onResize
+        let onResize: ResizeHandler = { size in
+            mapper(myHandler(size) as! T)
+        }
+        component.onResize = onResize
+        return component
+    }
+
+    override public func merge(with prevComponent: Component) {
+        guard let prevComponent = prevComponent as? OnComponentResize else { return }
+
+        prevSize = prevComponent.prevSize
+    }
+
+    override public func desiredSize() -> DesiredSize {
+        DesiredSize(width: .max, height: .max)
+    }
+
+    override public func render(to buffer: Buffer, in rect: Rect) {
+        size = rect.size
+    }
+
+    override public func messages(for event: Event) -> [AnyMessage] {
+        guard
+            case .tick = event,
+            let size = size,
+            size != prevSize
+        else { return [] }
+
+        prevSize = size
+        return [onResize(size)]
     }
 }
