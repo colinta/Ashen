@@ -3,11 +3,10 @@
 //
 
 
+public typealias SimpleHandler = () -> AnyMessage
 public typealias OnMouseHandler = (MouseEvent) -> AnyMessage
 public typealias OnTickHandler = (Float) -> AnyMessage
-public typealias OnNextHandler = () -> AnyMessage
 public typealias OnKeyHandler = (KeyEvent) -> AnyMessage
-public typealias EmptyKeyHandler = () -> AnyMessage
 public typealias LogHandler = (String) -> AnyMessage
 public typealias ResizeHandler = (Size) -> AnyMessage
 
@@ -58,16 +57,16 @@ public class OnTick: Component {
 }
 
 public class OnNext: Component {
-    var onNext: OnNextHandler
+    var onNext: SimpleHandler
 
-    public init(_ onNext: @escaping OnNextHandler) {
+    public init(_ onNext: @escaping SimpleHandler) {
         self.onNext = onNext
     }
 
     override public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let component = self
         let myHandler = self.onNext
-        let onNext: OnNextHandler = {
+        let onNext: SimpleHandler = {
             mapper(myHandler() as! T)
         }
         component.onNext = onNext
@@ -87,7 +86,7 @@ public class OnKeyPress: Component {
     var only: [KeyEvent]
     var except: [KeyEvent]
 
-    public convenience init(_ key: KeyEvent, _ onKey: @escaping EmptyKeyHandler) {
+    public convenience init(_ key: KeyEvent, _ onKey: @escaping SimpleHandler) {
         self.init({ _ in onKey() }, only: [key])
     }
 

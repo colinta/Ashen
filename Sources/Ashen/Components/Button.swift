@@ -3,10 +3,9 @@
 //
 
 public class Button: ComponentView {
-    public typealias OnClickHandler = (() -> AnyMessage)
     let size: DesiredSize?
     let content: ComponentView
-    var onClick: OnClickHandler
+    var onClick: SimpleHandler
     var clickState: ClickState = .up
 
     enum ClickState {
@@ -18,8 +17,8 @@ public class Button: ComponentView {
     public init(
         at location: Location = .tl(.zero),
         size: DesiredSize? = nil,
-        onClick: @escaping OnClickHandler,
-        content: ComponentView
+        onClick: @escaping SimpleHandler,
+        content: ComponentView = ComponentView()
     ) {
         self.size = size
         self.content = content
@@ -32,7 +31,7 @@ public class Button: ComponentView {
         let component = self
 
         let myClick = self.onClick
-        let onClick: OnClickHandler = {
+        let onClick: SimpleHandler = {
             mapper(myClick() as! T)
         }
         component.onClick = onClick
