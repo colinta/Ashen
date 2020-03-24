@@ -6,9 +6,9 @@ import Foundation
 
 
 public enum HttpError: Error {
-    case system(Error)
-    case noDataAtUrl(URL)
-    case unknown
+    case system(Int, Error)
+    case noDataAtUrl(Int, URL)
+    case unknown(Int)
 }
 
 public enum HttpOption {
@@ -96,17 +96,11 @@ public enum HttpOption {
 }
 
 func responseToHeaders(_ response: URLResponse?) -> Http.Headers {
-    let headers: Http.Headers
-    if let response = response as? HTTPURLResponse {
-        headers = response.allHeaderFields.compactMap { name, value -> Http.Header? in
-            guard let name = name as? String, let value = value as? String else { return nil }
-            return Http.Header(name: name, value: value)
-        }
+    guard let response = response as? HTTPURLResponse else { return [] }
+    return response.allHeaderFields.compactMap { name, value -> Http.Header? in
+        guard let name = name as? String, let value = value as? String else { return nil }
+        return Http.Header(name: name, value: value)
     }
-    else {
-        headers = []
-    }
-    return headers
 }
 
 public protocol URLSessionProtocol: class {
@@ -122,7 +116,7 @@ extension URLSession: URLSessionProtocol {
         completionHandler: Http.Delegate.OnReceivedHandler?
     ) -> URLSessionTaskProtocol {
         dataTask(with: request) { data, response, error in
-            completionHandler?(data, responseToHeaders(response), error)
+            completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), data, error)
         }
     }
 
@@ -134,10 +128,10 @@ extension URLSession: URLSessionProtocol {
             if let url = url,
                 let data = try? Data(contentsOf: url, options: [])
             {
-                completionHandler?(data, responseToHeaders(response), error)
+                completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), data, error)
             }
             else {
-                completionHandler?(nil, responseToHeaders(response), error)
+                completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), nil, error)
             }
         }
     }
@@ -201,7 +195,7 @@ public class Http: Command {
 
     public class Delegate: NSObject {
         public typealias OnProgressHandler = ((Float) -> Void)
-        public typealias OnReceivedHandler = ((Data?, Http.Headers, Error?) -> Void)
+        public typealias OnReceivedHandler = ((Int, Http.Headers, Data?, Error?) -> Void)
 
         var lastSentProgress = Date()
         var onReceived: OnReceivedHandler?
@@ -227,7 +221,7 @@ public class Http: Command {
     }
     public typealias Headers = [Header]
     public typealias Options = [HttpOption]
-    public typealias HttpResult = Result<(Data, Headers)>
+    public typealias HttpResult = Result<(Int, Headers, Data)>
     public typealias OnProgressHandler = (Float) -> AnyMessage?
     public typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
 
@@ -419,16 +413,16 @@ public class Http: Command {
     }
 
     public func start(_ done: @escaping (AnyMessage) -> Void) {
-        urlSessionDelegate.onReceived = { data, headers, error in
+        urlSessionDelegate.onReceived = { statusCode, headers, data, error in
             let result: HttpResult
             if let data = data {
-                result = .ok((data, headers))
+                result = .ok((statusCode, headers, data))
             }
             else if let error = error {
-                result = .fail(HttpError.system(error))
+                result = .fail(HttpError.system(statusCode, error))
             }
             else {
-                result = .fail(HttpError.unknown)
+                result = .fail(HttpError.unknown(statusCode))
             }
 
             if let message = self.onReceived(result) {
