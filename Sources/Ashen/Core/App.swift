@@ -94,7 +94,7 @@ public struct App<ProgramType: Program> {
     let program: ProgramType
     private let timeFactor: Float
 
-    public init(program: ProgramType, screen: ScreenType) {
+    public init(program: ProgramType, screen: ScreenType = TermboxScreen()) {
         self.program = program
         self.screen = screen
 
