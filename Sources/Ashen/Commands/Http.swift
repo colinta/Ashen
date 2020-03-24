@@ -116,7 +116,12 @@ extension URLSession: URLSessionProtocol {
         completionHandler: Http.Delegate.OnReceivedHandler?
     ) -> URLSessionTaskProtocol {
         dataTask(with: request) { data, response, error in
-            completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), data, error)
+            completionHandler?(
+                (response as? HTTPURLResponse)?.statusCode ?? 0,
+                responseToHeaders(response),
+                data,
+                error
+            )
         }
     }
 
@@ -128,10 +133,20 @@ extension URLSession: URLSessionProtocol {
             if let url = url,
                 let data = try? Data(contentsOf: url, options: [])
             {
-                completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), data, error)
+                completionHandler?(
+                    (response as? HTTPURLResponse)?.statusCode ?? 0,
+                    responseToHeaders(response),
+                    data,
+                    error
+                )
             }
             else {
-                completionHandler?((response as? HTTPURLResponse)?.statusCode ?? 0, responseToHeaders(response), nil, error)
+                completionHandler?(
+                    (response as? HTTPURLResponse)?.statusCode ?? 0,
+                    responseToHeaders(response),
+                    nil,
+                    error
+                )
             }
         }
     }
