@@ -7,6 +7,7 @@ public struct DesiredSize {
     public var height: Dimension?
 
     static public let zero = DesiredSize(width: 0, height: 0)
+    static public let max = DesiredSize(width: .max, height: .max)
 
     public init(width: Dimension? = nil, height: Dimension? = nil) {
         self.width = width
