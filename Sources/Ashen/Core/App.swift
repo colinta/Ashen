@@ -10,24 +10,49 @@ public enum SystemMessage {
     case rerender
 }
 
+public enum ExitState {
+    case quit
+    case error
+}
+
 public enum AppState {
     case quit
     case error
+    case quitAnd(() -> ExitState)
+
+    var exitState: ExitState {
+        switch self {
+        case let .quitAnd(closure):
+            return closure()
+        case .quit:
+            return .quit
+        case .error:
+            return .error
+        }
+    }
 }
 
 public enum LoopState {
     case quit
     case error
+    case quitAnd(() -> ExitState)
     case `continue`
 
     var shouldQuit: Bool {
-        self != .continue
+        switch self {
+        case .continue:
+            return false
+        default:
+            return true
+        }
     }
 
     var appState: AppState {
         switch self {
         case .error:
             return .error
+        case let .quitAnd(closure):
+            return .quitAnd(closure)
         default:
             return .quit
         }
@@ -78,7 +103,7 @@ public struct App<ProgramType: Program> {
         timeFactor = Float(info.numer) / Float(info.denom) / 1_000_000_000
     }
 
-    public func run() -> AppState {
+    public func run() -> ExitState {
         runningApps += 1
         do {
             try screen.setup()
@@ -98,7 +123,7 @@ public struct App<ProgramType: Program> {
             }
         }
 
-        return state
+        return state.exitState
     }
 
     private func main() -> AppState {
