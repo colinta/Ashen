@@ -21,11 +21,45 @@ public protocol Program {
 public enum Update<T> {
     case noChange
     case model(T)
-    case commands([Command])
     case update(T, [Command])
     case quit
     case error
     case quitAnd(() -> ExitState)
+
+    var model: T? {
+        switch self {
+        case let .model(model):
+            return model
+        case let .update(model, _):
+            return model
+        default:
+            return nil
+        }
+    }
+
+    var commands: [Command]? {
+        switch self {
+        case .model:
+            return []
+        case let .update(_, commands):
+            return commands
+        default:
+            return nil
+        }
+    }
+
+    var exitState: AppState? {
+        switch self {
+        case .quit:
+            return .quit
+        case .error:
+            return .error
+        case let .quitAnd(closure):
+            return .quitAnd(closure)
+        default:
+            return nil
+        }
+    }
 }
 
 public extension Program {

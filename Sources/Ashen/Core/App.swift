@@ -172,22 +172,17 @@ public struct App<ProgramType: Program> {
             updateAndRender = updateAndRender || messageQueueCopy.count > 0
             for message in messageQueueCopy {
                 let update = program.update(model: &model, message: message)
-                switch update {
-                case .noChange:
-                    break
-                case let .model(newModel):
+
+                if let state = update.exitState {
+                    return state
+                }
+
+                if let newModel = update.model {
                     model = newModel
-                case let .commands(newCommands):
+                }
+
+                if let newCommands = update.commands {
                     commands += newCommands
-                case let .update(newModel, newCommands):
-                    model = newModel
-                    commands += newCommands
-                case .quit:
-                    return .quit
-                case .error:
-                    return .error
-                case let .quitAnd(closure):
-                    return .quitAnd(closure)
                 }
             }
 
