@@ -14,8 +14,18 @@ public protocol Program {
 
     func setup(screen: ScreenType)
     func initial() -> (ModelType, [Command])
-    func update(model: inout ModelType, message: MessageType) -> (ModelType, [Command], LoopState)
+    func update(model: inout ModelType, message: MessageType) -> Update<ModelType>
     func render(model: ModelType, in screenSize: Size) -> Component
+}
+
+public enum Update<T> {
+    case noChange
+    case model(T)
+    case commands([Command])
+    case update(T, [Command])
+    case quit
+    case error
+    case quitAnd(() -> ExitState)
 }
 
 public extension Program {

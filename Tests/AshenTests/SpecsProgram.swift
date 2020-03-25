@@ -42,11 +42,9 @@ struct SpecsProgram: Program {
     }
 
     let verbose: Bool
-    let onEnd: LoopState
 
-    init(verbose: Bool, onEnd: LoopState) {
+    init(verbose: Bool) {
         self.verbose = verbose
-        self.onEnd = onEnd
     }
 
     func initial() -> (SpecsModel, [Command]) {
@@ -54,16 +52,16 @@ struct SpecsProgram: Program {
     }
 
     func update(model: inout SpecsModel, message: SpecsMessage)
-        -> (SpecsModel, [Command], LoopState)
+        -> Update<SpecsModel>
     {
         var runNext = false
         switch message {
         case .quit:
             if model.failed > 0 {
-                return (model, [], .error)
+                return .error
             }
             else {
-                return (model, [], .quit)
+                return .quit
             }
         case .begin:
             model.running = true
@@ -91,22 +89,17 @@ struct SpecsProgram: Program {
                 let spec = model.specs.removeFirst()
                 model.specLog.append("--- \(spec.name) ---")
                 let runner = SpecRunner(spec: spec, verbose: verbose)
-                return (model, [runner], .continue)
+                return .update(model, [runner])
             }
         }
-        return (model, [], .continue)
+        return .model(model)
     }
 
     func render(model: SpecsModel, in mySize: Size) -> Component {
         var components: [Component] = []
 
         if model.done {
-            if onEnd == .quit {
-                components.append(OnNext({ SpecsMessage.quit }))
-            }
-            else {
-                components.append(OnKeyPress({ SpecsMessage.quit }))
-            }
+            components.append(OnNext({ SpecsMessage.quit }))
         }
 
         components.append(LogView(at: .topLeft(y: 4), entries: model.specLog))

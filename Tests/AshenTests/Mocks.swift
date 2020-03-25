@@ -25,12 +25,12 @@ struct MockProgram: Program {
     }
 
     func update(model: inout Any, message: Any)
-        -> (Any, [Command], LoopState)
+        -> Update<Any>
     {
         if message is Quit {
-            return (mockModel, [], .quit)
+            return .exit(.quit)
         }
-        return (mockModel, [], .continue)
+        return .model(mockModel)
     }
 
     func render(model: Any, in size: Size) -> Component {

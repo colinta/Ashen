@@ -32,33 +32,6 @@ public enum AppState {
     }
 }
 
-public enum LoopState {
-    case quit
-    case error
-    case quitAnd(() -> ExitState)
-    case `continue`
-
-    var shouldQuit: Bool {
-        switch self {
-        case .continue:
-            return false
-        default:
-            return true
-        }
-    }
-
-    var appState: AppState {
-        switch self {
-        case .error:
-            return .error
-        case let .quitAnd(closure):
-            return .quitAnd(closure)
-        default:
-            return .quit
-        }
-    }
-}
-
 
 // when running specs there are multiple apps running; we only want the
 // debugging log to output when the "outermost" application exits.
@@ -198,13 +171,24 @@ public struct App<ProgramType: Program> {
 
             updateAndRender = updateAndRender || messageQueueCopy.count > 0
             for message in messageQueueCopy {
-                let (newModel, newCommands, state) = program.update(model: &model, message: message)
-                if state.shouldQuit {
-                    return state.appState
+                let update = program.update(model: &model, message: message)
+                switch update {
+                case .noChange:
+                    break
+                case let .model(newModel):
+                    model = newModel
+                case let .commands(newCommands):
+                    commands += newCommands
+                case let .update(newModel, newCommands):
+                    model = newModel
+                    commands += newCommands
+                case .quit:
+                    return .quit
+                case .error:
+                    return .error
+                case let .quitAnd(closure):
+                    return .quitAnd(closure)
                 }
-
-                model = newModel
-                commands += newCommands
             }
 
             if updateAndRender {
