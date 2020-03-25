@@ -4,7 +4,7 @@
 
 
 public class LabelView: ComponentView, CustomDebugStringConvertible {
-    let size: DesiredSize
+    let size: DesiredSize?
     let chars: [AttrCharType]
 
     let linesHeight: Int
@@ -16,7 +16,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
 
     public init(
         at location: Location = .tl(.zero),
-        size: DesiredSize = DesiredSize(),
+        size: DesiredSize? = nil,
         text: TextType
     ) {
         self.size = size
@@ -45,10 +45,7 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     }
 
     override public func desiredSize() -> DesiredSize {
-        DesiredSize(
-            width: size.width ?? .literal(linesWidth),
-            height: size.height ?? .literal(linesHeight)
-        )
+        self.size ?? DesiredSize(width: linesWidth, height: linesHeight)
     }
 
     override public func render(to buffer: Buffer, in rect: Rect) {
