@@ -5,7 +5,9 @@ A framework for writing terminal applications in Swift. Based on [The Elm Archit
 As a tutorial of Ashen, let's consider an application that fetches some todo
 items and renders them as a list.
 
-### Browsing
+### Example
+
+###### Old way
 
 In a traditional controller/view pattern, views are created during
 initialization, and updated later as needed with your application data.  Loading
@@ -40,6 +42,8 @@ func cellForRow(row: Thing) -> Component {
 }
 ```
 
+###### New way
+
 What would this look like using Ashen or Elm or React? In these frameworks,
 rendering output is stateless; it is based the model, and you render *all* the
 views and their properties based on that state.
@@ -49,9 +53,11 @@ func render(model: Model, in screenSize: Size) -> Component {
     guard
         let data = model.data
     else {
+        // no data?  Show the spinner
         return SpinnerView()
     }
 
+    // data available - use a rowHeight based on the available viewport
     let rowHeight: Int
     if screenSize.height >= 30 {
       rowHeight = 3
@@ -128,19 +134,13 @@ struct SpinnersDemo: Program {
     struct Model {
     }
 
-    // Commands will be discussed in the context of `update`, but tl;dr they are
-    // ways to interface with external event sources, e.g. HTTP requests.
-    // Usually an enum.
-    enum Command {
-    }
-
     // Return your initial model and commands. if your app requires
     // initialization from an API (i.eg. a loading spinner), use a
     // `loading/loaded/error` enum to represent the initial state.  If you
     // persist your application to the database you could load that here, either
     // synchronously or via a `Command`.
     func initial() -> (Model, [Command]) {
-        Model()
+        (Model(), [])
     }
 
     // Ashen will call this method with the current model, and a message that
@@ -153,9 +153,14 @@ struct SpinnersDemo: Program {
     // another form of event emitters, like Components, but they talk with
     // external services, either asynchronously or synchronously.
     func update(model: inout Model, message: Message)
-        -> (Model, [Command], AnyMessage?)
+        -> Update<Model>
     {
-        (model, [], SystemMessage.quit)
+        .noChange
+        // or .stop(.quit)
+        // or .stop(.error)
+        // or .model(model)
+        // or .commands([])
+        // or .update(model, [])
     }
 
     // Finally the render() method is given a model and a size, and you return
