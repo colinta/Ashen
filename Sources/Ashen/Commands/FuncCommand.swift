@@ -8,9 +8,9 @@ public struct FuncCommand {
 }
 
 extension FuncCommand: Command {
-    public func start(_ done: @escaping (AnyMessage) -> Void) {
+    public func start(_ send: @escaping (AnyMessage) -> Void) {
         let msg = fn()
-        done(msg)
+        send(msg)
     }
 
     public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {

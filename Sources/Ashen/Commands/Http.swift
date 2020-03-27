@@ -427,7 +427,7 @@ public class Http: Command {
         session.ashenCancel()
     }
 
-    public func start(_ done: @escaping (AnyMessage) -> Void) {
+    public func start(_ send: @escaping (AnyMessage) -> Void) {
         urlSessionDelegate.onReceived = { statusCode, headers, data, error in
             let result: HttpResult
             if let data = data {
@@ -441,13 +441,13 @@ public class Http: Command {
             }
 
             if let message = self.onReceived(result) {
-                done(message)
+                send(message)
             }
         }
 
         if let onProgress = onProgress {
             urlSessionDelegate.onProgress = { amt in
-                onProgress(amt).map { done($0) }
+                onProgress(amt).map { send($0) }
             }
             startDownloadTask(request)
         }
