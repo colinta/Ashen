@@ -26,23 +26,12 @@ public enum Update<T> {
     case error(Error)
     case quitAnd(() -> ExitState)
 
-    var model: T? {
+    var values: (T, [Command])? {
         switch self {
         case let .model(model):
-            return model
-        case let .update(model, _):
-            return model
-        default:
-            return nil
-        }
-    }
-
-    var commands: [Command]? {
-        switch self {
-        case .model:
-            return []
-        case let .update(_, commands):
-            return commands
+            return (model, [])
+        case let .update(model, commands):
+            return (model, commands)
         default:
             return nil
         }

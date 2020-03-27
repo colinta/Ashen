@@ -113,7 +113,7 @@ public struct App<ProgramType: Program> {
         ) -> AppState
     {
         var prevTimestamp = mach_absolute_time()
-        var (model, commands) = program.initial()
+        var (model, commandQueue) = program.initial()
 
         var window = program.render(model: model, in: screen.size)
         var buffer = screen.render(window: window)
@@ -124,7 +124,7 @@ public struct App<ProgramType: Program> {
             qos: .background
         )
         while true {
-            for command in commands {
+            for command in commandQueue {
                 commandBackgroundThread.async {
                     command.start { msg in
                         guard let msg = msg as? ProgramType.MessageType else { return }
@@ -135,7 +135,7 @@ public struct App<ProgramType: Program> {
                     }
                 }
             }
-            commands = []
+            commandQueue = []
 
             let (events, nextTimestamp) = collectSystemEvents(
                 buffer: buffer,
@@ -203,12 +203,9 @@ public struct App<ProgramType: Program> {
                     return state
                 }
 
-                if let newModel = update.model {
+                if let (newModel, newCommands) = update.values {
                     model = newModel
-                }
-
-                if let newCommands = update.commands {
-                    commands += newCommands
+                    commandQueue += newCommands
                 }
             }
 
