@@ -81,8 +81,8 @@ public struct App<ProgramType: Program> {
     }
 
     public func run(
-        onExit: ProgramType.MessageType?,
-        onAbort: ProgramType.MessageType?
+        onExit: ProgramType.MessageType? = nil,
+        onAbort: ProgramType.MessageType? = nil
         ) -> ExitState
     {
         runningApps += 1
