@@ -10,8 +10,8 @@ public struct DesiredSize {
     static public let max = DesiredSize(width: .max, height: .max)
 
     public init(calculate: @escaping (Size) -> Size) {
-        self.width = .calculate({ size in calculate(size).width })
-        self.height = .calculate({ size in calculate(size).height })
+        self.width = .calculate({ size, _ in calculate(size).width })
+        self.height = .calculate({ size, _ in calculate(size).height })
     }
 
     public init(width: Dimension? = nil, height: Dimension? = nil) {
@@ -40,35 +40,56 @@ public struct DesiredSize {
     }
 
     func constrain(in size: Size) -> Size {
-        let width = constrain(self.width, in: size, max: size.width)
-        let height = constrain(self.height, in: size, max: size.height)
+        let width = self.width?.constrain(in: size, axis: .x) ?? 0
+        let height = self.height?.constrain(in: size, axis: .y) ?? 0
         return Size(width: width, height: height)
     }
+}
 
-    private func constrain(_ dimension: Dimension?, in size: Size, max: Int) -> Int {
-        guard let dimension = dimension else { return 0 }
-
-        switch dimension {
-        case let .literal(literal):
-            return literal
-        case let .calculate(calculate):
-            return calculate(size)
-        case .max:
-            return max
-        case let .smallest(values):
-            return values.filter({ $0 <= max }).min() ?? 0
-        case let .biggest(values):
-            return values.filter({ $0 <= max }).max() ?? 0
-        }
-    }
+public enum Axis {
+    case x
+    case y
 }
 
 public enum Dimension {
     case literal(Int)
-    case calculate((Size) -> Int)
+    case percent(Int)
     case max
-    case smallest([Int])
-    case biggest([Int])
+    case biggest(of: [Int])
+    case calculate((Size, Axis) -> Int)
+
+    func plus(_ delta: Int) -> Dimension {
+        let dimension = self
+        return .calculate { size, axis in
+            return dimension.constrain(in: size, axis: axis) + delta
+        }
+    }
+
+    func minus(_ delta: Int) -> Dimension {
+        plus(-delta)
+    }
+
+    func constrain(in size: Size, axis: Axis) -> Int {
+        let max: Int
+        switch axis {
+        case .x: max = size.width
+        case .y: max = size.height
+        }
+
+        switch self {
+        case let .literal(literal):
+            return literal
+        case let .calculate(calculate):
+            return calculate(size, axis)
+        case .max:
+            return max
+        case let .percent(percent):
+            return max * percent / 100
+        case let .biggest(values):
+            return values.filter({ $0 <= max }).max() ?? 0
+        }
+    }
+
 }
 
 extension Dimension: ExpressibleByIntegerLiteral {
