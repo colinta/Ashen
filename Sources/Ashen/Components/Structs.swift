@@ -152,33 +152,33 @@ public enum Location {
     case bc(Point)
     case br(Point)
 
-    func origin(for mySize: Size, in size: Size) -> Point {
+    func origin(for mySize: Size, in parentSize: Size) -> Point {
         switch self {
         case let .tl(point): return point
-        case let .tc(point): return Point(x: point.x + (size.width - mySize.width) / 2, y: point.y)
-        case let .tr(point): return Point(x: point.x + size.width - mySize.width, y: point.y)
+        case let .tc(point): return Point(x: point.x + (parentSize.width - mySize.width) / 2, y: point.y)
+        case let .tr(point): return Point(x: point.x + parentSize.width - mySize.width, y: point.y)
         case let .ml(point):
-            return Point(x: point.x, y: point.y + (size.height - mySize.height) / 2)
+            return Point(x: point.x, y: point.y + (parentSize.height - mySize.height) / 2)
         case let .mc(point):
             return Point(
-                x: point.x + (size.width - mySize.width) / 2,
-                y: point.y + (size.height - mySize.height) / 2
+                x: point.x + (parentSize.width - mySize.width) / 2,
+                y: point.y + (parentSize.height - mySize.height) / 2
             )
         case let .mr(point):
             return Point(
-                x: point.x + size.width - mySize.width,
-                y: point.y + (size.height - mySize.height) / 2
+                x: point.x + parentSize.width - mySize.width,
+                y: point.y + (parentSize.height - mySize.height) / 2
             )
-        case let .bl(point): return Point(x: point.x, y: point.y + size.height - mySize.height)
+        case let .bl(point): return Point(x: point.x, y: point.y + parentSize.height - mySize.height)
         case let .bc(point):
             return Point(
-                x: point.x + (size.width - mySize.width) / 2,
-                y: point.y + size.height - mySize.height
+                x: point.x + (parentSize.width - mySize.width) / 2,
+                y: point.y + parentSize.height - mySize.height
             )
         case let .br(point):
             return Point(
-                x: point.x + size.width - mySize.width,
-                y: point.y + size.height - mySize.height
+                x: point.x + parentSize.width - mySize.width,
+                y: point.y + parentSize.height - mySize.height
             )
         }
     }
