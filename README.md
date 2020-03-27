@@ -53,11 +53,12 @@ func render(model: Model, in screenSize: Size) -> Component {
     guard
         let data = model.data
     else {
-        // no data?  Show the spinner
+        // no data?  Show the spinner.  Defaults to centering itself in the
+        // parent view.
         return SpinnerView()
     }
 
-    // data available - use a rowHeight based on the available viewport
+    // data is available - use a rowHeight based on the available viewport
     let rowHeight: Int
     if screenSize.height >= 30 {
       rowHeight = 3
@@ -71,7 +72,7 @@ func render(model: Model, in screenSize: Size) -> Component {
 
     return Window(components: [
         LabelView(text: "Our things"),
-        OptimizedListView(dataList: data, rowHeight: rowHeight) { row in
+        ListView(dataList: data, rowHeight: rowHeight) { row in
             LabelView(text: row.title)
         }
         // 👆 this view is similar to how UITableView renders cells - only
@@ -87,17 +88,28 @@ func render(model: Model, in screenSize: Size) -> Component {
 So instead of mutating the `isHidden` property of these views, we render the views
 we need based on our model.
 
+###### Async tasks
+
 To fetch our data, we need to call out to the runtime to ask it to perform a
 background task, aka a `Command`, and then report the results back as a
-`Message`. `Message` is how your components (aka views, but also system event
-emitters) can tell your application about changes that *might* result in a
-change to your model.  For instance, if someone types in a "name" text field you
-probably want to know about that so you can update the model's `name` property.
+`Message`. `Message` is how your Components can tell your application about
+changes that *might* result in a change to your model.  For instance, if someone
+types in a "name" text field you probably want to know about that so you can
+update the model's `name` property.
+
+Sources of Messages include Views, Commands, and system event components
+(e.g. a `KeyEvent` message is created via the `OnKeyPress` component, which
+receives system-level events and maps those into an instance of your app's
+`Message` type).
 
 Our application starts at the `initial()` method.  We return our initial model
-and a list of commands to run.
+and a list of commands to run.  We will add an `Http` Command:
 
 ```swift
+enum Message {
+    case received(Result<(Int, Headers, Data), HttpError>)
+}
+
 func initial() -> (Model, [Command]) {
     let url = URL(string: "http://example.com")!
     let cmd = Http.get(url) { result in
@@ -109,8 +121,21 @@ func initial() -> (Model, [Command]) {
 ```
 
 When the Http request succeeds (or fails) the result will be turned into an
-instance of your application's `Message` type, and passed to the `update()`
-function that you provide.
+instance of your application's `Message` type (usually an enum), and passed to
+the `update()` function that you provide.
+
+###### Updating
+
+In your application's `update()` function, you will instruct the runtime how the
+message affects your state.  Your options are:
+
+- `.noChange` — ignore the message
+- `.model()`  — return an updated model (shortcut for `.update(model, [])`)
+- `.update()` — return a model and a list of Commands to run
+- `.quit`     — graceful exit (usually means exit with status 0)
+- `.quitAnd()`— graceful exit with a closure that runs just before the runtime
+  is done cleaning up
+- `.error()`  — indicate that an error occurred (usually means exit with non-zero status)
 
 # Program
 
@@ -178,9 +203,10 @@ struct SpinnersDemo: Program {
     }
 
     // The `start` function is called with your command, and a callback you can
-    // call with one of your program's `Message` values.  The `done` callback is
-    // often called asynchronously, e.g. after an HTTP or background process.
-    func start(command: Command, done: @escaping (Message) -> Void) {
+    // call with one of your program's `Message` values.  The `send` callback is
+    // called asynchronously, e.g. after an HTTP or background process.  It can
+    // be called any number of times, e.g. for progress messages.
+    func start(command: Command, send: @escaping (Message) -> Void) {
     }
 }
 ```
@@ -190,10 +216,10 @@ struct SpinnersDemo: Program {
 To run your program, create an app and run it, passing in a program and a
 screen.  It will return `.quit` or `.error`, depending on how the program
 exited.  `TermboxScreen` is recommended for the screen parameter, but in theory
-you could create a `ScreenType` that runs on iOS or outputs HTML.
+you could create a `ScreenType` for other output paradigms.
 
 ```swift
-let app = App(program: YourProgram(), screen: TermboxScreen())
+let app = App(program: YourProgram())  // default screen is TermboxScreen()
 let state = app.run()
 
 switch state {
@@ -202,6 +228,14 @@ switch state {
 }
 ```
 
+Important note: ALL Ashen programs can be aborted using `ctrl+c` and `ctrl+d`.
+`ctrl+c` is considered an error/abort and `ctrl+d` is considered a graceful
+exit.  If you want to respond to these events, you can include special messages
+to `Ashen.run()`:
+
+```swift
+let app = App(program: YourProgram())  // default screen is TermboxScreen()
+```
 
 ## Location and Size structs
 
@@ -224,6 +258,17 @@ container.  There are nine locations:
 +------------+--------------+-------------+
 ```
 
+`Size` and `DesiredSize` work hand in hand - most `ComponentView` classes expect
+an instance of `DesiredSize`, but some prefer an explicit `Size`, or others
+don't accept any size parameter.  Regardless, *all* views implement
+`func desiredSize() -> DesiredSize`, which tells parent views the ideal size for
+this view.  This class has a lot of flexibility; it supports literal numbers
+(`DesiredSize(width: 100, height: 1)`), "largest of" values, and even accepts a
+closure that returns a size dynamically, based on the size of the parent view.
+
+Another way to have dynamic sizing, and this was shown above, is to change the
+layout based on the `screenSize: Size` that is passed to `render()`.
+
 ###### Examples:
 
 ```swift
@@ -233,31 +278,22 @@ LabelView(at: .bottomRight(y: -1))  // in bottomRight corner, and up 1 row
 ```
 
 Sizes can be defined absolutely, or relative to the parent view, and with positive
-or negative offsets.  They are also chainable, for a more descriptive API.
+or negative offsets.
 
 ```swift
 // assume the parent container is width: 80, height: 30
-LabelView(size: .size(5, 10))  // width: 5, height: 10
-LabelView(size: .width(10).height(percent: 100))  // width: 10, height: 30
-LabelView(size: .fullWidth(minus: 4).height(times: 0.5, plus: 5))  // width: 76, height: 20
+
+LabelView(size: DesiredSize(width: 5, height: 10))
+LabelView(size: DesiredSize(width: 10, height: .percent(100)))
+// -> width: 10, height: 30
+LabelView(size: DesiredSize(width: .max.minus(4), height: .percent(50).plus(5)))
+// -> width: 76, height: 20
 ```
 
-###### Available size functions:
-
-```
-.size(width:, height:)
-.minus(0)  .minus(width:, height:)
-.plus(0)   .plus(width:, height:)
-.width(width) /* default height is 1 */      .height(height)  /* default width is 1 */
-.parentWidth(percent: 0...100, plus: 0, minus: 0)  .parentHeight(percent: 0...100, plus: 0, minus: 0)
-.parentWidth(times: 0...1, plus: 0, minus: 0)      .parentHeight(times: 0...1, plus: 0, minus: 0)
-.fullWidth(plus: 0, minus: 0)                .fullHeight(plus: 0, minus: 0)
-```
-
-Using these location and size descriptions, you can accomplish the majority of your UI, but you can
-also choose to use `Layout` classes like `FlowLayout` to position views in a
-stack or row, and `GridLayout` to specify rows and columns of views, with weights to describe the
-relative sizes.
+Using these location and size descriptions, you can accomplish the majority of
+your UI, but you can also choose to use `Layout` classes like `FlowLayout` to
+position views in a stack or row, and `GridLayout` to specify rows and columns
+of views, with weights to describe the relative sizes.
 
 ## Views
 
