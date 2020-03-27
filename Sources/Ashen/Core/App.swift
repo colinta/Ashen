@@ -17,7 +17,7 @@ public enum ExitState {
 
 public enum AppState {
     case quit
-    case error
+    case error(Swift.Error)
     case quitAnd(() -> ExitState)
 
     var exitState: ExitState {
@@ -67,6 +67,10 @@ public struct App<ProgramType: Program> {
     let program: ProgramType
     private let timeFactor: Float
 
+    public enum Error: Swift.Error {
+        case interrupt
+    }
+
     public init(program: ProgramType, screen: ScreenType = TermboxScreen()) {
         self.program = program
         self.screen = screen
@@ -76,7 +80,11 @@ public struct App<ProgramType: Program> {
         timeFactor = Float(info.numer) / Float(info.denom) / 1_000_000_000
     }
 
-    public func run() -> ExitState {
+    public func run(
+        onExit: ProgramType.MessageType?,
+        onAbort: ProgramType.MessageType?
+        ) -> ExitState
+    {
         runningApps += 1
         do {
             try screen.setup()
@@ -86,7 +94,7 @@ public struct App<ProgramType: Program> {
         }
 
         program.setup(screen: screen)
-        let state = main()
+        let state = main(onExit: onExit, onAbort: onAbort)
         screen.teardown()
         runningApps -= 1
 
@@ -99,7 +107,11 @@ public struct App<ProgramType: Program> {
         return state.exitState
     }
 
-    private func main() -> AppState {
+    private func main(
+        onExit: ProgramType.MessageType?,
+        onAbort: ProgramType.MessageType?
+        ) -> AppState
+    {
         var prevTimestamp = mach_absolute_time()
         var (model, commands) = program.initial()
 
@@ -115,10 +127,10 @@ public struct App<ProgramType: Program> {
             for command in commands {
                 commandBackgroundThread.async {
                     command.start { msg in
-                        if let msg = msg as? ProgramType.MessageType {
-                            sync {
-                                messageQueue.append(msg)
-                            }
+                        guard let msg = msg as? ProgramType.MessageType else { return }
+
+                        sync {
+                            messageQueue.append(msg)
                         }
                     }
                 }
@@ -135,10 +147,24 @@ public struct App<ProgramType: Program> {
 
             for event in events {
                 if case let .key(key) = event, key == .signalQuit {
+                    if let message = onExit {
+                        let update = program.update(model: &model, message: message)
+                        if let state = update.exitState {
+                            return state
+                        }
+                    }
+
                     return .quit
                 }
                 else if case let .key(key) = event, key == .signalInt {
-                    return .error
+                    if let message = onAbort {
+                        let update = program.update(model: &model, message: message)
+                        if let state = update.exitState {
+                            return state
+                        }
+                    }
+
+                    return .error(Error.interrupt)
                 }
                 else if case .window = event {
                     updateAndRender = true

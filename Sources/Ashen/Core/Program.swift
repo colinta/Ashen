@@ -23,7 +23,7 @@ public enum Update<T> {
     case model(T)
     case update(T, [Command])
     case quit
-    case error
+    case error(Error)
     case quitAnd(() -> ExitState)
 
     var model: T? {
@@ -52,8 +52,8 @@ public enum Update<T> {
         switch self {
         case .quit:
             return .quit
-        case .error:
-            return .error
+        case let .error(error):
+            return .error(error)
         case let .quitAnd(closure):
             return .quitAnd(closure)
         default:
