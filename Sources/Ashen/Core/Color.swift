@@ -38,7 +38,7 @@ public enum Color {
             return .white
 
         case let .any(color):
-            guard color >= 0 && color < 0x0100 else { return .default }
+            guard color >= 0 && color < 256 else { return .default }
             return Attributes(rawValue: color)
         }
     }
