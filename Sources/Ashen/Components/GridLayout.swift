@@ -75,13 +75,14 @@ public class GridLayout: ComponentLayout {
             }
         }
 
+        let totalWeight = self.totalWeight(weights)
         var calculations: [Int] = weights.map { weight in
             var calculated = 0
             switch weight {
             case let .fixed(value):
                 calculated = value
             case let .relative(value):
-                calculated = Int(value * Float(relative) / totalWeight(weights))
+                calculated = Int(value * Float(relative) / totalWeight)
             }
 
             remaining -= calculated
