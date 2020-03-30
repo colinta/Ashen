@@ -7,8 +7,8 @@ public class LabelView: ComponentView, CustomDebugStringConvertible {
     let size: DesiredSize?
     let chars: [AttrCharType]
 
-    let linesHeight: Int
-    let linesWidth: Int
+    public let linesHeight: Int
+    public let linesWidth: Int
 
     public var debugDescription: String {
         "LabelView(\(chars))"
