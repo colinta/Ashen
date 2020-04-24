@@ -18,7 +18,9 @@ struct OnTickSpecs: Spec {
             return MockProgram.Quit()
         })
         let app = App(program: program, screen: screen)
-        _ = app.run()
+        do {
+            try app.run()
+        } catch {}
         expect("receives .tick (\(ticked))").assert(ticked)
         expect("dt(\(dt)) is reasonable").assert(dt > 0.001)
         done()

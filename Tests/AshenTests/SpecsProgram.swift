@@ -20,6 +20,10 @@ private let specs: [Spec] = [
 
 
 struct SpecsProgram: Program {
+    enum Error: Swift.Error {
+        case failed
+    }
+
     struct SpecsModel {
         var passed: Int = 0
         var failed: Int = 0
@@ -58,7 +62,7 @@ struct SpecsProgram: Program {
         switch message {
         case .quit:
             if model.failed > 0 {
-                return .error
+                return .error(Error.failed)
             }
             else {
                 return .quit

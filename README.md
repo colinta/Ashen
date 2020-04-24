@@ -1,6 +1,6 @@
 # Ashen
 
-A framework for writing terminal applications in Swift. Based on [The Elm Architecture][Elm].
+A framework for writing terminal applications in Swift. Based on [The Elm Architecture][elm].
 
 As a tutorial of Ashen, let's consider an application that fetches some todo
 items and renders them as a list.
@@ -10,7 +10,7 @@ items and renders them as a list.
 ###### Old way
 
 In a traditional controller/view pattern, views are created during
-initialization, and updated later as needed with your application data.  Loading
+initialization, and updated later as needed with your application data. Loading
 data from a server to load a list of views might look something like this:
 
 ```swift
@@ -45,7 +45,7 @@ func cellForRow(row: Thing) -> Component {
 ###### New way
 
 What would this look like using Ashen or Elm or React? In these frameworks,
-rendering output is stateless; it is based the model, and you render *all* the
+rendering output is stateless; it is based the model, and you render _all_ the
 views and their properties based on that state.
 
 ```swift
@@ -93,7 +93,7 @@ we need based on our model.
 To fetch our data, we need to call out to the runtime to ask it to perform a
 background task, aka a `Command`, and then report the results back as a
 `Message`. `Message` is how your Components can tell your application about
-changes that *might* result in a change to your model.  For instance, if someone
+changes that _might_ result in a change to your model. For instance, if someone
 types in a "name" text field you probably want to know about that so you can
 update the model's `name` property.
 
@@ -102,8 +102,8 @@ Sources of Messages include Views, Commands, and system event components
 receives system-level events and maps those into an instance of your app's
 `Message` type).
 
-Our application starts at the `initial()` method.  We return our initial model
-and a list of commands to run.  We will add an `Http` Command:
+Our application starts at the `initial()` method. We return our initial model
+and a list of commands to run. We will add an `Http` Command:
 
 ```swift
 enum Message {
@@ -127,15 +127,15 @@ the `update()` function that you provide.
 ###### Updating
 
 In your application's `update()` function, you will instruct the runtime how the
-message affects your state.  Your options are:
+message affects your state. Your options are:
 
-- `.noChange` — ignore the message
-- `.model()`  — return an updated model (shortcut for `.update(model, [])`)
-- `.update()` — return a model and a list of Commands to run
-- `.quit`     — graceful exit (usually means exit with status 0)
-- `.quitAnd()`— graceful exit with a closure that runs just before the runtime
-  is done cleaning up
-- `.error()`  — indicate that an error occurred (usually means exit with non-zero status)
+-   `.noChange` — ignore the message
+-   `.model()` — return an updated model (shortcut for `.update(model, [])`)
+-   `.update()` — return a model and a list of Commands to run
+-   `.quit` — graceful exit (usually means exit with status 0)
+-   `.quitAnd()`— graceful exit with a closure that runs just before the runtime
+    is done cleaning up
+-   `.error()` — indicate that an error occurred (usually means exit with non-zero status)
 
 # Program
 
@@ -214,23 +214,23 @@ struct SpinnersDemo: Program {
 ## Running your Program
 
 To run your program, create an app and run it, passing in a program and a
-screen.  It will return `.quit` or `.error`, depending on how the program
-exited.  `TermboxScreen` is recommended for the screen parameter, but in theory
+screen. It will return `.quit` or `.error`, depending on how the program
+exited. `TermboxScreen` is recommended for the screen parameter, but in theory
 you could create a `ScreenType` for other output paradigms.
 
 ```swift
 let app = App(program: YourProgram())  // default screen is TermboxScreen()
-let state = app.run()
-
-switch state {
-    case .quit: exit(EX_OK)
-    case .error: exit(EX_IOERR)
+do {
+    app.run()
+    exit(EX_OK)
+} catch {
+    exit(EX_IOERR)
 }
 ```
 
 Important note: ALL Ashen programs can be aborted using `ctrl+c` and `ctrl+d`.
 `ctrl+c` is considered an error/abort and `ctrl+d` is considered a graceful
-exit.  If you want to respond to these events, you can include special messages
+exit. If you want to respond to these events, you can include special messages
 to `Ashen.run()`:
 
 ```swift
@@ -240,7 +240,7 @@ let app = App(program: YourProgram())  // default screen is TermboxScreen()
 ## Location and Size structs
 
 The `Location` struct is used to place your views relative to their parent
-container.  There are nine locations:
+container. There are nine locations:
 
 ```
 +------------+--------------+-------------+
@@ -260,9 +260,9 @@ container.  There are nine locations:
 
 `Size` and `DesiredSize` work hand in hand - most `ComponentView` classes expect
 an instance of `DesiredSize`, but some prefer an explicit `Size`, or others
-don't accept any size parameter.  Regardless, *all* views implement
+don't accept any size parameter. Regardless, _all_ views implement
 `func desiredSize() -> DesiredSize`, which tells parent views the ideal size for
-this view.  This class has a lot of flexibility; it supports literal numbers
+this view. This class has a lot of flexibility; it supports literal numbers
 (`DesiredSize(width: 100, height: 1)`), "largest of" values, and even accepts a
 closure that returns a size dynamically, based on the size of the parent view.
 
@@ -299,5 +299,5 @@ of views, with weights to describe the relative sizes.
 
 Todo: list the available views
 
-[Elm]: http://elm-lang.org
-[React]: https://facebook.github.io/react/
+[elm]: http://elm-lang.org
+[react]: https://facebook.github.io/react/

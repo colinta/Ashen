@@ -28,7 +28,7 @@ struct MockProgram: Program {
         -> Update<Any>
     {
         if message is Quit {
-            return .exit(.quit)
+            return .quit
         }
         return .model(mockModel)
     }

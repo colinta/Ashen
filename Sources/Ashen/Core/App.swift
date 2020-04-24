@@ -12,7 +12,7 @@ public enum SystemMessage {
 
 public enum ExitState {
     case quit
-    case error
+    case error(Swift.Error)
 }
 
 public enum AppState {
@@ -20,14 +20,16 @@ public enum AppState {
     case error(Swift.Error)
     case quitAnd(() -> ExitState)
 
-    var exitState: ExitState {
+    func cleanup() throws {
         switch self {
         case let .quitAnd(closure):
-            return closure()
+            if case let .error(err) = closure() {
+                throw err
+            }
         case .quit:
-            return .quit
-        case .error:
-            return .error
+            return
+        case let .error(err):
+            throw err
         }
     }
 }
@@ -83,15 +85,10 @@ public struct App<ProgramType: Program> {
     public func run(
         onExit: ProgramType.MessageType? = nil,
         onAbort: ProgramType.MessageType? = nil
-        ) -> ExitState
+        ) throws
     {
         runningApps += 1
-        do {
-            try screen.setup()
-        }
-        catch {
-            return .error
-        }
+        try screen.setup()
 
         program.setup(screen: screen)
         let state = main(onExit: onExit, onAbort: onAbort)
@@ -104,7 +101,7 @@ public struct App<ProgramType: Program> {
             }
         }
 
-        return state.exitState
+        try state.cleanup()
     }
 
     private func main(
