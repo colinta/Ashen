@@ -10,22 +10,15 @@ public enum SystemMessage {
     case rerender
 }
 
-public enum ExitState {
-    case quit
-    case error(Swift.Error)
-}
-
 public enum AppState {
     case quit
     case error(Swift.Error)
-    case quitAnd(() -> ExitState)
+    case quitAnd(() throws -> Void)
 
     func cleanup() throws {
         switch self {
         case let .quitAnd(closure):
-            if case let .error(err) = closure() {
-                throw err
-            }
+            try closure()
         case .quit:
             return
         case let .error(err):

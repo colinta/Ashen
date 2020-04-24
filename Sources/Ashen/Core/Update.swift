@@ -8,7 +8,7 @@ public enum Update<T> {
     case update(T, [Command])
     case quit
     case error(Error)
-    case quitAnd(() -> ExitState)
+    case quitAnd(() throws -> Void)
 
     public var values: (T, [Command])? {
         switch self {
