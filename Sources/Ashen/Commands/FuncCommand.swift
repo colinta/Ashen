@@ -8,6 +8,10 @@ public struct FuncCommand {
 }
 
 extension FuncCommand: Command {
+    public init(_ fn: @escaping () -> AnyMessage) {
+        self.fn = fn
+    }
+
     public func start(_ send: @escaping (AnyMessage) -> Void) {
         let msg = fn()
         send(msg)
@@ -15,8 +19,8 @@ extension FuncCommand: Command {
 
     public func map<T, U>(_ mapper: @escaping (T) -> U) -> Self {
         let fn = self.fn
-        return FuncCommand {
+        return FuncCommand({
             mapper(fn() as! T)
-        }
+        })
     }
 }
