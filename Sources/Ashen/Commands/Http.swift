@@ -236,7 +236,7 @@ public class Http: Command {
     }
     public typealias Headers = [Header]
     public typealias Options = [HttpOption]
-    public typealias HttpResult = Result<(Int, Headers, Data)>
+    public typealias HttpResult = Result<(Int, Headers, Data), HttpError>
     public typealias OnProgressHandler = (Float) -> AnyMessage?
     public typealias OnReceivedHandler = (HttpResult) -> AnyMessage?
 
@@ -431,13 +431,13 @@ public class Http: Command {
         urlSessionDelegate.onReceived = { statusCode, headers, data, error in
             let result: HttpResult
             if let data = data {
-                result = .ok((statusCode, headers, data))
+                result = .success((statusCode, headers, data))
             }
             else if let error = error {
-                result = .fail(HttpError.system(statusCode, error))
+                result = .failure(HttpError.system(statusCode, error))
             }
             else {
-                result = .fail(HttpError.unknown(statusCode))
+                result = .failure(HttpError.unknown(statusCode))
             }
 
             if let message = self.onReceived(result) {
