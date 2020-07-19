@@ -1,5 +1,5 @@
 ////
-///  Chars.swift
+///  Buffer.swift
 //
 
 public class Buffer {

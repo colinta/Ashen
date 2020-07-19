@@ -2,7 +2,6 @@
 ///  Structs.swift
 //
 
-
 public struct Size: Equatable {
     public var width: Int
     public var height: Int
