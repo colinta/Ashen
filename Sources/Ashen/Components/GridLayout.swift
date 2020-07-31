@@ -46,14 +46,6 @@ public class GridLayout: ComponentLayout {
     let rows: [Row]
     let size: Size
 
-    private static func totalWeight(_ weights: [Weight]) -> Float {
-        weights.reduce(0 as Float) { memo, weight in
-            if case let .relative(value) = weight {
-                return memo + value
-            }
-            return memo
-        }
-    }
     public init(at location: Location = .tl(.zero), size: Size, rows: [Row]) {
         self.size = size
         self.rows = rows
@@ -70,12 +62,16 @@ public class GridLayout: ComponentLayout {
         var remaining = screen
         var relative = screen
         for weight in weights {
-            if case let .fixed(value) = weight {
-                relative = max(0, relative - value)
-            }
+            guard case let .fixed(value) = weight else { continue }
+            relative = max(0, relative - value)
         }
 
-        let totalWeight = self.totalWeight(weights)
+        var totalWeight: Float = 0
+        for weight in weights {
+            guard case let .relative(value) = weight else { continue }
+            totalWeight += value
+        }
+
         var calculations: [Int] = weights.map { weight in
             var calculated = 0
             switch weight {
