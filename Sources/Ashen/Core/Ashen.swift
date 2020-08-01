@@ -35,7 +35,7 @@ private func main<Model, Msg>(
     let initial = program.initial()
     var model = initial.model
     var cmds = initial.commands
-    var view = Frame(program.view(model, screen.size))
+    var view: View<Msg>!
 
     var prevTimestamp = mach_absolute_time()
     var info = mach_timebase_info(numer: 0, denom: 0)

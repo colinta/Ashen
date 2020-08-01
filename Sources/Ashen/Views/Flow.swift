@@ -30,14 +30,16 @@ public enum FlowDirection {
 public enum FlowSize {
     case flex(Float)
     case fixed
+
+    public static let flex1: FlowSize = .flex(1)
 }
 
 public func Columns<Msg>(_ views: [View<Msg>]) -> View<Msg> {
-    Flow(.leftToRight, views.map { (.flex(1), $0) })
+    Flow(.leftToRight, views.map { (.flex1, $0) })
 }
 
 public func Rows<Msg>(_ views: [View<Msg>]) -> View<Msg> {
-    Flow(.topToBottom, views.map { (.flex(1), $0) })
+    Flow(.topToBottom, views.map { (.flex1, $0) })
 }
 
 public func Stack<Msg>(_ direction: FlowDirection, _ views: [View<Msg>]) -> View<Msg> {

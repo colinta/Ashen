@@ -17,6 +17,15 @@ public struct MouseEvent {
         }
     }
 
+    public var isPressed: Bool {
+        switch event {
+        case .click:
+            return true
+        default:
+            return false
+        }
+    }
+
     public var isReleased: Bool {
         switch event {
         case .release:

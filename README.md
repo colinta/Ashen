@@ -242,7 +242,9 @@ exit.
     ```swift
     Flow(.leftToRight, [  // alias: .ltr
         (.fixed, Text(" ")),
-        (.flex(1), Text(Hi!).underlined()), // this view will stretch to fill the available space
+        (.flex1, Text(Hi!).underlined()), // this view will stretch to fill the available space
+        // .flex1 is a handy alias for .flex(1) - just like CSS flex: 1, you can use different flex
+        // values to give more or less % of the available space to the subviews
         (.fixed, Text(" ")),
     ])
     Flow(.bottomToTop, views)

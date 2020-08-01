@@ -87,21 +87,21 @@ public class Buffer {
 
     var chars: Chars = [:]
 
-    // writing at "0, 0" writes at this offset
-    private var offset: Point = .zero
+    // writing at local point "0, 0" writes at this offset
+    private var currentOffset: Point = .zero
     // as the screen is clipped, the offset can be moved *outside* the current clipped area.  The
     // zeroOrigin refers to the point where drawing is "safe"
     private var zeroOrigin: Point = .zero
     // the clipped size, measured from the offset
-    private var size: Size
+    private var currentClipSize: Size
     // the "model key", which stores and retrieves view models
-    private var key: String = ""
+    private var currentKey: String = ""
     private var models: [String: Any]
     private var mouse: [Int: [Int: String]]
     private var diff: Chars?
 
     init(size: Size, prev: Buffer?) {
-        self.size = size
+        self.currentClipSize = size
         self.models = prev?.models ?? [:]
         self.mouse = [:]
         self.diff = prev?.chars
@@ -118,25 +118,25 @@ public class Buffer {
         // footprint, too, which is a win.
 
         let nextSize = Size(
-            width: min(size.width - origin.x, nextDesiredSize.width),
-            height: min(size.height - origin.y, nextDesiredSize.height)
+            width: min(currentClipSize.width - origin.x, nextDesiredSize.width),
+            height: min(currentClipSize.height - origin.y, nextDesiredSize.height)
         )
-        let prevOffset = offset
+        let prevOffset = currentOffset
         let prevZeroOrigin = zeroOrigin
-        let prevSize = size
+        let prevClipSize = currentClipSize
 
-        offset = offset + origin
+        currentOffset = currentOffset + origin
         zeroOrigin = Point(
-            x: max(zeroOrigin.x, offset.x),
-            y: max(zeroOrigin.y, offset.y)
+            x: max(zeroOrigin.x, currentOffset.x),
+            y: max(zeroOrigin.y, currentOffset.y)
         )
-        size = nextSize
+        currentClipSize = nextSize
 
         block()
 
-        offset = prevOffset
+        currentOffset = prevOffset
         zeroOrigin = prevZeroOrigin
-        size = prevSize
+        currentClipSize = prevClipSize
     }
 
     func render<Msg>(
@@ -146,20 +146,20 @@ public class Buffer {
         clip nextDesiredSize: Size,
         offset renderOffset: Point = .zero
     ) {
-        let prevKey = key
-        key = calculateNextKey(view: view, nextKey: nextKey)
+        let prevKey = currentKey
+        currentKey = calculateNextKey(view: view, nextKey: nextKey)
         push(at: origin, clip: nextDesiredSize) {
             let innerRect = Rect(origin: renderOffset, size: nextDesiredSize)
             view.render(innerRect, self)
 
         }
-        key = prevKey
+        currentKey = prevKey
     }
 
     func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, view: View<Msg>) {
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        let initial = rect.origin + offset
-        let maxPt = rect.origin + offset + size
+        let initial = rect.origin + currentOffset
+        let maxPt = currentOffset + currentClipSize
         guard
             initial.x + rect.width > zeroOrigin.x, initial.y + rect.height > zeroOrigin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
@@ -189,27 +189,27 @@ public class Buffer {
     }
 
     func events<Msg>(key nextKey: BufferKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {
-        let prevKey = key
-        key = calculateNextKey(view: view, nextKey: nextKey)
+        let prevKey = currentKey
+        currentKey = calculateNextKey(view: view, nextKey: nextKey)
         let events = view.events(event, self)
-        key = prevKey
+        currentKey = prevKey
         return events
     }
 
     func store(_ model: Any) {
-        models[key] = model
+        models[currentKey] = model
     }
 
     func retrieve<T>() -> T? {
-        return models[key] as? T
+        return models[currentKey] as? T
 
     }
 
     func write(_ content: Attributed, at localPt: Point, attributes extraAttributes: [Attr] = []) {
         let width = content.maxWidth
         let height = content.countLines
-        let initial = localPt + offset
-        let maxPt = localPt + offset + size
+        let initial = localPt + currentOffset
+        let maxPt = currentOffset + currentClipSize
         guard
             initial.x + width > zeroOrigin.x, initial.y + height > zeroOrigin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
@@ -248,8 +248,8 @@ public class Buffer {
     func modifyCharacter(
         at localPt: Point, map modify: (AttributedCharacter) -> AttributedCharacter
     ) {
-        let point = localPt + offset
-        let maxPt = localPt + offset + size
+        let point = localPt + currentOffset
+        let maxPt = currentOffset + currentClipSize
         guard
             point.x + 1 > zeroOrigin.x, point.y + 1 > zeroOrigin.y,
             point.x < maxPt.x, point.y < maxPt.y
@@ -263,8 +263,8 @@ public class Buffer {
     func modifyCharacters(
         in localRect: Rect, map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
     ) {
-        let initial = localRect.origin + offset
-        let maxPt = localRect.origin + offset + size
+        let initial = localRect.origin + currentOffset
+        let maxPt = currentOffset + currentClipSize
         guard
             initial.x + localRect.width > zeroOrigin.x, initial.y + localRect.height > zeroOrigin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
@@ -288,16 +288,16 @@ public class Buffer {
         if let id = view.id {
             return "#\(id)"
         } else if let overrideKey = view.key {
-            return "\(key){\(overrideKey)}"
+            return "\(currentKey){\(overrideKey)}"
         } else {
-            return key + nextKey.bufferKey
+            return currentKey + nextKey.bufferKey
         }
     }
 }
 
 extension Buffer: CustomStringConvertible {
     public var description: String {
-        Buffer.desc(chars)
+        "currentKey: \(currentKey)\n\(Buffer.desc(chars))"
     }
 }
 
