@@ -8,6 +8,7 @@ public struct View<Msg> {
     let events: (Event, Buffer) -> ([Msg], [Event])
     let key: String?
     let id: String?
+    let debugName: String?
 
     init(
         preferredSize: @escaping (Size) -> Size,
@@ -19,45 +20,21 @@ public struct View<Msg> {
         self.events = events
         self.key = nil
         self.id = nil
+        self.debugName = nil
     }
 
-    init(
+    private init(
         preferredSize: @escaping (Size) -> Size,
         render: @escaping (Rect, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
-        key: String
-    ) {
-        self.preferredSize = preferredSize
-        self.render = render
-        self.events = events
-        self.key = key
-        self.id = nil
-    }
-
-    init(
-        preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Rect, Buffer) -> Void,
-        events: @escaping (Event, Buffer) -> ([Msg], [Event]),
-        id: String
-    ) {
-        self.preferredSize = preferredSize
-        self.render = render
-        self.events = events
-        self.key = nil
-        self.id = id
-    }
-
-    init(
-        preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Rect, Buffer) -> Void,
-        events: @escaping (Event, Buffer) -> ([Msg], [Event]),
-        key: String?, id: String?
+        key: String?, id: String?, debugName: String?
     ) {
         self.preferredSize = preferredSize
         self.render = render
         self.events = events
         self.key = key
         self.id = id
+        self.debugName = debugName
     }
 
     public static func scan(events: [Event], _ scan: (Event) -> ([Msg], [Event])) -> (
@@ -69,12 +46,25 @@ public struct View<Msg> {
         }
     }
 
+    public func copy(
+        preferredSize: @escaping (Size) -> Size,
+        render: @escaping (Rect, Buffer) -> Void,
+        events: @escaping (Event, Buffer) -> ([Msg], [Event])
+    ) -> View<Msg> {
+        View(
+            preferredSize: preferredSize,
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+
     public func key(_ key: String) -> View<Msg> {
         View(
             preferredSize: preferredSize,
             render: render,
             events: events,
-            key: key
+            key: key, id: nil, debugName: debugName
         )
     }
 
@@ -83,7 +73,18 @@ public struct View<Msg> {
             preferredSize: preferredSize,
             render: render,
             events: events,
-            id: id
+            key: nil, id: id, debugName: debugName
+        )
+    }
+
+    public func debugName(_ debugName: String) -> View<Msg> {
+        View(
+            preferredSize: preferredSize,
+            render: render,
+            events: events,
+            key: key,
+            id: id,
+            debugName: debugName
         )
     }
 
@@ -96,7 +97,8 @@ public struct View<Msg> {
             events: { event, buffer in
                 let (msgs, newEvents) = self.events(event, buffer)
                 return (msgs.map(msgMap), newEvents)
-            }
+            },
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -111,7 +113,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -126,7 +128,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -141,7 +143,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -156,7 +158,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -171,7 +173,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -186,7 +188,7 @@ public struct View<Msg> {
             },
             render: render,
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -207,7 +209,7 @@ public struct View<Msg> {
                 }
             },
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 
@@ -227,7 +229,7 @@ public struct View<Msg> {
                 }
             },
             events: events,
-            key: key, id: id
+            key: key, id: id, debugName: debugName
         )
     }
 }

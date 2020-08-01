@@ -6,7 +6,7 @@ import Termbox
 
 extension View {
     public func styled(_ style: Attr) -> View<Msg> {
-        View(
+        copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
                 self.render(rect, buffer)
@@ -21,8 +21,7 @@ extension View {
                     }
                 }
             },
-            events: events,
-            key: key, id: id
+            events: events
         )
     }
 
@@ -31,7 +30,7 @@ extension View {
     }
 
     public func bottomLined() -> View<Msg> {
-        View(
+        copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
                 self.render(rect, buffer)
@@ -44,8 +43,7 @@ extension View {
                     }
                 }
             },
-            events: events,
-            key: key, id: id
+            events: events
         )
     }
 
@@ -66,7 +64,7 @@ extension View {
     }
 
     public func reset() -> View<Msg> {
-        View(
+        copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
                 self.render(rect, buffer)
@@ -74,8 +72,7 @@ extension View {
                     buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1)) { $0.reset() }
                 }
             },
-            events: events,
-            key: key, id: id
+            events: events
         )
     }
 }
