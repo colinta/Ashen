@@ -54,29 +54,38 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             var maxHeight = 0
             var remainingSize = parentSize
             for (flowSize, view) in views {
-                guard case .fixed = flowSize else {
-                    return parentSize
-                }
                 let preferredSize = view.preferredSize(remainingSize)
-                allSizes = allSizes + preferredSize
                 maxWidth = max(maxWidth, preferredSize.width)
                 maxHeight = max(maxHeight, preferredSize.height)
-                if direction.isHorizontal {
-                    remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
-                } else {
-                    remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
+                if case .fixed = flowSize {
+                    allSizes = allSizes + preferredSize
+                    if direction.isHorizontal {
+                        remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
+                    } else {
+                        remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
+                    }
+                }
+                else if direction.isHorizontal {
+                    remainingSize = Size(width: 0, height: remainingSize.height)
+                    allSizes = Size(width: parentSize.width, height: allSizes.height)
+                    break
+                }
+                else {
+                    remainingSize = Size(width: remainingSize.width, height: 0)
+                    allSizes = Size(width: allSizes.width, height: parentSize.height)
+                    break
                 }
             }
 
             if direction.isHorizontal {
                 return Size(
-                    width: allSizes.width,
-                    height: maxHeight
+                    width: min(parentSize.width, allSizes.width),
+                    height: min(parentSize.height, maxHeight)
                 )
             } else {
                 return Size(
-                    width: maxWidth,
-                    height: allSizes.height
+                    width: min(parentSize.width, maxWidth),
+                    height: min(parentSize.height, allSizes.height)
                 )
             }
         },
