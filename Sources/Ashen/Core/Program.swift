@@ -2,23 +2,22 @@
 ///  Program.swift
 //
 
-public typealias AnyMessage = Any
-public class AnyInstance { fileprivate init() {} }
-public let NoMessage = AnyInstance()
+public typealias InitialFunction<Model, Msg> = () -> Initial<Model, Msg>
+public typealias UpdateFunction<Model, Msg> = (inout Model, Msg) -> State<Model, Msg>
+public typealias ViewFunction<Model, Msg> = (Model, Size) -> View<Msg>
 
-public typealias AnyCommand = Any
+public struct Program<Model, Msg> {
+    public let initial: InitialFunction<Model, Msg>
+    public let update: UpdateFunction<Model, Msg>
+    public let view: ViewFunction<Model, Msg>
 
-public protocol Program {
-    associatedtype ModelType
-    associatedtype MessageType
-
-    func setup(screen: ScreenType)
-    func initial() -> (ModelType, [Command])
-    func update(model: inout ModelType, message: MessageType) -> Update<ModelType>
-    func render(model: ModelType, in screenSize: Size) -> Component
-}
-
-public extension Program {
-    func setup(screen: ScreenType) {
+    public init(
+        _ initial: @escaping InitialFunction<Model, Msg>,
+        _ update: @escaping UpdateFunction<Model, Msg>,
+        _ view: @escaping ViewFunction<Model, Msg>
+    ) {
+        self.initial = initial
+        self.update = update
+        self.view = view
     }
 }

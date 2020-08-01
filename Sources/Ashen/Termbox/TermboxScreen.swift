@@ -4,17 +4,16 @@
 
 import Termbox
 
-
-public class TermboxScreen: ScreenType {
-    public var size: Size { Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
+public class TermboxScreen {
+    var size: Size { Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
     private var queuedEvents: [Event] = []
-    private var currentMouseClick: (x: UInt16, y: UInt16, button: MouseEvent.Button)?
+    private var currentMouseClick: (MouseEvent.Button)?
+    var didSendFirstResize = false
 
-    public init() {
-        Termbox.debug = debug
+    init() {
     }
 
-    public func setup() throws {
+    func setup() throws {
         try Termbox.initialize()
         Termbox.outputMode = .color256
         Termbox.enableMouse()
@@ -22,35 +21,37 @@ public class TermboxScreen: ScreenType {
         Termbox.render()
     }
 
-    public func teardown() {
+    func teardown() {
         Termbox.shutdown()
     }
 
-    public func render(window: Component) -> Buffer {
-        let buffer = window.render(size: size)
-        render(buffer: buffer)
-        return buffer
-    }
+    func render(buffer: Buffer) {
+        let chars = buffer.diffedChars
 
-    public func render(buffer: Buffer) {
-        let chars = buffer.chars
-
-        Termbox.clear()
+        // There were issues rendering after a screen resize, and putting in
+        // this render fixed things, but I don't understand why
+        Termbox.render()
 
         for (y, row) in chars {
             guard y >= 0 && y < size.height else { continue }
-            for (x, attrChar) in row {
+            for (x, char) in row {
                 guard
                     x >= 0, x < size.width,
-                        let char = (attrChar.char ?? " ").unicodeScalars.first
+                    let unicodeChar = char.character.unicodeScalars.first
                 else { continue }
 
-                let foreground = foregroundAttrs(attrChar.attrs)
-                let background = backgroundAttrs(attrChar.attrs)
+                let foreground = foregroundAttrs(char.attributes)
+                let background = backgroundAttrs(char.attributes)
+                let printChar: Unicode.Scalar
+                if unicodeChar == "\u{0000}" {
+                    printChar = " "
+                } else {
+                    printChar = unicodeChar
+                }
                 Termbox.putc(
                     x: Int32(x),
                     y: Int32(y),
-                    char: char,
+                    char: printChar,
                     foreground: foreground,
                     background: background
                 )
@@ -60,23 +61,21 @@ public class TermboxScreen: ScreenType {
         Termbox.render()
     }
 
-    public func nextEvent(buffer: Buffer) -> Event? {
-        var event: Event? = nil
+    func nextEvent() -> Event? {
+        guard didSendFirstResize else {
+            didSendFirstResize = true
+            return .window(width: Int(size.width), height: Int(size.height))
+        }
+
+        let event: Event?
         if queuedEvents.count > 0 {
             event = queuedEvents.removeFirst()
-        }
-        else {
+        } else {
             let termboxEvent = Termbox.peekEvent(timeoutInMilliseconds: 1)
             event = convertTermboxEvent(termboxEvent)
         }
 
-        if let event = event, case let .mouse(mouse) = event {
-            guard let row = buffer.mouse[mouse.y], let info = row[mouse.x] else { return nil }
-            return .mouse(mouse.on(info: info))
-        }
-        else {
-            return event
-        }
+        return event
     }
 
     private func convertTermboxEvent(_ termboxEvent: TermboxEvent) -> Event? {
@@ -98,7 +97,8 @@ public class TermboxScreen: ScreenType {
         return nil
     }
 
-    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse) -> MouseEvent
+    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse)
+        -> MouseEvent
         .Event
     {
         if let prevMouseClick = currentMouseClick,
@@ -106,34 +106,32 @@ public class TermboxScreen: ScreenType {
             type != .wheelUp,
             type != .wheelDown
         {
-            if type == .left, prevMouseClick.button == .left {
+            if type == .left, prevMouseClick == .left {
                 return .drag(.left)
-            }
-            else if type == .middle, prevMouseClick.button == .middle {
+            } else if type == .middle, prevMouseClick == .middle {
                 return .drag(.middle)
-            }
-            else if type == .right, prevMouseClick.button == .right {
+            } else if type == .right, prevMouseClick == .right {
                 return .drag(.right)
             }
 
             currentMouseClick = nil
             let nextEvent = termboxMouseEvent(x, y, type)
             queuedEvents.append(.mouse(MouseEvent(x: Int(x), y: Int(y), event: nextEvent)))
-            return .release(prevMouseClick.button)
+            return .release(prevMouseClick)
         }
 
         switch type {
         case .left:
-            currentMouseClick = (x: x, y: y, button: .left)
+            currentMouseClick = .left
             return .click(.left)
         case .right:
-            currentMouseClick = (x: x, y: y, button: .right)
+            currentMouseClick = .right
             return .click(.right)
         case .middle:
-            currentMouseClick = (x: x, y: y, button: .middle)
+            currentMouseClick = .middle
             return .click(.middle)
         case .release:
-            let button = currentMouseClick?.button ?? .left
+            let button = currentMouseClick ?? .left
             currentMouseClick = nil
             return .release(button)
         case .wheelUp:

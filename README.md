@@ -49,13 +49,13 @@ rendering output is stateless; it is based the model, and you render _all_ the
 views and their properties based on that state.
 
 ```swift
-func render(model: Model, in screenSize: Size) -> Component {
+func render(model: Model, size: Size) -> View<Message> {
     guard
         let data = model.data
     else {
         // no data?  Show the spinner.  Defaults to centering itself in the
         // parent view.
-        return SpinnerView()
+        return Spinner()
     }
 
     // data is available - use a rowHeight based on the available viewport
@@ -70,8 +70,8 @@ func render(model: Model, in screenSize: Size) -> Component {
       rowHeight = 1
     }
 
-    return Window(components: [
-        LabelView(text: "Our things"),
+    return Stack(.topToBottom, [
+        Text("Our things"),
         ListView(dataList: data, rowHeight: rowHeight) { row in
             LabelView(text: row.title)
         }
@@ -110,13 +110,13 @@ enum Message {
     case received(Result<(Int, Headers, Data), HttpError>)
 }
 
-func initial() -> (Model, [Command]) {
+func initial() -> Initial<Model, Message> {
     let url = URL(string: "http://example.com")!
     let cmd = Http.get(url) { result in
       Message.received(result)
     }
 
-    return (Model(), [cmd])
+    return Initial(Model(), [cmd])
 }
 ```
 
@@ -130,12 +130,15 @@ In your application's `update()` function, you will instruct the runtime how the
 message affects your state. Your options are:
 
 -   `.noChange` — ignore the message
--   `.model()` — return an updated model (shortcut for `.update(model, [])`)
--   `.update()` — return a model and a list of Commands to run
+-   `.update(model, [cmds])` — return a model and a list of Commands to run
 -   `.quit` — graceful exit (usually means exit with status 0)
--   `.quitAnd()`— graceful exit with a closure that runs just before the runtime
-    is done cleaning up
--   `.error()` — indicate that an error occurred (usually means exit with non-zero status)
+-   `.quitAnd({ ... })`— graceful exit with a closure that runs just before the runtime
+    is done cleaning up. You can also throw an error in that closure.
+
+For convenience there are two helper "types":
+
+-   `.model(model)` — return just updated model, no commands (shortcut for `.update(model, [])`)
+-   `.error(error)` — quit and raise an error.
 
 # Program
 
@@ -146,7 +149,7 @@ Here's a skeleton program template:
 // by `App`.  If you are designing a subprogram, you need not adhere to
 // `Program`, though it is handy because you can easily test *just* that part of
 // your application.
-struct SpinnersDemo: Program {
+struct SpinnersDemo {
     // This is usually an enum, but it can be any type.  Your app will respond
     // to state changes by accepting a `Message` and returning a modified
     // `Model`.
@@ -164,8 +167,8 @@ struct SpinnersDemo: Program {
     // `loading/loaded/error` enum to represent the initial state.  If you
     // persist your application to the database you could load that here, either
     // synchronously or via a `Command`.
-    func initial() -> (Model, [Command]) {
-        (Model(), [])
+    func initial() -> Initial<Model, Message> {
+        Initial(Model())
     }
 
     // Ashen will call this method with the current model, and a message that
@@ -178,126 +181,98 @@ struct SpinnersDemo: Program {
     // another form of event emitters, like Components, but they talk with
     // external services, either asynchronously or synchronously.
     func update(model: inout Model, message: Message)
-        -> Update<Model>
+        -> State<Model, Message>
     {
-        .noChange
-        // or .stop(.quit)
-        // or .stop(.error)
-        // or .model(model)
-        // or .commands([])
-        // or .update(model, [])
+        switch message {
+        case .quit:
+            return .quit
+        }
     }
 
     // Finally the render() method is given a model and a size, and you return
     // a component - usually a Window or Box that contains child components. The
     // screenSize is used to assist view sizing or adaptive layouts.  render()
     // is also called when the window is resized.
-    func render(model: Model, in screenSize: Size) -> Component {
+    func render(model: Model, in screenSize: Size) -> View<Message> {
         let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
-            SpinnerView(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
+            Spinner(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
         }
-        return Window(
-            components: spinners + [
+        return Stack(.down, // alias for .topToBottom
+            spinners + [
                 OnKeyPress(.enter, { Message.quit }),
             ])
-    }
-
-    // The `start` function is called with your command, and a callback you can
-    // call with one of your program's `Message` values.  The `send` callback is
-    // called asynchronously, e.g. after an HTTP or background process.  It can
-    // be called any number of times, e.g. for progress messages.
-    func start(command: Command, send: @escaping (Message) -> Void) {
     }
 }
 ```
 
 ## Running your Program
 
-To run your program, create an app and run it, passing in a program and a
+To run your program, pass your `initial`, `update`, and `view`, passing in a program and a
 screen. It will return `.quit` or `.error`, depending on how the program
 exited. `TermboxScreen` is recommended for the screen parameter, but in theory
 you could create a `ScreenType` for other output paradigms.
 
 ```swift
-let app = App(program: YourProgram())  // default screen is TermboxScreen()
 do {
-    app.run()
+    try Ashen(Program(initial, update, view))
     exit(EX_OK)
 } catch {
     exit(EX_IOERR)
 }
 ```
 
-Important note: ALL Ashen programs can be aborted using `ctrl+c` and `ctrl+d`.
-`ctrl+c` is considered an error/abort and `ctrl+d` is considered a graceful
-exit. If you want to respond to these events, you can include special messages
-to `Ashen.run()`:
+Important note: ALL Ashen programs can be aborted using `ctrl+c` and `ctrl+\`.
+`ctrl+c` is considered an error/abort and `ctrl+\` is considered a graceful
+exit.
 
-```swift
-let app = App(program: YourProgram())  // default screen is TermboxScreen()
-```
+# Views
 
-## Location and Size structs
+- `Text()` - display text or attributed text.
+    ```swift
+    Text("Some plain text")
+    Text("Some underlined text".underlined())
+    ```
+- `Box()` - surround a view with a customizable border.
+    ```swift
+    Box(view)
+    Box(view, .border(.double))
+    Box(view, .border(.double), .title("Welcome".bold()))
+    ```
+- `Flow()` - arrange views using a flexbox *like* layout.
+    ```swift
+    Flow(.leftToRight, [  // alias: .ltr
+        (.fixed, Text(" ")),
+        (.flex(1), Text(Hi!).underlined()), // this view will stretch to fill the available space
+        (.fixed, Text(" ")),
+    ])
+    Flow(.bottomToTop, views)
+    ```
+- `Columns()` - arrange views horizontally, equally sized and taking up all space.
+    ```swift
+    Columns(views)
+    ```
+- `Rows()` - arrange views vertically, equally sized and taking up all space.
+    ```swift
+    Rows(views)
+    ```
+- `Stack()` - arrange views according to their preferred (usually smallest) size.
+    ```swift
+    Stack(.ltr, views)
+    ```
+- `Frame()` - place a view inside a container that fills the available space, and supports alignment.
+    ```swift
+    Frame(Text("Hi!"), .alignment(.middleCenter))
+    ```
+- `Spinner()` - show a simple 1x1 spinner animation
+    ```swift
+    Spinner()
+    ```
 
-The `Location` struct is used to place your views relative to their parent
-container. There are nine locations:
+## View Modifiers
 
-```
-+------------+--------------+-------------+
-|topLeft     |   topCenter  |     topRight|  `topLeft` is so common, it has a
-|aka `at`    |   aka `top`  |             |  shorthand.
-|            |              |             |
-+------------+--------------+-------------+  The default value for most views
-|            |              |             |  is at (x: 0, y: 0)
-|middleLeft  | middleCenter |  middleRight|
-|            | aka `center` |             |
-+------------+--------------+-------------+
-|            |              |             |
-|            | aka `bottom` |             |
-|bottomLeft  | bottomCenter |  bottomRight|
-+------------+--------------+-------------+
-```
+Views can be created in a fluent syntax (these will feel much like SwiftUI, though not nearly that level of complexity & sophistication).
 
-`Size` and `DesiredSize` work hand in hand - most `ComponentView` classes expect
-an instance of `DesiredSize`, but some prefer an explicit `Size`, or others
-don't accept any size parameter. Regardless, _all_ views implement
-`func desiredSize() -> DesiredSize`, which tells parent views the ideal size for
-this view. This class has a lot of flexibility; it supports literal numbers
-(`DesiredSize(width: 100, height: 1)`), "largest of" values, and even accepts a
-closure that returns a size dynamically, based on the size of the parent view.
 
-Another way to have dynamic sizing, and this was shown above, is to change the
-layout based on the `screenSize: Size` that is passed to `render()`.
-
-###### Examples:
-
-```swift
-LabelView(at: .at(5, 10))  // label at x: 5, y: 10
-LabelView(at: .middleCenter())
-LabelView(at: .bottomRight(y: -1))  // in bottomRight corner, and up 1 row
-```
-
-Sizes can be defined absolutely, or relative to the parent view, and with positive
-or negative offsets.
-
-```swift
-// assume the parent container is width: 80, height: 30
-
-LabelView(size: DesiredSize(width: 5, height: 10))
-LabelView(size: DesiredSize(width: 10, height: .percent(100)))
-// -> width: 10, height: 30
-LabelView(size: DesiredSize(width: .max.minus(4), height: .percent(50).plus(5)))
-// -> width: 76, height: 20
-```
-
-Using these location and size descriptions, you can accomplish the majority of
-your UI, but you can also choose to use `Layout` classes like `FlowLayout` to
-position views in a stack or row, and `GridLayout` to specify rows and columns
-of views, with weights to describe the relative sizes.
-
-## Views
-
-Todo: list the available views
 
 [elm]: http://elm-lang.org
 [react]: https://facebook.github.io/react/

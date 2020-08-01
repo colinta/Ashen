@@ -6,7 +6,6 @@ public struct MouseEvent {
     public let x: Int
     public let y: Int
     public let event: Event
-    public let component: Component?
 
     public var button: Button? {
         switch event {
@@ -15,6 +14,15 @@ public struct MouseEvent {
         case let .release(button): return button
         default:
             return nil
+        }
+    }
+
+    public var isReleased: Bool {
+        switch event {
+        case .release:
+            return true
+        default:
+            return false
         }
     }
 
@@ -40,20 +48,7 @@ public struct MouseEvent {
         self.x = x
         self.y = y
         self.event = event
-        self.component = nil
     }
-
-    init(x: Int, y: Int, event: Event, component: Component) {
-        self.x = x
-        self.y = y
-        self.event = event
-        self.component = component
-    }
-
-    func on(info: (Component, Point)) -> MouseEvent {
-        MouseEvent(x: x - info.1.x, y: y - info.1.y, event: event, component: info.0)
-    }
-
 }
 
 extension MouseEvent.Event: Equatable {
@@ -62,8 +57,8 @@ extension MouseEvent.Event: Equatable {
     }
 }
 
-public extension MouseEvent {
-    var toString: String {
+extension MouseEvent {
+    public var toString: String {
         switch self.event {
         case let .drag(btn):
             return "drag(\(x), \(y), \(btn))"
@@ -77,8 +72,8 @@ public extension MouseEvent {
     }
 }
 
-public extension MouseEvent.Event {
-    var toString: String {
+extension MouseEvent.Event {
+    public var toString: String {
         switch self {
         case let .drag(btn):
             return "drag(\(btn))"

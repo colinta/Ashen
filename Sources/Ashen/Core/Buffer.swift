@@ -2,109 +2,309 @@
 ///  Buffer.swift
 //
 
+protocol BufferKey {
+    var bufferKey: String { get }
+}
+
 public class Buffer {
-    typealias Chars = [Int: [Int: AttrCharType]]
-    typealias Mouse = [Int: [Int: (Component, Point)]]
-    private(set) var chars: Chars = [:]
-    private(set) var mouse: Mouse = [:]
-    private var offset: Point = .zero
-    private var zeroOrigin: Point = .zero
-    private var size: Size
+    public typealias Row = [Int: AttributedCharacter]
+    public typealias Chars = [Int: Row]
 
-    init(size: Size) {
-        self.size = size
-    }
-
-    public func claimMouse(rect: Rect, component: Component) {
-        for localY in rect.origin.y..<rect.origin.y + rect.size.height {
-            let y = offset.y + localY
-            guard y >= zeroOrigin.y, y < offset.y + size.height else { continue }
-            var row = mouse[y] ?? [:]
-
-            for localX in rect.origin.x..<rect.origin.x + rect.size.width {
-                let x = offset.x + localX
-                guard
-                    x >= zeroOrigin.x,
-                    x < offset.x + size.width,
-                    row[x] == nil
-                else { continue }
-
-                row[x] = (component, rect.origin + offset)
+    public static func desc(_ chars: Chars) -> String {
+        var description = ""
+        let height = chars.reduce(0) { m0, kv0 in
+            max(m0, kv0.key)
+        }
+        let width = chars.reduce(0) { memo, kv in
+            max(
+                memo,
+                kv.value.reduce(0) { m1, kv1 in
+                    max(m1, kv1.key)
+                })
+        }
+        for y in 0...height {
+            guard let row = chars[y] else {
+                description += "↩︎\n"
+                continue
             }
 
-            mouse[y] = row
+            for x in 0...width {
+                guard let c = row[x] else {
+                    description += "."
+                    continue
+                }
+
+                if c.character == "\u{0}" {
+                    description += String("◦")
+                } else {
+                    description += String(c.character)
+                }
+            }
+
+            description += "↩︎\n"
         }
+        return description
     }
 
-    public func push(offset nextOffset: Point, clip nextDesiredSize: Size, _ block: () -> Void) {
-        guard nextOffset.x < size.width, nextOffset.y < size.height else { return }
-        let nextSize = Size(
-            width: min(size.width - nextOffset.x, nextDesiredSize.width),
-            height: min(size.height - nextOffset.y, nextDesiredSize.height)
-        )
-        guard nextOffset.x + nextSize.width > 0, nextOffset.y + nextSize.height > 0 else { return }
-        guard nextSize.width > 0, nextSize.height > 0 else { return }
+    var diffedChars: Chars {
+        guard let diff = diff else { return chars }
 
+        var diffedChars: Chars = [:]
+        // assign new characters
+        for (y, row) in chars {
+            guard let diffRow = diff[y] else {
+                diffedChars[y] = row
+                continue
+            }
+
+            var renderRow: Row = [:]
+            for (x, c) in row {
+                guard let diffC = diffRow[x] else {
+                    renderRow[x] = c
+                    continue
+                }
+
+                if diffC != c {
+                    renderRow[x] = c
+                }
+            }
+            diffedChars[y] = renderRow
+        }
+
+        // overwrite removed characters with ' '
+        for (y, diffRow) in diff {
+            var renderRow: Row = diffedChars[y] ?? [:]
+            for (x, _) in diffRow {
+                if chars[y]?[x] == nil {
+                    renderRow[x] = AttributedCharacter(character: " ", attributes: [])
+                }
+            }
+            diffedChars[y] = renderRow
+        }
+
+        return diffedChars
+    }
+
+    var chars: Chars = [:]
+
+    // writing at "0, 0" writes at this offset
+    private var offset: Point = .zero
+    // as the screen is clipped, the offset can be moved *outside* the current clipped area.  The
+    // zeroOrigin refers to the point where drawing is "safe"
+    private var zeroOrigin: Point = .zero
+    // the clipped size, measured from the offset
+    private var size: Size
+    // the "model key", which stores and retrieves view models
+    private var key: String = ""
+    private var models: [String: Any]
+    private var mouse: [Int: [Int: String]]
+    private var diff: Chars?
+
+    init(size: Size, prev: Buffer?) {
+        self.size = size
+        self.models = prev?.models ?? [:]
+        self.mouse = [:]
+        self.diff = prev?.chars
+    }
+
+    func push(
+        at origin: Point,
+        clip nextDesiredSize: Size,
+        _ block: () -> Void
+    ) {
+        // this method used to guard against renders outside the clipping area,
+        // but that prevented events like `OnResize` from being called, so now
+        // the clipping guard is only in `write`. Reduces the clipping logic
+        // footprint, too, which is a win.
+
+        let nextSize = Size(
+            width: min(size.width - origin.x, nextDesiredSize.width),
+            height: min(size.height - origin.y, nextDesiredSize.height)
+        )
         let prevOffset = offset
         let prevZeroOrigin = zeroOrigin
         let prevSize = size
-        offset = Point(
-            x: offset.x + nextOffset.x,
-            y: offset.y + nextOffset.y
-        )
+
+        offset = offset + origin
         zeroOrigin = Point(
             x: max(zeroOrigin.x, offset.x),
             y: max(zeroOrigin.y, offset.y)
         )
         size = nextSize
+
         block()
+
         offset = prevOffset
         zeroOrigin = prevZeroOrigin
         size = prevSize
     }
 
-    public func write(_ attrChar: AttrCharType, x localX: Int, y localY: Int) {
+    func render<Msg>(
+        key nextKey: BufferKey,
+        view: View<Msg>,
+        at origin: Point,
+        clip nextDesiredSize: Size,
+        offset renderOffset: Point = .zero
+    ) {
+        let prevKey = key
+        key = calculateNextKey(view: view, nextKey: nextKey)
+        push(at: origin, clip: nextDesiredSize) {
+            let innerRect = Rect(origin: renderOffset, size: nextDesiredSize)
+            view.render(innerRect, self)
+
+        }
+        key = prevKey
+    }
+
+    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, view: View<Msg>) {
+        let currentKey = calculateNextKey(view: view, nextKey: nextKey)
+        let initial = rect.origin + offset
+        let maxPt = rect.origin + offset + size
         guard
-            attrChar.char != "",
-            localX >= 0, localY >= 0,
-                localX < size.width, localY < size.height
+            initial.x + rect.width > zeroOrigin.x, initial.y + rect.height > zeroOrigin.y,
+            initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
 
-        let x = localX + offset.x
-        let y = localY + offset.y
+        for y in (initial.y..<initial.y + rect.height) {
+            if y > maxPt.y { break }
+            guard y >= zeroOrigin.y else { continue }
+
+            var row = mouse[y] ?? [:]
+            for x in (initial.x..<initial.x + rect.width) {
+                if x > maxPt.x { break }
+                guard
+                    x >= zeroOrigin.x,
+                    row[x] == nil
+                else { continue }
+                row[x] = currentKey
+            }
+            mouse[y] = row
+        }
+    }
+
+    func checkMouse<Msg>(key nextKey: BufferKey, mouse: MouseEvent, view: View<Msg>) -> Bool {
+        guard let row = self.mouse[mouse.y], let checkKey = row[mouse.x] else { return false }
+        let currentKey = calculateNextKey(view: view, nextKey: nextKey)
+        return currentKey == checkKey
+    }
+
+    func events<Msg>(key nextKey: BufferKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {
+        let prevKey = key
+        key = calculateNextKey(view: view, nextKey: nextKey)
+        let events = view.events(event, self)
+        key = prevKey
+        return events
+    }
+
+    func store(_ model: Any) {
+        models[key] = model
+    }
+
+    func retrieve<T>() -> T? {
+        return models[key] as? T
+
+    }
+
+    func write(_ content: Attributed, at localPt: Point, attributes extraAttributes: [Attr] = []) {
+        let width = content.maxWidth
+        let height = content.countLines
+        let initial = localPt + offset
+        let maxPt = localPt + offset + size
         guard
-            x >= zeroOrigin.x, y >= zeroOrigin.y
+            initial.x + width > zeroOrigin.x, initial.y + height > zeroOrigin.y,
+            initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
 
+        var x = initial.x
+        var y = initial.y
         var row = chars[y] ?? [:]
-        if let prevText = row[x] {
-            if prevText.char == nil, let char = attrChar.char {
-                row[x] = AttrChar(char, prevText.attrs)
+        for ac in content.attributedCharacters {
+            if ac.character == "\n" {
+                chars[y] = row
+
+                y += 1
+                if y >= maxPt.y {
+                    // do not 'break' out of the loop, because the current line
+                    // "buffer" is assigned to self.chars
+                    return
+                }
+
+                row = chars[y] ?? [:]
+                x = initial.x
+            } else if y >= zeroOrigin.y {
+                if x >= zeroOrigin.x, x < maxPt.x {
+                    if let prevC = row[x], prevC.character == "\u{0000}" {
+                        row[x] = ac.styled(prevC.attributes + extraAttributes)
+                    } else if row[x] == nil {
+                        row[x] = ac.styled(extraAttributes)
+                    }
+                }
+                x += 1
             }
         }
-        else {
-            row[x] = attrChar
-        }
         chars[y] = row
+    }
+
+    func modifyCharacter(
+        at localPt: Point, map modify: (AttributedCharacter) -> AttributedCharacter
+    ) {
+        let point = localPt + offset
+        let maxPt = localPt + offset + size
+        guard
+            point.x + 1 > zeroOrigin.x, point.y + 1 > zeroOrigin.y,
+            point.x < maxPt.x, point.y < maxPt.y
+        else { return }
+        var row = chars[point.y] ?? [:]
+        let char = row[point.x] ?? AttributedCharacter(character: "\u{0000}", attributes: [])
+        row[point.x] = modify(char)
+        chars[point.y] = row
+    }
+
+    func modifyCharacters(
+        in localRect: Rect, map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
+    ) {
+        let initial = localRect.origin + offset
+        let maxPt = localRect.origin + offset + size
+        guard
+            initial.x + localRect.width > zeroOrigin.x, initial.y + localRect.height > zeroOrigin.y,
+            initial.x < maxPt.x, initial.y < maxPt.y
+        else { return }
+        for y in initial.y..<initial.y + localRect.height {
+            guard y >= zeroOrigin.y else { continue }
+            guard y < maxPt.y else { break }
+            for x in initial.x..<initial.x + localRect.width {
+                guard x >= zeroOrigin.x else { continue }
+                guard x < maxPt.x else { break }
+
+                var row = chars[y] ?? [:]
+                let char = row[x] ?? AttributedCharacter(character: "\u{0000}", attributes: [])
+                row[x] = modify(x, y, char)
+                chars[y] = row
+            }
+        }
+    }
+
+    func calculateNextKey<Msg>(view: View<Msg>, nextKey: BufferKey) -> String {
+        if let id = view.id {
+            return "#\(id)"
+        } else if let overrideKey = view.key {
+            return "\(key){\(overrideKey)}"
+        } else {
+            return key + nextKey.bufferKey
+        }
     }
 }
 
 extension Buffer: CustomStringConvertible {
     public var description: String {
-        var description = ""
-        for j in 0..<size.height {
-            for i in 0..<size.width {
-                guard
-                    let c = (chars[j] ?? [:])[i],
-                    let char = c.char
-                else {
-                    description += " "
-                    continue
-                }
-                description += char
-            }
-            description += "\n"
-        }
-        return description
+        Buffer.desc(chars)
     }
+}
+
+extension String: BufferKey {
+    var bufferKey: String { return ".\(self)" }
+}
+
+extension Int: BufferKey {
+    var bufferKey: String { return "[\(self)]" }
 }

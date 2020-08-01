@@ -5,9 +5,10 @@
 import XCTest
 @testable import Ashen
 
-class TodoTests: XCTestCase {
+class BasicTests: XCTestCase {
     func testAshen() {
-        let app = App(program: SpecsProgram(verbose: false), screen: SpecsScreen())
-        XCTAssertNoThrow(try app.run())
+        XCTAssertNoThrow(
+            try Ashen(Program({ Initial(1) }, { _, _ in 1 }, { _, _ in Text("") }
+            )))
     }
 }

@@ -4,7 +4,7 @@
 
 import Termbox
 
-public enum Color {
+public enum Color: Equatable {
     case none
     case black
     case red
@@ -16,7 +16,7 @@ public enum Color {
     case white
     case any(AttrSize)
 
-    var toTermbox: Attributes {
+    var toTermbox: TermboxAttributes {
         switch self {
         case .none:
             return .default
@@ -41,5 +41,9 @@ public enum Color {
             guard color >= 0 && color < 256 else { return .default }
             return Attributes(rawValue: color)
         }
+    }
+
+    public static func == (lhs: Color, rhs: Color) -> Bool {
+        lhs.toTermbox == rhs.toTermbox
     }
 }

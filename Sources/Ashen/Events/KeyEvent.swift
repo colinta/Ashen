@@ -173,8 +173,8 @@ extension KeyEvent: Equatable {
     }
 }
 
-public extension KeyEvent {
-    var isPrintable: Bool {
+extension KeyEvent {
+    public var isPrintable: Bool {
         switch self {
         case let .alt(key):
             return key.isPrintable
@@ -185,7 +185,7 @@ public extension KeyEvent {
         }
     }
 
-    var toPrintable: String {
+    public var toPrintable: String {
         switch self {
         case let .alt(key): return "\(key.toPrintable)"
         case let .char(key): return "\(key.toPrintable)"
@@ -195,7 +195,7 @@ public extension KeyEvent {
         }
     }
 
-    var toString: String {
+    public var toString: String {
         switch self {
         case let .ctrl(key): return "⌃\(key.toString.uppercased())"
         case let .alt(key): return "⌥\(key.toString)"
@@ -242,8 +242,8 @@ public enum CtrlKeyEvent {
     case end
 }
 
-public extension CtrlKeyEvent {
-    var toString: String {
+extension CtrlKeyEvent {
+    public var toString: String {
         switch self {
         case let .alt(key): return "⌥\(key.toString)"
         case .two: return "2"
@@ -419,12 +419,12 @@ public enum AltKeyEvent {
     public static let tilde: AltKeyEvent = .char(.tilde)
 }
 
-public extension AltKeyEvent {
-    var isPrintable: Bool {
+extension AltKeyEvent {
+    public var isPrintable: Bool {
         toPrintable != ""
     }
 
-    var toPrintable: String {
+    public var toPrintable: String {
         switch self {
         case .char(.a): return "å"
         case .char(.b): return "∫"
@@ -526,7 +526,7 @@ public extension AltKeyEvent {
         }
     }
 
-    var toString: String {
+    public var toString: String {
         switch self {
         case let .shift(key): return "⇧\(key.toString)"
         case let .char(key): return key.toString
@@ -550,8 +550,8 @@ public enum ShiftKeyEvent {
     case end
 }
 
-public extension ShiftKeyEvent {
-    var toString: String {
+extension ShiftKeyEvent {
+    public var toString: String {
         switch self {
         case .down: return "↓"
         case .up: return "↑"
@@ -673,15 +673,15 @@ public enum CharKeyEvent: UInt16 {
     case tilde
 }
 
-public extension CharKeyEvent {
-    var toPrintable: String {
+extension CharKeyEvent {
+    public var toPrintable: String {
         if case .space = self {
             return " "
         }
         return toString
     }
 
-    var toString: String {
+    public var toString: String {
         switch self {
         case .space: return "␣"
 
@@ -823,8 +823,8 @@ public enum FnKeyEvent {
 
 }
 
-public extension FnKeyEvent {
-    var toPrintable: String {
+extension FnKeyEvent {
+    public var toPrintable: String {
         switch self {
         case .enter:
             return "\n"
@@ -833,7 +833,7 @@ public extension FnKeyEvent {
         }
     }
 
-    var toString: String {
+    public var toString: String {
         switch self {
         case .tab: return "⇥"
         case .enter: return "↩︎"
