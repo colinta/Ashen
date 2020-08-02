@@ -45,8 +45,9 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions]) -> View<Msg> 
         + min(border.bottomSide.countLines, border.blCorner.countLines, border.brCorner.countLines)
 
     return View<Msg>(
-        preferredSize: {
-            framedInside.preferredSize($0).grow(
+        preferredSize: { size in
+            let innerSize = size.shrink(width: minSidesWidth, height: minTopsHeight)
+            return framedInside.preferredSize(innerSize).grow(
                 width: minSidesWidth,
                 height: minTopsHeight
             )
