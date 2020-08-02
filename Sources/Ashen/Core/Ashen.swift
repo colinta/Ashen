@@ -26,6 +26,20 @@ public func Ashen<Model, Msg>(_ program: Program<Model, Msg>) throws {
     try main(screen, program)
 }
 
+let messageThread = DispatchQueue(label: "messageThread")
+let commandThread = DispatchQueue(
+    label: "commandThread",
+    qos: .background
+)
+
+func sync(_ block: @escaping () -> Void) {
+    messageThread.sync(execute: block)
+}
+
+func background(_ block: @escaping () -> Void) {
+    commandThread.async(execute: block)
+}
+
 private func main<Model, Msg>(
     _ screen: TermboxScreen,
     _ program: Program<Model, Msg>
@@ -48,12 +62,23 @@ private func main<Model, Msg>(
     var prevSize: Size? = nil
 
     while true {
-        cmds.forEach { cmd in cmd.run({ msg in queue.append(msg) }) }
+        cmds.forEach { cmd in
+            background {
+                cmd.run({ msg in
+                    sync {
+                        queue.append(msg)
+                    }
+                })
+            }
+        }
         cmds = []
 
-        while !queue.isEmpty {
-            let msg = queue.removeFirst()
-
+        var currentQueue: [Msg] = []
+        sync {
+            currentQueue = queue
+            queue = []
+        }
+        for msg in currentQueue {
             let newState = program.update(&model, msg)
             switch newState {
             case .noChange:
@@ -97,7 +122,10 @@ private func main<Model, Msg>(
             }
 
             let (msgs, events) = view.events(event, buffer)
-            msgs.forEach { queue.append($0) }
+            sync {
+                msgs.forEach { queue.append($0) }
+            }
+
             for event in events {
                 if case .redraw = event {
                     shouldRender = true
