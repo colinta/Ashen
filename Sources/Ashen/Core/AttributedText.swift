@@ -79,13 +79,14 @@ extension Attributed {
             let characterWidth = Buffer.displayWidth(of: ac.character)
             if width + characterWidth > fitting {
                 current = current + buffer
-                buffer = AttributedString(ac)
+                buffer = AttributedString("")
                 shouldAddNewline = true
                 width = 0
             } else {
-                buffer = buffer + ac
-                width += characterWidth
             }
+
+            buffer = buffer + ac
+            width += characterWidth
         }
 
         if shouldAddNewline {
