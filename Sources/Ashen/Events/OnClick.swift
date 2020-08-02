@@ -9,7 +9,7 @@ public enum ClickOptions {
 private let ON_CLICK_KEY = "OnClick"
 
 public func OnLeftClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping () -> Msg, _ options: [ClickOptions] = []
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: [ClickOptions] = []
 ) -> View<Msg> {
     let clickable = OnClick(inside, { _ in msg() }, options)
     return View<Msg>(
@@ -30,7 +30,7 @@ public func OnLeftClick<Msg>(
 }
 
 public func OnRightClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping () -> Msg, _ options: [ClickOptions] = []
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: [ClickOptions] = []
 ) -> View<Msg> {
     let clickable = OnClick(inside, { _ in msg() }, options)
     return View<Msg>(
