@@ -241,7 +241,7 @@ public class Buffer {
                         row[x] = ac.styled(extraAttributes)
                     }
 
-                    for xi in 1 ..< width {
+                    for xi in 1..<width {
                         row[x + xi] = AttributedCharacter(character: "\u{FEFF}", attributes: [])
                     }
                 }
@@ -304,16 +304,13 @@ public class Buffer {
         guard
             char.unicodeScalars.count == 1,
             let val = char.unicodeScalars.first?.value,
-            val >= 0x1100 &&
-            (val <= 0x115f || val == 0x2329 || val == 0x232a ||
-                (val >= 0x2e80 && val <= 0xa4cf && val != 0x303f) ||
-                (val >= 0xac00 && val <= 0xd7a3) ||
-                (val >= 0xf900 && val <= 0xfaff) ||
-                (val >= 0xfe30 && val <= 0xfe6f) ||
-                (val >= 0xff00 && val <= 0xff60) ||
-                (val >= 0xffe0 && val <= 0xffe6) ||
-                (val >= 0x20000 && val <= 0x2fffd) ||
-                (val >= 0x30000 && val <= 0x3fffd))
+            val >= 0x1100
+                && (val <= 0x115f || val == 0x2329 || val == 0x232a
+                    || (val >= 0x2e80 && val <= 0xa4cf && val != 0x303f)
+                    || (val >= 0xac00 && val <= 0xd7a3) || (val >= 0xf900 && val <= 0xfaff)
+                    || (val >= 0xfe30 && val <= 0xfe6f) || (val >= 0xff00 && val <= 0xff60)
+                    || (val >= 0xffe0 && val <= 0xffe6) || (val >= 0x20000 && val <= 0x2fffd)
+                    || (val >= 0x30000 && val <= 0x3fffd))
         else { return 1 }
         return 2
     }

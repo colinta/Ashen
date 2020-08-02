@@ -64,13 +64,11 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                     } else {
                         remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
                     }
-                }
-                else if direction.isHorizontal {
+                } else if direction.isHorizontal {
                     remainingSize = Size(width: 0, height: remainingSize.height)
                     allSizes = Size(width: parentSize.width, height: allSizes.height)
                     break
-                }
-                else {
+                } else {
                     remainingSize = Size(width: remainingSize.width, height: 0)
                     allSizes = Size(width: allSizes.width, height: parentSize.height)
                     break

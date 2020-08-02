@@ -82,8 +82,7 @@ extension Attributed {
                 buffer = AttributedString(ac)
                 shouldAddNewline = true
                 width = 0
-            }
-            else {
+            } else {
                 buffer = buffer + ac
                 width += characterWidth
             }
