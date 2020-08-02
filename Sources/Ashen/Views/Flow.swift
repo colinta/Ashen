@@ -173,11 +173,13 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             }
         },
         events: { event, buffer in
-            views.enumerated().reduce(([Msg](), [Event]())) { info, index_view in
+            views.enumerated().reduce(([Msg](), [event])) { info, index_view in
                 let (msgs, events) = info
                 let (index, view) = (index_view.0, index_view.1.1)
-                let (newMsgs, newEvents) = buffer.events(key: index, event: event, view: view)
-                return (msgs + newMsgs, events + newEvents)
+                let (newMsgs, newEvents) = View.scan(events: events) { event in
+                    return buffer.events(key: index, event: event, view: view)
+                }
+                return (msgs + newMsgs, newEvents)
             }
         }
     )
