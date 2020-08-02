@@ -232,14 +232,20 @@ public class Buffer {
                 row = chars[y] ?? [:]
                 x = initial.x
             } else if y >= zeroOrigin.y {
+                let width = displayWidth(of: ac.character)
+
                 if x >= zeroOrigin.x, x < maxPt.x {
                     if let prevC = row[x], prevC.character == "\u{0000}" {
                         row[x] = ac.styled(prevC.attributes + extraAttributes)
                     } else if row[x] == nil {
                         row[x] = ac.styled(extraAttributes)
                     }
+
+                    for xi in 1 ..< width {
+                        row[x + xi] = AttributedCharacter(character: "\u{FEFF}", attributes: [])
+                    }
                 }
-                x += 1
+                x += width
             }
         }
         chars[y] = row
@@ -307,4 +313,22 @@ extension String: BufferKey {
 
 extension Int: BufferKey {
     var bufferKey: String { return "[\(self)]" }
+}
+
+private func displayWidth(of char: Character) -> Int {
+    guard
+        char.unicodeScalars.count == 1,
+        let val = char.unicodeScalars.first?.value,
+        val >= 0x1100 &&
+        (val <= 0x115f || val == 0x2329 || val == 0x232a ||
+            (val >= 0x2e80 && val <= 0xa4cf && val != 0x303f) ||
+            (val >= 0xac00 && val <= 0xd7a3) ||
+            (val >= 0xf900 && val <= 0xfaff) ||
+            (val >= 0xfe30 && val <= 0xfe6f) ||
+            (val >= 0xff00 && val <= 0xff60) ||
+            (val >= 0xffe0 && val <= 0xffe6) ||
+            (val >= 0x20000 && val <= 0x2fffd) ||
+            (val >= 0x30000 && val <= 0x3fffd))
+    else { return 1 }
+    return 2
 }
