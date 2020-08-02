@@ -75,7 +75,7 @@ private func main<Model, Msg>(
         let buffer: Buffer
         if shouldRender || screenSize != prevSize {
             buffer = Buffer(size: screenSize, prev: prevBuffer)
-            view = Frame(program.view(model, screenSize))
+            view = Window(program.view(model, screenSize))
             view.render(Rect(origin: .zero, size: screenSize), buffer)
             screen.render(buffer: buffer)
             shouldRender = false

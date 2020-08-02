@@ -4,7 +4,7 @@
 
 public typealias InitialFunction<Model, Msg> = () -> Initial<Model, Msg>
 public typealias UpdateFunction<Model, Msg> = (inout Model, Msg) -> State<Model, Msg>
-public typealias ViewFunction<Model, Msg> = (Model, Size) -> View<Msg>
+public typealias ViewFunction<Model, Msg> = (Model, Size) -> [View<Msg>]
 
 public struct Program<Model, Msg> {
     public let initial: InitialFunction<Model, Msg>
