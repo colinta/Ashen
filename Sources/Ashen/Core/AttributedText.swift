@@ -64,6 +64,42 @@ extension Attributed {
         AttributedString(
             characters: self.attributedCharacters.map { $0.reset() })
     }
+
+    public func insertNewlines(fitting: Int) -> AttributedString {
+        var current = AttributedString()
+        var buffer = AttributedString()
+        var width = 0
+        var shouldAddNewline = false
+        for ac in self.attributedCharacters {
+            if shouldAddNewline {
+                current = current + AttributedString("\n")
+                shouldAddNewline = false
+            }
+
+            let characterWidth = Buffer.displayWidth(of: ac.character)
+            if width + characterWidth > fitting {
+                current = current + buffer
+                buffer = AttributedString(ac)
+                shouldAddNewline = true
+                width = 0
+            }
+            else {
+                buffer = buffer + ac
+                width += characterWidth
+            }
+        }
+
+        if shouldAddNewline {
+            current = current + AttributedString("\n")
+        }
+        return current + buffer
+    }
+
+    var string: String {
+        attributedCharacters.reduce("") { str, c in
+            "\(str)\(c.character)"
+        }
+    }
 }
 
 public struct AttributedString: Attributed {
@@ -90,10 +126,14 @@ public struct AttributedString: Attributed {
         return max(maxWidth, currentWidth)
     }
 
-    public init(_ string: String, attributes: [Attr] = []) {
+    public init(_ string: String = "", attributes: [Attr] = []) {
         self.attributedCharacters = string.map {
             AttributedCharacter(character: $0, attributes: attributes)
         }
+    }
+
+    public init(_ char: AttributedCharacter) {
+        self.attributedCharacters = [char]
     }
 
     public init(characters: [AttributedCharacter]) {
@@ -106,6 +146,10 @@ public struct AttributedString: Attributed {
 
     public static func + (lhs: AttributedString, rhs: AttributedString) -> AttributedString {
         AttributedString(characters: lhs.attributedCharacters + rhs.attributedCharacters)
+    }
+
+    public static func + (lhs: AttributedString, rhs: AttributedCharacter) -> AttributedString {
+        AttributedString(characters: lhs.attributedCharacters + [rhs])
     }
 
     public static func + (lhs: String, rhs: AttributedString) -> AttributedString {
