@@ -101,14 +101,13 @@ public struct View<Msg> {
             key: key, id: id, debugName: debugName
         )
     }
-
     public func minWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: max(parent.width, width),
-                    height: parent.height
+                    width: max(previous.width, width),
+                    height: previous.height
                 )
             },
             render: render,
@@ -120,10 +119,10 @@ public struct View<Msg> {
     public func width(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
                     width: width,
-                    height: parent.height
+                    height: previous.height
                 )
             },
             render: render,
@@ -135,10 +134,10 @@ public struct View<Msg> {
     public func maxWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: min(parent.width, width),
-                    height: parent.height
+                    width: min(previous.width, width),
+                    height: previous.height
                 )
             },
             render: render,
@@ -150,10 +149,10 @@ public struct View<Msg> {
     public func minHeight(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: parent.width,
-                    height: max(parent.height, height)
+                    width: previous.width,
+                    height: max(previous.height, height)
                 )
             },
             render: render,
@@ -165,9 +164,9 @@ public struct View<Msg> {
     public func height(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: parent.width,
+                    width: previous.width,
                     height: height
                 )
             },
@@ -180,10 +179,25 @@ public struct View<Msg> {
     public func maxHeight(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: parent.width,
-                    height: min(parent.height, height)
+                    width: previous.width,
+                    height: min(previous.height, height)
+                )
+            },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+
+    public func stretch(_ orientation: Orientation) -> View<Msg> {
+        View(
+            preferredSize: { size in
+                let previous = self.preferredSize(size)
+                return Size(
+                    width: orientation == .horizontal ? size.width : previous.width,
+                    height: orientation == .vertical ? size.height : previous.height
                 )
             },
             render: render,
@@ -195,10 +209,10 @@ public struct View<Msg> {
     public func padding(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) -> View<Msg> {
         View(
             preferredSize: { size in
-                let parent = self.preferredSize(size)
+                let previous = self.preferredSize(size)
                 return Size(
-                    width: parent.width + left + right,
-                    height: parent.height + top + bottom
+                    width: previous.width + left + right,
+                    height: previous.height + top + bottom
                 )
             },
             render: { rect, buffer in
