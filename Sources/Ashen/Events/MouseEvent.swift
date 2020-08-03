@@ -26,6 +26,15 @@ public struct MouseEvent {
         }
     }
 
+    public var isDown: Bool {
+        switch event {
+        case .click, .drag:
+            return true
+        default:
+            return false
+        }
+    }
+
     public var isReleased: Bool {
         switch event {
         case .release:

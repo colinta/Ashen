@@ -15,42 +15,17 @@ struct ClickModel {
 public func OnLeftClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
 ) -> View<Msg> {
-    var highlight = false
-    for opt in options {
-        switch opt {
-        case let .highlight(highlightOpt):
-            highlight = highlightOpt
-        }
-    }
-
-    let clickable = OnClick(inside, { _ in msg() }, options)
-    return View<Msg>(
-        preferredSize: clickable.preferredSize,
-        render: clickable.render,
-        events: { event, buffer in
-            let (msgs, events) = inside.events(event, buffer)
-            return View.scan(events: events) { event in
-                guard
-                    case let .mouse(mouseEvent) = event,
-                    mouseEvent.button == .left,
-                    buffer.checkMouse(key: ON_CLICK_KEY, mouse: mouseEvent, view: inside)
-                else { return (msgs, [event]) }
-
-                if mouseEvent.isReleased {
-                    buffer.store(ClickModel(isHighlighted: false))
-                    return (msgs + [msg()], highlight ? [.redraw] : [])
-                } else if mouseEvent.isPressed && highlight {
-                    buffer.store(ClickModel(isHighlighted: true))
-                    return (msgs, [.redraw])
-                }
-                return (msgs, [])
-            }
-        }
-    )
+    OnLeftOrRightClick(.left, inside, msg, options)
 }
 
 public func OnRightClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
+) -> View<Msg> {
+    OnLeftOrRightClick(.right, inside, msg, options)
+}
+
+private func OnLeftOrRightClick<Msg>(
+    _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping () -> Msg, _ options: [ClickOptions]
 ) -> View<Msg> {
     var highlight = false
     for opt in options {
@@ -60,7 +35,7 @@ public func OnRightClick<Msg>(
         }
     }
 
-    let clickable = OnClick(inside, { _ in msg() }, options)
+    let clickable = OnClick(inside, nil, options)
     return View<Msg>(
         preferredSize: clickable.preferredSize,
         render: clickable.render,
@@ -69,14 +44,25 @@ public func OnRightClick<Msg>(
             return View.scan(events: events) { event in
                 guard
                     case let .mouse(mouseEvent) = event,
-                    mouseEvent.button == .right,
+                    mouseEvent.button == button
+                else {
+                    return (msgs, [event])
+                }
+                guard
                     buffer.checkMouse(key: ON_CLICK_KEY, mouse: mouseEvent, view: inside)
-                else { return (msgs, [event]) }
+                else {
+                    let model: ClickModel? = buffer.retrieve()
+                    if model?.isHighlighted == true {
+                        buffer.store(ClickModel(isHighlighted: false))
+                        return (msgs, [event, .redraw])
+                    }
+                    return (msgs, [event])
+                }
 
                 if mouseEvent.isReleased {
                     buffer.store(ClickModel(isHighlighted: false))
                     return (msgs + [msg()], highlight ? [.redraw] : [])
-                } else if mouseEvent.isPressed && highlight {
+                } else if mouseEvent.isDown && highlight {
                     buffer.store(ClickModel(isHighlighted: true))
                     return (msgs, [.redraw])
                 }
@@ -87,13 +73,13 @@ public func OnRightClick<Msg>(
 }
 
 public func OnClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: ClickOptions...
+    _ inside: View<Msg>, _ msg: @escaping (MouseEvent.Button) -> Msg, _ options: ClickOptions...
 ) -> View<Msg> {
     OnClick(inside, msg, options)
 }
 
 private func OnClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: [ClickOptions]
+    _ inside: View<Msg>, _ msg: ((MouseEvent.Button) -> Msg)?, _ options: [ClickOptions]
 ) -> View<Msg> {
     var highlight = false
     for opt in options {
@@ -127,9 +113,9 @@ private func OnClick<Msg>(
                     buffer.checkMouse(key: ON_CLICK_KEY, mouse: mouseEvent, view: inside)
                 else { return (msgs, [event]) }
 
-                if mouseEvent.isReleased {
+                if mouseEvent.isReleased, let button = mouseEvent.button {
                     buffer.store(ClickModel(isHighlighted: false))
-                    return (msgs + [msg(mouseEvent)], highlight ? [.redraw] : [])
+                    return (msgs + (msg.map { [$0(button)] } ?? []), highlight ? [.redraw] : [])
                 } else if mouseEvent.isPressed && highlight {
                     buffer.store(ClickModel(isHighlighted: true))
                     return (msgs, [.redraw])
