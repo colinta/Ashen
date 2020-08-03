@@ -232,6 +232,18 @@ extension View {
         )
     }
 
+    public func compact() -> View<Msg> {
+        View(
+            preferredSize: preferredSize,
+            render: { rect, buffer in
+                let size = self.preferredSize(rect.size)
+                self.render(Rect(origin: rect.origin, size: size), buffer)
+            },
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+
     public func padding(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) -> View<Msg> {
         View(
             preferredSize: { size in
