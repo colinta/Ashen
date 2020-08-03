@@ -39,7 +39,7 @@ public enum Color: Equatable {
 
         case let .any(color):
             guard color >= 0 && color < 256 else { return .default }
-            return Attributes(rawValue: color)
+            return TermboxAttributes(rawValue: color)
         }
     }
 
