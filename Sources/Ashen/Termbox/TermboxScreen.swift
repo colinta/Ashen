@@ -146,8 +146,6 @@ public class TermboxScreen {
 private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
     let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
         switch attr {
-        case .foreground(.none):
-            return memo.union(Attributes.default)
         case .background:
             return memo
         default:
@@ -160,8 +158,6 @@ private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
 private func backgroundAttrs(_ attrs: [Attr]) -> Attributes {
     let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
         switch attr {
-        case .background(.none):
-            return memo.union(Attributes.default)
         case .foreground:
             return memo
         default:
