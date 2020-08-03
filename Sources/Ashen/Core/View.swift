@@ -101,6 +101,32 @@ public struct View<Msg> {
             key: key, id: id, debugName: debugName
         )
     }
+
+    public func modifyCharacters(
+        _ modify: @escaping (Point, Size, AttributedCharacter) -> AttributedCharacter
+    ) -> View<Msg> {
+        View(
+            preferredSize: preferredSize,
+            render: { rect, buffer in
+                self.render(rect, buffer)
+                let size = rect.size
+                for y in rect.origin.y..<rect.origin.y + rect.height {
+                    for x in rect.origin.x..<rect.origin.x + rect.width {
+                        let pt = Point(x: x, y: y)
+                        buffer.modifyCharacter(at: pt) { modify(pt, size, $0) }
+                    }
+                }
+            },
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+}
+
+//
+// MARK: View + Frame size extensions
+//
+extension View {
     public func minWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
@@ -220,26 +246,6 @@ public struct View<Msg> {
                 buffer.push(at: Point(x: left, y: top), clip: innerSize) {
                     let innerRect = Rect(origin: .zero, size: innerSize)
                     self.render(innerRect, buffer)
-                }
-            },
-            events: events,
-            key: key, id: id, debugName: debugName
-        )
-    }
-
-    public func modifyCharacters(
-        _ modify: @escaping (Point, Size, AttributedCharacter) -> AttributedCharacter
-    ) -> View<Msg> {
-        View(
-            preferredSize: preferredSize,
-            render: { rect, buffer in
-                self.render(rect, buffer)
-                let size = rect.size
-                for y in rect.origin.y..<rect.origin.y + rect.height {
-                    for x in rect.origin.x..<rect.origin.x + rect.width {
-                        let pt = Point(x: x, y: y)
-                        buffer.modifyCharacter(at: pt) { modify(pt, size, $0) }
-                    }
                 }
             },
             events: events,
