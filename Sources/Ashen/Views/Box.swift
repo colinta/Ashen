@@ -14,7 +14,7 @@ extension View {
     }
 }
 
-public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions]) -> View<Msg> {
+public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<Msg> {
     var border: BoxBorder = .single
     var title: Attributed?
     var frameOptions: [FrameOptions] = []

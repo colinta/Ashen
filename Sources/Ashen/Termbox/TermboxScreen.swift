@@ -28,8 +28,9 @@ public class TermboxScreen {
     func render(buffer: Buffer) {
         let chars = buffer.diffedChars
 
-        // There were issues rendering after a screen resize, and putting in
-        // this render fixed things, but I don't understand why
+        // There were issues rendering after a screen resize (increasing the size causes
+        // characters to not be rendered, even though they are in diffedChars), and putting
+        // in this extra Termbox.render fixed things. I don't understand why.
         Termbox.render()
 
         for (y, row) in chars {

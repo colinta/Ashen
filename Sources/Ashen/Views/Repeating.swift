@@ -14,7 +14,8 @@ public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
                 x = 0
                 while x < rect.width {
                     buffer.render(
-                        key: "Repeating-\(x)-\(y)", view: view, at: Point(x: x, y: y), clip: rect.size)
+                        key: "Repeating-\(x)-\(y)", view: view, at: Point(x: x, y: y),
+                        clip: rect.size)
                     x += viewSize.width
                 }
                 y += viewSize.height

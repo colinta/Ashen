@@ -8,13 +8,23 @@ public struct AttributedCoder: Codable {
     let spans: [AttributedSpan]
 
     public init(_ attributed: Attributed) {
-        let (spans, _) = attributed.attributedCharacters.reduce(([AttributedSpan](), [Attr]())) { spans_attrs, ac in
+        let (spans, _) = attributed.attributedCharacters.reduce(([AttributedSpan](), [Attr]())) {
+            spans_attrs, ac in
             var (spans, attrs) = spans_attrs
             if ac.attributes == attrs, let last = spans.popLast() {
-                return (spans + [AttributedSpan(string: last.string + "\(ac.character)", attrs: last.attrs)], attrs)
-            }
-            else {
-                return (spans + [AttributedSpan(string: "\(ac.character)", attrs: ac.attributes.map { AttrCoder(attr: $0) })], ac.attributes)
+                return (
+                    spans + [
+                        AttributedSpan(string: last.string + "\(ac.character)", attrs: last.attrs)
+                    ], attrs
+                )
+            } else {
+                return (
+                    spans + [
+                        AttributedSpan(
+                            string: "\(ac.character)",
+                            attrs: ac.attributes.map { AttrCoder(attr: $0) })
+                    ], ac.attributes
+                )
             }
         }
         self.spans = spans
@@ -95,12 +105,10 @@ public struct AttributedCoder: Codable {
             if let namedColor = try? values.decode(NamedColor.self, forKey: .name) {
                 self.namedColor = namedColor
                 self.intColor = nil
-            }
-            else if let intColor = try? values.decode(AttrSize.self, forKey: .int){
+            } else if let intColor = try? values.decode(AttrSize.self, forKey: .int) {
                 self.namedColor = nil
                 self.intColor = intColor
-            }
-            else {
+            } else {
                 self.namedColor = nil
                 self.intColor = nil
             }
@@ -164,8 +172,7 @@ public struct AttributedCoder: Codable {
                 case .white:
                     return .white
                 }
-            }
-            else if let intColor = intColor {
+            } else if let intColor = intColor {
                 return .any(intColor)
             }
             return nil
