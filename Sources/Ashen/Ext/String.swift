@@ -17,7 +17,9 @@ extension String {
 
     public var maxWidth: Int {
         lines.reduce(0) { memo, line in
-            max(memo, line.count)
+            max(memo, line.reduce(0) { len, c in
+                len + Buffer.displayWidth(of: c)
+            })
         }
     }
 }

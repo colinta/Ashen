@@ -319,11 +319,17 @@ public class Buffer {
             val >= 0x1100
                 && (val <= 0x115f || val == 0x2329 || val == 0x232a
                     || (val >= 0x2e80 && val <= 0xa4cf && val != 0x303f)
-                    || (val >= 0xac00 && val <= 0xd7a3) || (val >= 0xf900 && val <= 0xfaff)
-                    || (val >= 0xfe30 && val <= 0xfe6f) || (val >= 0xff00 && val <= 0xff60)
-                    || (val >= 0xffe0 && val <= 0xffe6) || (val >= 0x20000 && val <= 0x2fffd)
+                    || (val >= 0xac00 && val <= 0xd7a3)
+                    || (val >= 0xf900 && val <= 0xfaff)
+                    || (val >= 0xfe30 && val <= 0xfe6f)
+                    || (val >= 0xff00 && val <= 0xff60)
+                    || (val >= 0xffe0 && val <= 0xffe6)
+                    || (val >= 0x1f004 && val <= 0x1fad6)
+                    || (val >= 0x20000 && val <= 0x2fffd)
                     || (val >= 0x30000 && val <= 0x3fffd))
-        else { return 1 }
+        else {
+            return 1
+        }
         return 2
     }
 }

@@ -74,6 +74,14 @@ extension Attributed {
         var width = 0
         var shouldAddNewline = false
         for ac in self.attributedCharacters {
+            if ac.character == "\n" {
+                current = current + buffer + AttributedString("\n")
+                buffer = AttributedString("")
+                shouldAddNewline = false
+                width = 0
+                continue
+            }
+
             if shouldAddNewline {
                 current = current + AttributedString("\n")
                 shouldAddNewline = false
@@ -85,7 +93,6 @@ extension Attributed {
                 buffer = AttributedString("")
                 shouldAddNewline = true
                 width = 0
-            } else {
             }
 
             buffer = buffer + ac
@@ -123,7 +130,7 @@ public struct AttributedString: Attributed {
             if ac.character == "\n" {
                 return (max(maxWidth, currentWidth), 0)
             } else {
-                return (maxWidth, currentWidth + 1)
+                return (maxWidth, currentWidth + Buffer.displayWidth(of: ac.character))
             }
         }
         return max(maxWidth, currentWidth)
