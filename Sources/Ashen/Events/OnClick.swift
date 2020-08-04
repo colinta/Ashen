@@ -25,9 +25,10 @@ public func OnRightClick<Msg>(
 }
 
 private func OnLeftOrRightClick<Msg>(
-    _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping () -> Msg, _ options: [ClickOptions]
+    _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping () -> Msg,
+    _ options: [ClickOptions]
 ) -> View<Msg> {
-    var highlight = false
+    var highlight = true
     for opt in options {
         switch opt {
         case let .highlight(highlightOpt):
@@ -81,7 +82,7 @@ public func OnClick<Msg>(
 private func OnClick<Msg>(
     _ inside: View<Msg>, _ msg: ((MouseEvent.Button) -> Msg)?, _ options: [ClickOptions]
 ) -> View<Msg> {
-    var highlight = false
+    var highlight = true
     for opt in options {
         switch opt {
         case let .highlight(highlightOpt):
