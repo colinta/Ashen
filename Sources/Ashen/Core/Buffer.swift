@@ -34,7 +34,7 @@ public class Buffer {
                     continue
                 }
 
-                if c.character == "\u{0}" {
+                if c.character == AttributedCharacter.null.character {
                     description += String("◦")
                 } else {
                     description += String(c.character)
@@ -76,10 +76,13 @@ public class Buffer {
             var renderRow: Row = diffedChars[y] ?? [:]
             for (x, _) in diffRow {
                 if chars[y]?[x] == nil {
-                    renderRow[x] = AttributedCharacter(character: " ", attributes: [])
+                    renderRow[x] = AttributedCharacter.null
                 }
             }
-            diffedChars[y] = renderRow
+
+            if !renderRow.isEmpty {
+                diffedChars[y] = renderRow
+            }
         }
 
         return diffedChars
@@ -235,14 +238,21 @@ public class Buffer {
                 let width = Buffer.displayWidth(of: ac.character)
 
                 if x >= zeroOrigin.x, x < maxPt.x {
-                    if let prevC = row[x], prevC.character == "\u{0000}" {
+                    var didWrite = false
+                    if let prevC = row[x],
+                        prevC.character == AttributedCharacter.null.character
+                    {
                         row[x] = ac.styled(prevC.attributes + extraAttributes)
+                        didWrite = true
                     } else if row[x] == nil {
                         row[x] = ac.styled(extraAttributes)
+                        didWrite = true
                     }
 
-                    for xi in 1..<width {
-                        row[x + xi] = AttributedCharacter(character: "\u{FEFF}", attributes: [])
+                    if didWrite {
+                        for d in 1..<width {
+                            row[x + d] = AttributedCharacter.skip
+                        }
                     }
                 }
                 x += width
@@ -261,7 +271,8 @@ public class Buffer {
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
         var row = chars[point.y] ?? [:]
-        let char = row[point.x] ?? AttributedCharacter(character: "\u{0000}", attributes: [])
+        let char = row[point.x] ?? AttributedCharacter.null
+        guard char != AttributedCharacter.skip else { return }
         row[point.x] = modify(char)
         chars[point.y] = row
     }
@@ -283,7 +294,8 @@ public class Buffer {
                 guard x < maxPt.x else { break }
 
                 var row = chars[y] ?? [:]
-                let char = row[x] ?? AttributedCharacter(character: "\u{0000}", attributes: [])
+                let char = row[x] ?? AttributedCharacter.null
+                guard char != AttributedCharacter.skip else { continue }
                 row[x] = modify(x, y, char)
                 chars[y] = row
             }

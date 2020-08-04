@@ -26,6 +26,9 @@ public struct AttributedCharacter: Equatable {
     public static func == (lhs: AttributedCharacter, rhs: AttributedCharacter) -> Bool {
         return lhs.character == rhs.character && lhs.attributes == rhs.attributes
     }
+
+    public static let skip = AttributedCharacter(character: "\u{FEFF}", attributes: [])
+    public static let null = AttributedCharacter(character: "\u{0}", attributes: [])
 }
 
 public protocol Attributed {

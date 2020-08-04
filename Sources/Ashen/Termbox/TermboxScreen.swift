@@ -36,7 +36,7 @@ public class TermboxScreen {
             guard y >= 0 && y < size.height else { continue }
             for (x, char) in row {
                 guard
-                    char.character != "\u{FEFF}",
+                    char.character != AttributedCharacter.skip.character,
                     x >= 0, x < size.width,
                     let unicodeChar = char.character.unicodeScalars.first
                 else { continue }
