@@ -140,6 +140,17 @@ public struct View<Msg> {
 // MARK: View + Frame size extensions
 //
 extension View {
+    public func size(_ size: Size) -> View<Msg> {
+        View(
+            preferredSize: { _ in
+                return size
+            },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+
     public func minWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
@@ -335,11 +346,11 @@ extension View {
         styled(.bold)
     }
 
-    public func foreground(_ color: Color) -> View<Msg> {
+    public func foreground(color: Color) -> View<Msg> {
         styled(.foreground(color))
     }
 
-    public func background(_ color: Color) -> View<Msg> {
+    public func background(color: Color) -> View<Msg> {
         styled(.background(color))
     }
 
