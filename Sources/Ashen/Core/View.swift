@@ -102,18 +102,31 @@ public struct View<Msg> {
         )
     }
 
+    public func background(view: View<Msg>) -> View<Msg> {
+        View(
+            preferredSize: preferredSize,
+            render: { rect, buffer in
+                self.render(rect, buffer)
+                Repeating(view).render(rect, buffer)
+            },
+            events: events,
+            key: key, id: id, debugName: debugName
+        )
+    }
+
     public func modifyCharacters(
         _ modify: @escaping (Point, Size, AttributedCharacter) -> AttributedCharacter
     ) -> View<Msg> {
         View(
             preferredSize: preferredSize,
             render: { rect, buffer in
+                let mask = buffer.mask
                 self.render(rect, buffer)
                 let size = rect.size
                 for y in rect.origin.y..<rect.origin.y + rect.height {
                     for x in rect.origin.x..<rect.origin.x + rect.width {
                         let pt = Point(x: x, y: y)
-                        buffer.modifyCharacter(at: pt) { modify(pt, size, $0) }
+                        buffer.modifyCharacter(at: pt, mask: mask) { modify(pt, size, $0) }
                     }
                 }
             },
@@ -274,10 +287,11 @@ extension View {
         copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
+                let mask = buffer.mask
                 self.render(rect, buffer)
                 for y in (0..<rect.height) {
                     for x in (0..<rect.width) {
-                        buffer.modifyCharacter(at: Point(x: x, y: y)) { c in
+                        buffer.modifyCharacter(at: Point(x: x, y: y), mask: mask) { c in
                             guard !c.attributes.contains(style) else { return c }
                             let newC = AttributedCharacter(
                                 character: c.character, attributes: c.attributes + [style])
@@ -298,9 +312,10 @@ extension View {
         copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
+                let mask = buffer.mask
                 self.render(rect, buffer)
                 for x in (0..<rect.width) {
-                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1)) { c in
+                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1), mask: mask) { c in
                         guard !c.attributes.contains(.underline) else { return c }
                         let newC = AttributedCharacter(
                             character: c.character, attributes: c.attributes + [.underline])
@@ -332,9 +347,12 @@ extension View {
         copy(
             preferredSize: preferredSize,
             render: { rect, buffer in
+                let mask = buffer.mask
                 self.render(rect, buffer)
                 for x in (0..<rect.width) {
-                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1)) { $0.reset() }
+                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1), mask: mask) {
+                        $0.reset()
+                    }
                 }
             },
             events: events

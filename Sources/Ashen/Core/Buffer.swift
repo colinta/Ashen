@@ -7,6 +7,7 @@ protocol BufferKey {
 }
 
 public class Buffer {
+    public typealias Mask = [Int: [Int: Bool]]
     public typealias Row = [Int: AttributedCharacter]
     public typealias Chars = [Int: Row]
 
@@ -89,6 +90,23 @@ public class Buffer {
     }
 
     var chars: Chars = [:]
+    var mask: Mask {
+        let initial = currentOffset
+        let maxPt = currentOffset + currentClipSize
+        var mask: Mask = [:]
+        for y in initial.y..<maxPt.y {
+            var row: [Int: Bool] = [:]
+            for x in initial.x..<maxPt.x {
+                guard
+                    chars[y]?[x] == nil
+                        || chars[y]?[x]?.character == AttributedCharacter.null.character
+                else { continue }
+                row[x] = true
+            }
+            mask[y] = row
+        }
+        return mask
+    }
 
     // writing at local point "0, 0" writes at this offset
     private var currentOffset: Point = .zero
@@ -262,7 +280,7 @@ public class Buffer {
     }
 
     func modifyCharacter(
-        at localPt: Point, map modify: (AttributedCharacter) -> AttributedCharacter
+        at localPt: Point, mask: Mask?, map modify: (AttributedCharacter) -> AttributedCharacter
     ) {
         let point = localPt + currentOffset
         let maxPt = currentOffset + currentClipSize
@@ -270,6 +288,8 @@ public class Buffer {
             point.x + 1 > zeroOrigin.x, point.y + 1 > zeroOrigin.y,
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
+        if let mask = mask, mask[point.y]?[point.x] != true { return }
+
         var row = chars[point.y] ?? [:]
         let char = row[point.x] ?? AttributedCharacter.null
         guard char != AttributedCharacter.skip else { return }
@@ -278,7 +298,8 @@ public class Buffer {
     }
 
     func modifyCharacters(
-        in localRect: Rect, map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
+        in localRect: Rect, mask: Mask?,
+        map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
     ) {
         let initial = localRect.origin + currentOffset
         let maxPt = currentOffset + currentClipSize
@@ -296,6 +317,7 @@ public class Buffer {
                 var row = chars[y] ?? [:]
                 let char = row[x] ?? AttributedCharacter.null
                 guard char != AttributedCharacter.skip else { continue }
+                if let mask = mask, mask[y]?[x] != true { continue }
                 row[x] = modify(x, y, char)
                 chars[y] = row
             }

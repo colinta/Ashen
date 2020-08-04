@@ -92,11 +92,13 @@ private func OnClick<Msg>(
     return View<Msg>(
         preferredSize: { inside.preferredSize($0) },
         render: { rect, buffer in
-            inside.render(rect, buffer)
             let model: ClickModel? = buffer.retrieve()
             let isHighlighted = model?.isHighlighted ?? false
+
+            let mask: Buffer.Mask? = highlight && isHighlighted ? buffer.mask : nil
+            inside.render(rect, buffer)
             if highlight && isHighlighted {
-                buffer.modifyCharacters(in: rect) { x, y, c in
+                buffer.modifyCharacters(in: rect, mask: mask) { x, y, c in
                     c.styled(.reverse)
                 }
             }
