@@ -69,7 +69,9 @@ public class Buffer {
                     renderRow[x] = c
                 }
             }
-            diffedChars[y] = renderRow
+            if !renderRow.isEmpty {
+                diffedChars[y] = renderRow
+            }
         }
 
         // overwrite removed characters with ' '
