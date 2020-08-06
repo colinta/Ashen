@@ -154,7 +154,7 @@ public class Buffer {
         let prevKey = currentKey
         currentKey = calculateNextKey(view: view, nextKey: nextKey)
         push(viewport: viewport) {
-            view.render(viewport.toLocalOrigin(), self)
+            view.render(viewport.toLocalViewport(), self)
         }
         currentKey = prevKey
     }
@@ -209,7 +209,7 @@ public class Buffer {
 
     }
 
-    func write(_ content: Attributed, at localPt: Point, attributes extraAttributes: [Attr] = []) {
+    func write(_ content: Attributed, at localPt: Point) {
         let width = content.maxWidth
         let height = content.countLines
         let initial = localPt + currentOrigin
@@ -243,10 +243,10 @@ public class Buffer {
                     if let prevC = row[x],
                         prevC.character == AttributedCharacter.null.character
                     {
-                        row[x] = ac.styled(prevC.attributes + extraAttributes)
+                        row[x] = ac.styled(prevC.attributes)
                         didWrite = true
                     } else if row[x] == nil {
-                        row[x] = ac.styled(extraAttributes)
+                        row[x] = ac
                         didWrite = true
                     }
 

@@ -62,11 +62,11 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                 return
             }
 
-            let innerBorderSize = viewport.frame.size.shrink(
+            let innerBorderSize = viewport.size.shrink(
                 width: minSidesWidth,
                 height: minTopsHeight
             )
-            let innerVisibleSize = viewport.frame.size.shrink(
+            let innerVisibleSize = viewport.size.shrink(
                 width: maxSidesWidth,
                 height: maxTopsHeight
             )
@@ -74,16 +74,16 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
             buffer.write(border.tlCorner, at: .zero)
             buffer.write(
                 border.trCorner,
-                at: Point(x: viewport.frame.size.width - border.trCorner.maxWidth, y: 0)
+                at: Point(x: viewport.size.width - border.trCorner.maxWidth, y: 0)
             )
             buffer.write(
                 border.blCorner,
-                at: Point(x: 0, y: viewport.frame.size.height - border.blCorner.countLines))
+                at: Point(x: 0, y: viewport.size.height - border.blCorner.countLines))
             buffer.write(
                 border.brCorner,
                 at: Point(
-                    x: viewport.frame.size.width - border.trCorner.maxWidth,
-                    y: viewport.frame.size.height - border.brCorner.countLines))
+                    x: viewport.size.width - border.trCorner.maxWidth,
+                    y: viewport.size.height - border.brCorner.countLines))
 
             if let title = title {
                 let titleWidth = title.maxWidth
@@ -100,18 +100,18 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                 buffer.write(
                     border.leftCap,
                     at: Point(
-                        x: viewport.frame.size.width - border.trCorner.maxWidth - rightWidth
+                        x: viewport.size.width - border.trCorner.maxWidth - rightWidth
                             - border.leftCap.maxWidth, y: 0))
                 buffer.write(
-                    " ",
+                    " ".underlined(),
                     at: Point(
                         x: border.tlCorner.maxWidth + leftWidth + border.rightCap.maxWidth,
-                        y: titleY), attributes: [.underline])
+                        y: titleY))
                 buffer.write(
-                    titleTextWidth < titleWidth ? "…" : " ",
+                    (titleTextWidth < titleWidth ? "…" : " ").underlined(),
                     at: Point(
-                        x: viewport.frame.size.width - rightWidth - border.leftCap.maxWidth
-                            - border.trCorner.maxWidth - 1, y: titleY), attributes: [.underline])
+                        x: viewport.size.width - rightWidth - border.leftCap.maxWidth
+                            - border.trCorner.maxWidth - 1, y: titleY))
 
                 var x = 0
                 while x < innerBorderSize.width {
@@ -126,14 +126,14 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                         border.bottomSide,
                         at: Point(
                             x: x + border.tlCorner.maxWidth,
-                            y: viewport.frame.size.height - border.topSide.countLines))
+                            y: viewport.size.height - border.topSide.countLines))
                     x += border.topSide.maxWidth
                 }
                 buffer.write(
-                    title,
+                    title.underlined(),
                     at: Point(
                         x: border.tlCorner.maxWidth + leftWidth + border.rightCap.maxWidth + 1,
-                        y: titleY), attributes: [.underline])
+                        y: titleY))
             } else {
                 var x = 0
                 while x < innerBorderSize.width {
@@ -144,7 +144,7 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                             border.bottomSide,
                             at: Point(
                                 x: x + border.tlCorner.maxWidth,
-                                y: viewport.frame.size.height - border.topSide.countLines))
+                                y: viewport.size.height - border.topSide.countLines))
                     }
                     x += border.topSide.maxWidth
                 }
@@ -158,7 +158,7 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                     buffer.write(
                         border.rightSide,
                         at: Point(
-                            x: viewport.frame.size.width - border.rightSide.maxWidth,
+                            x: viewport.size.width - border.rightSide.maxWidth,
                             y: y + border.tlCorner.countLines
                         ))
                 }

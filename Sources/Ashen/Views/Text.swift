@@ -28,7 +28,7 @@ public func Text<Msg>(_ text: Attributed, _ options: TextOptions...) -> View<Msg
             guard wrap else {
                 return buffer.write(text, at: .zero)
             }
-            let withNewlines = text.insertNewlines(fitting: viewport.frame.size.width)
+            let withNewlines = text.insertNewlines(fitting: viewport.size.width)
             buffer.write(withNewlines, at: .zero)
         },
         events: { event, _ in ([], [event]) },

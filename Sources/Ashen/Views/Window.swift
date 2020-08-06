@@ -15,7 +15,7 @@ public func Window<Msg>(_ views: [View<Msg>]) -> View<Msg> {
 
             for (index, view) in views.enumerated() {
                 buffer.render(
-                    key: index, view: view, viewport: viewport)
+                    key: index, view: view, viewport: viewport.toViewport())
             }
         },
         events: { event, buffer in

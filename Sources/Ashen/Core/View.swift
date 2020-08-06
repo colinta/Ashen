@@ -4,7 +4,7 @@
 
 public struct View<Msg> {
     let preferredSize: (Size) -> Size
-    let render: (Viewport, Buffer) -> Void
+    let render: (LocalViewport, Buffer) -> Void
     let events: (Event, Buffer) -> ([Msg], [Event])
     let key: String?
     let id: String?
@@ -12,7 +12,7 @@ public struct View<Msg> {
 
     public init(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Viewport, Buffer) -> Void,
+        render: @escaping (LocalViewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
         debugName: String = ""
     ) {
@@ -26,7 +26,7 @@ public struct View<Msg> {
 
     private init(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Viewport, Buffer) -> Void,
+        render: @escaping (LocalViewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
         key: String?, id: String?, debugName: String
     ) {
@@ -49,7 +49,7 @@ public struct View<Msg> {
 
     public func copy(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Viewport, Buffer) -> Void,
+        render: @escaping (LocalViewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event])
     ) -> View<Msg> {
         View(
@@ -123,7 +123,7 @@ public struct View<Msg> {
             render: { viewport, buffer in
                 let mask = buffer.mask
                 self.render(viewport, buffer)
-                let size = viewport.frame.size
+                let size = viewport.size
                 for y in viewport.mask.minY..<viewport.mask.minY + viewport.mask.height {
                     for x in viewport.mask.minX..<viewport.mask.minX + viewport.mask.width {
                         let pt = Point(x: x, y: y)
@@ -178,7 +178,7 @@ extension View {
             },
             render: { viewport, buffer in
                 let innerViewport = viewport.limit(width: width)
-                buffer.push(viewport: innerViewport) {
+                buffer.push(viewport: innerViewport.toViewport()) {
                     self.render(innerViewport, buffer)
                 }
             },
@@ -198,7 +198,7 @@ extension View {
             },
             render: { viewport, buffer in
                 let innerViewport = viewport.limit(width: width)
-                buffer.push(viewport: innerViewport) {
+                buffer.push(viewport: innerViewport.toViewport()) {
                     self.render(innerViewport, buffer)
                 }
             },
@@ -233,7 +233,7 @@ extension View {
             },
             render: { viewport, buffer in
                 let innerViewport = viewport.limit(height: height)
-                buffer.push(viewport: innerViewport) {
+                buffer.push(viewport: innerViewport.toViewport()) {
                     self.render(innerViewport, buffer)
                 }
             },
@@ -253,7 +253,7 @@ extension View {
             },
             render: { viewport, buffer in
                 let innerViewport = viewport.limit(height: height)
-                buffer.push(viewport: innerViewport) {
+                buffer.push(viewport: innerViewport.toViewport()) {
                     self.render(innerViewport, buffer)
                 }
             },
@@ -281,9 +281,9 @@ extension View {
         View(
             preferredSize: preferredSize,
             render: { viewport, buffer in
-                let size = self.preferredSize(viewport.frame.size)
-                let innerViewport = Viewport(
-                    frame: Rect(origin: .zero, size: size), mask: viewport.mask)
+                let size = self.preferredSize(viewport.size)
+                let innerViewport = LocalViewport(
+                    size: size, mask: viewport.mask)
                 self.render(innerViewport, buffer)
             },
             events: events,
@@ -301,11 +301,11 @@ extension View {
                 )
             },
             render: { viewport, buffer in
-                let innerSize = viewport.frame.size.shrink(
+                let innerSize = viewport.size.shrink(
                     width: left + right, height: top + bottom)
                 let innerViewport = Viewport(Rect(origin: Point(x: left, y: top), size: innerSize))
                 buffer.push(viewport: innerViewport) {
-                    self.render(innerViewport.toLocalOrigin(), buffer)
+                    self.render(innerViewport.toLocalViewport(), buffer)
                 }
             },
             events: events,
@@ -324,8 +324,8 @@ extension View {
             render: { viewport, buffer in
                 let mask = buffer.mask
                 self.render(viewport, buffer)
-                for y in (0..<viewport.frame.size.height) {
-                    for x in (0..<viewport.frame.size.width) {
+                for y in (0..<viewport.size.height) {
+                    for x in (0..<viewport.size.width) {
                         buffer.modifyCharacter(at: Point(x: x, y: y), mask: mask) { c in
                             guard !c.attributes.contains(style) else { return c }
                             let newC = AttributedCharacter(
@@ -349,9 +349,9 @@ extension View {
             render: { viewport, buffer in
                 let mask = buffer.mask
                 self.render(viewport, buffer)
-                for x in (0..<viewport.frame.size.width) {
+                for x in (0..<viewport.size.width) {
                     buffer.modifyCharacter(
-                        at: Point(x: x, y: viewport.frame.size.height - 1), mask: mask
+                        at: Point(x: x, y: viewport.size.height - 1), mask: mask
                     ) { c in
                         guard !c.attributes.contains(.underline) else { return c }
                         let newC = AttributedCharacter(
@@ -386,9 +386,9 @@ extension View {
             render: { viewport, buffer in
                 let mask = buffer.mask
                 self.render(viewport, buffer)
-                for x in (0..<viewport.frame.size.width) {
+                for x in (0..<viewport.size.width) {
                     buffer.modifyCharacter(
-                        at: Point(x: x, y: viewport.frame.size.height - 1), mask: mask
+                        at: Point(x: x, y: viewport.size.height - 1), mask: mask
                     ) {
                         $0.reset()
                     }

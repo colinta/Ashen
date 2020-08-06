@@ -96,7 +96,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                 return
             }
 
-            var remainingSize = viewport.frame.size
+            var remainingSize = viewport.size
             var flexTotal: Float = 0
             var preferredSizes: [Int: Size] = [:]
             var lastFlexIndex = 0
@@ -125,9 +125,9 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             case .leftToRight, .topToBottom:
                 cursor = .zero
             case .rightToLeft:
-                cursor = Point(x: viewport.frame.size.width, y: 0)
+                cursor = Point(x: viewport.size.width, y: 0)
             case .bottomToTop:
-                cursor = Point(x: 0, y: viewport.frame.size.height)
+                cursor = Point(x: 0, y: viewport.size.height)
             }
 
             for (index, (flowSize, view)) in views.enumerated() {
@@ -141,23 +141,23 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                             isLast
                             ? remainingFlexSize.width
                             : Int((flexPercent * Float(startingFlexSize.width)).rounded())
-                        viewSize = Size(width: width, height: viewport.frame.size.height)
+                        viewSize = Size(width: width, height: viewport.size.height)
                         remainingFlexSize = remainingFlexSize - Size(width: width, height: 0)
                     } else {
                         let height =
                             isLast
                             ? remainingFlexSize.height
                             : Int((flexPercent * Float(startingFlexSize.height)).rounded())
-                        viewSize = Size(width: viewport.frame.size.width, height: height)
+                        viewSize = Size(width: viewport.size.width, height: height)
                         remainingFlexSize = remainingFlexSize - Size(width: 0, height: height)
                     }
                 case .fixed:
                     if direction.isHorizontal {
                         viewSize = Size(
-                            width: preferredSizes[index]!.width, height: viewport.frame.size.height)
+                            width: preferredSizes[index]!.width, height: viewport.size.height)
                     } else {
                         viewSize = Size(
-                            width: viewport.frame.size.width, height: preferredSizes[index]!.height)
+                            width: viewport.size.width, height: preferredSizes[index]!.height)
                     }
                 }
 

@@ -108,7 +108,7 @@ private func OnClick<Msg>(
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
             buffer.claimMouse(
-                key: ON_CLICK_KEY, rect: Rect(origin: .zero, size: viewport.frame.size),
+                key: ON_CLICK_KEY, rect: Rect(origin: .zero, size: viewport.size),
                 view: inside)
         },
         events: { event, buffer in

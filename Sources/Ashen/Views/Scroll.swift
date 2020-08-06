@@ -31,7 +31,7 @@ public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOptions...) -> Vie
                 return
             }
 
-            let innerPreferredSize = inside.preferredSize(viewport.frame.size)
+            let innerPreferredSize = inside.preferredSize(viewport.size)
 
             let scrollViewport = Viewport(
                 frame: Rect(origin: viewport.mask.origin - offset, size: innerPreferredSize),

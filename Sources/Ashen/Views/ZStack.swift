@@ -20,7 +20,7 @@ public func ZStack<Msg>(_ views: [View<Msg>]) -> View<Msg> {
         render: { viewport, buffer in
             for (index, view) in views.enumerated() {
                 buffer.render(
-                    key: index, view: view, viewport: viewport)
+                    key: index, view: view, viewport: viewport.toViewport())
             }
         },
         events: { event, buffer in

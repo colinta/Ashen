@@ -33,7 +33,7 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> V
                 return
             }
 
-            let innerPreferredSize = inside.preferredSize(viewport.frame.size)
+            let innerPreferredSize = inside.preferredSize(viewport.size)
 
             let positionX: Int
             let positionY: Int
@@ -41,17 +41,17 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> V
             case .topLeft, .middleLeft, .bottomLeft:
                 positionX = 0
             case .topCenter, .middleCenter, .bottomCenter:
-                positionX = Int((viewport.frame.size.width - innerPreferredSize.width) / 2)
+                positionX = Int((viewport.size.width - innerPreferredSize.width) / 2)
             case .topRight, .middleRight, .bottomRight:
-                positionX = viewport.frame.size.width - innerPreferredSize.width
+                positionX = viewport.size.width - innerPreferredSize.width
             }
             switch alignment {
             case .topLeft, .topCenter, .topRight:
                 positionY = 0
             case .middleLeft, .middleCenter, .middleRight:
-                positionY = Int((viewport.frame.size.height - innerPreferredSize.height) / 2)
+                positionY = Int((viewport.size.height - innerPreferredSize.height) / 2)
             case .bottomLeft, .bottomCenter, .bottomRight:
-                positionY = viewport.frame.size.height - innerPreferredSize.height
+                positionY = viewport.size.height - innerPreferredSize.height
             }
 
             buffer.render(
