@@ -26,8 +26,8 @@ public struct Viewport: Equatable {
     public static let zero: Viewport = Viewport(frame: .zero, mask: .zero)
 
     public func limit(width: Int) -> Viewport {
-        let maxFrameX = frame.x + width
-        let maxMaskWidth = maxFrameX - mask.x
+        let maxFrameX = frame.minX + width
+        let maxMaskWidth = maxFrameX - mask.minX
         return Viewport(
             frame: frame.sized(width: min(frame.width, width)),
             mask: mask.sized(width: min(mask.width, maxMaskWidth))
@@ -35,8 +35,8 @@ public struct Viewport: Equatable {
     }
 
     public func limit(height: Int) -> Viewport {
-        let maxFrameY = frame.y + height
-        let maxMaskHeight = maxFrameY - mask.y
+        let maxFrameY = frame.minY + height
+        let maxMaskHeight = maxFrameY - mask.minY
         return Viewport(
             frame: frame.sized(height: min(frame.height, height)),
             mask: mask.sized(height: min(mask.height, maxMaskHeight))

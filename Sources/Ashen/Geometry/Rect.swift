@@ -6,9 +6,9 @@ public struct Rect: Equatable {
     public let origin: Point
     public let size: Size
 
-    public var x: Int { origin.x }
+    public var minX: Int { origin.x }
     public var maxX: Int { origin.x + size.width }
-    public var y: Int { origin.y }
+    public var minY: Int { origin.y }
     public var maxY: Int { origin.y + size.height }
     public var width: Int { size.width }
     public var height: Int { size.height }
@@ -52,10 +52,10 @@ public struct Rect: Equatable {
     }
 
     public func intersection(with rect: Rect) -> Rect {
-        let x0 = max(x, rect.x)
-        let x1 = min(x + width, rect.x + rect.width)
-        let y0 = max(y, rect.y)
-        let y1 = min(y + height, rect.y + rect.height)
+        let x0 = max(minX, rect.minX)
+        let x1 = min(maxX, rect.maxX)
+        let y0 = max(minY, rect.minY)
+        let y1 = min(maxY, rect.maxY)
         return Rect(origin: Point(x: x0, y: y0), size: Size(width: x1 - x0, height: y1 - y0))
     }
 

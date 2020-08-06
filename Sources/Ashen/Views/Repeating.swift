@@ -10,8 +10,8 @@ public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
 
             let viewSize = view.preferredSize(viewport.frame.size)
             guard viewSize.width > 0, viewSize.height > 0 else { return }
-            var y = Int(viewport.mask.y / viewSize.height)
-            let x0 = Int(viewport.mask.x / viewSize.width)
+            var y = Int(viewport.mask.minY / viewSize.height)
+            let x0 = Int(viewport.mask.minX / viewSize.width)
             var x: Int
             while y < viewport.mask.height {
                 x = x0

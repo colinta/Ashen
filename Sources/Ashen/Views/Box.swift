@@ -138,7 +138,7 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                 var x = 0
                 while x < innerBorderSize.width {
                     guard x < viewport.mask.maxX else { break }
-                    if x + border.topSide.maxWidth >= viewport.mask.x {
+                    if x + border.topSide.maxWidth >= viewport.mask.minX {
                         buffer.write(border.topSide, at: Point(x: x + border.tlCorner.maxWidth, y: 0))
                         buffer.write(
                             border.bottomSide,
@@ -153,7 +153,7 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
             var y = 0
             while y < innerBorderSize.height {
                 guard y < viewport.mask.maxY else { break }
-                if y + border.leftSide.countLines >= viewport.mask.y {
+                if y + border.leftSide.countLines >= viewport.mask.minY {
                     buffer.write(border.leftSide, at: Point(x: 0, y: y + border.tlCorner.countLines))
                     buffer.write(
                         border.rightSide,
