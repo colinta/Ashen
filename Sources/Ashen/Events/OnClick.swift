@@ -15,13 +15,13 @@ struct ClickModel {
 public func OnLeftClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
 ) -> View<Msg> {
-    OnLeftOrRightClick(.left, inside, msg, options)
+    OnLeftOrRightClick(.left, inside, msg, options).debugName("OnLeftClick")
 }
 
 public func OnRightClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
 ) -> View<Msg> {
-    OnLeftOrRightClick(.right, inside, msg, options)
+    OnLeftOrRightClick(.right, inside, msg, options).debugName("OnRightClick")
 }
 
 private func OnLeftOrRightClick<Msg>(
@@ -69,7 +69,8 @@ private func OnLeftOrRightClick<Msg>(
                 }
                 return (msgs, [])
             }
-        }
+        },
+        debugName: ""
     )
 }
 
@@ -127,6 +128,7 @@ private func OnClick<Msg>(
                 }
                 return (msgs, [event])
             }
-        }
+        },
+        debugName: "OnClick"
     )
 }

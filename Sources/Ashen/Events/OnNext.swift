@@ -9,6 +9,7 @@ public func OnNext<Msg>(_ onNext: @escaping SimpleHandler<Msg>) -> View<Msg> {
         events: { event, buffer in
             guard case .tick = event else { return ([], [event]) }
             return ([onNext()], [event])
-        }
+        },
+        debugName: "OnNext"
     )
 }

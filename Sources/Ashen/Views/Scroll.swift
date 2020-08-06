@@ -43,6 +43,7 @@ public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOptions...) -> Vie
         },
         events: { event, buffer in
             buffer.events(key: "Scroll", event: event, view: inside)
-        }
+        },
+        debugName: "Scroll"
     )
 }

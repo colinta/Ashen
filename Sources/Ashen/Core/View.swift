@@ -8,26 +8,27 @@ public struct View<Msg> {
     let events: (Event, Buffer) -> ([Msg], [Event])
     let key: String?
     let id: String?
-    let debugName: String?
+    let debugName: String
 
-    init(
+    public init(
         preferredSize: @escaping (Size) -> Size,
         render: @escaping (Viewport, Buffer) -> Void,
-        events: @escaping (Event, Buffer) -> ([Msg], [Event])
+        events: @escaping (Event, Buffer) -> ([Msg], [Event]),
+        debugName: String = ""
     ) {
         self.preferredSize = preferredSize
         self.render = render
         self.events = events
         self.key = nil
         self.id = nil
-        self.debugName = nil
+        self.debugName = debugName
     }
 
     private init(
         preferredSize: @escaping (Size) -> Size,
         render: @escaping (Viewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
-        key: String?, id: String?, debugName: String?
+        key: String?, id: String?, debugName: String
     ) {
         self.preferredSize = preferredSize
         self.render = render
@@ -110,7 +111,7 @@ public struct View<Msg> {
                 Repeating(view).render(viewport, buffer)
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".background(\(view.debugName))"
         )
     }
 
@@ -147,7 +148,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".size(\(size))"
         )
     }
 
@@ -162,7 +163,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".minWidth(\(width))"
         )
     }
 
@@ -182,7 +183,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".width(\(width))"
         )
     }
 
@@ -202,7 +203,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".maxWidth(\(width))"
         )
     }
 
@@ -217,7 +218,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".minHeight(\(height))"
         )
     }
 
@@ -237,7 +238,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".height(\(height))"
         )
     }
 
@@ -257,7 +258,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".maxHeight(\(height))"
         )
     }
 
@@ -272,7 +273,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".stretch(\(orientation))"
         )
     }
 
@@ -286,7 +287,7 @@ extension View {
                 self.render(innerViewport, buffer)
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".compact()"
         )
     }
 
@@ -308,7 +309,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            key: key, id: id, debugName: debugName + ".padding(top: \(top), left: \(left), bottom: \(bottom), right: \(right))"
         )
     }
 }

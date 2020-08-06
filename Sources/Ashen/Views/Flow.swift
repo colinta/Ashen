@@ -35,15 +35,15 @@ public enum FlowSize {
 }
 
 public func Columns<Msg>(_ views: [View<Msg>]) -> View<Msg> {
-    Flow(.leftToRight, views.map { (.flex1, $0) })
+    Flow(.leftToRight, views.map { (.flex1, $0) }).debugName("Columns")
 }
 
 public func Rows<Msg>(_ views: [View<Msg>]) -> View<Msg> {
-    Flow(.topToBottom, views.map { (.flex1, $0) })
+    Flow(.topToBottom, views.map { (.flex1, $0) }).debugName("Rows")
 }
 
 public func Stack<Msg>(_ direction: FlowDirection, _ views: [View<Msg>]) -> View<Msg> {
-    Flow(direction, views.map { (.fixed, $0) })
+    Flow(direction, views.map { (.fixed, $0) }).debugName("Stack")
 }
 
 public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>)]) -> View<Msg> {
@@ -187,6 +187,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                 }
                 return (msgs + newMsgs, newEvents)
             }
-        }
+        },
+        debugName: "Flow"
     )
 }

@@ -9,6 +9,7 @@ public func OnWindowResize<Msg>(_ onResize: @escaping OnResizeHandler<Msg>) -> V
         events: { event, buffer in
             guard case let .window(width, height) = event else { return ([], [event]) }
             return ([onResize(Size(width: width, height: height))], [event])
-        }
+        },
+        debugName: "OnWindowResize"
     )
 }

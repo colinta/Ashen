@@ -51,6 +51,7 @@ public func OnTick<Msg>(_ onTick: @escaping OnTickHandler<Msg>, options: [OnTick
                 buffer.store(OnTickModel(timeout: nextTimeout))
                 return ([], [event])
             }
-        }
+        },
+        debugName: "OnTick"
     )
 }

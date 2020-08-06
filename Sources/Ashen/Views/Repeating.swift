@@ -25,6 +25,7 @@ public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
                 y += viewSize.height
             }
         },
-        events: { event, _ in ([], [event]) }
+        events: { event, _ in ([], [event]) },
+        debugName: "Repeating"
     )
 }

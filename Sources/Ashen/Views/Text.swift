@@ -31,6 +31,7 @@ public func Text<Msg>(_ text: Attributed, _ options: TextOptions...) -> View<Msg
             let withNewlines = text.insertNewlines(fitting: viewport.frame.size.width)
             buffer.write(withNewlines, at: .zero)
         },
-        events: { event, _ in ([], [event]) }
+        events: { event, _ in ([], [event]) },
+        debugName: "Text"
     )
 }

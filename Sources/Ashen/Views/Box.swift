@@ -178,7 +178,8 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
         },
         events: { event, buffer in
             buffer.events(key: "Box", event: event, view: framedInside)
-        }
+        },
+        debugName: "Box"
     )
 }
 

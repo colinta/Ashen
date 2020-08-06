@@ -27,6 +27,7 @@ public func Window<Msg>(_ views: [View<Msg>]) -> View<Msg> {
                 }
                 return (msgs + newMsgs, newEvents)
             }
-        }
+        },
+        debugName: "Window"
     )
 }

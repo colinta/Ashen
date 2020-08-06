@@ -30,6 +30,7 @@ public func OnMouse<Msg>(
                 else { return (msgs, [event]) }
                 return (msgs + [msg(mouseEvent)], [])
             }
-        }
+        },
+        debugName: "OnMouse"
     )
 }

@@ -55,6 +55,7 @@ public func Spinner<Msg>() -> View<Msg> {
 
             buffer.store(model.next(dt: dt))
             return ([], [event])
-        }
+        },
+        debugName: "Spinner"
     )
 }

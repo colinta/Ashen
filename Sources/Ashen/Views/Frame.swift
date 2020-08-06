@@ -61,6 +61,7 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> V
         },
         events: { event, buffer in
             buffer.events(key: "Frame", event: event, view: inside)
-        }
+        },
+        debugName: "Frame"
     )
 }

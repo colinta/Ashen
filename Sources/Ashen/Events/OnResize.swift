@@ -31,6 +31,7 @@ public func OnResize<Msg>(_ inside: View<Msg>, _ onResize: @escaping OnResizeHan
                 else { return (msgs, [event]) }
                 return (msgs + [onResize(model.size)], [event])
             }
-        }
+        },
+        debugName: "OnResize"
     )
 }

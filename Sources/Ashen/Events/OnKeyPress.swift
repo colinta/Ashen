@@ -39,7 +39,8 @@ public func OnKeyPress<Msg>(
                 eventMatches(key, only: only, except: except)
             else { return ([], [event]) }
             return ([onKeyPress(key)], [])
-        }
+        },
+        debugName: "OnKeyPress"
     )
 }
 
