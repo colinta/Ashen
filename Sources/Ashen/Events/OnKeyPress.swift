@@ -2,20 +2,20 @@
 ///  OnKeyPress.swift
 //
 
-public typealias OnKeyHandler<Msg> = (KeyEvent) -> Msg
+public typealias OnKeyEvent<Msg> = (KeyEvent) -> Msg
 
 public enum OnKeyPressOptions {
     case only([KeyEvent])
     case except([KeyEvent])
 }
 
-public func OnKeyPress<Msg>(key: KeyEvent, _ onKeyPress: @escaping SimpleHandler<Msg>) -> View<Msg>
+public func OnKeyPress<Msg>(key: KeyEvent, _ onKeyPress: @escaping @autoclosure SimpleEvent<Msg>) -> View<Msg>
 {
     OnKeyPress({ _ in onKeyPress() }, options: [.only([key])])
 }
 
 public func OnKeyPress<Msg>(
-    _ onKeyPress: @escaping OnKeyHandler<Msg>, options: [OnKeyPressOptions] = []
+    _ onKeyPress: @escaping OnKeyEvent<Msg>, options: [OnKeyPressOptions] = []
 ) -> View<Msg> {
     var only: [KeyEvent] = []
     var except: [KeyEvent] = []

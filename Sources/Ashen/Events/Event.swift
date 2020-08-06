@@ -2,7 +2,7 @@
 ///  Event.swift
 //
 
-public typealias SimpleHandler<Msg> = () -> Msg
+public typealias SimpleEvent<Msg> = () -> Msg
 
 public enum Event {
     case key(KeyEvent)

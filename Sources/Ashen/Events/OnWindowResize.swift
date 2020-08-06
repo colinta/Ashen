@@ -2,7 +2,7 @@
 ///  OnWindowResize.swift
 //
 
-public func OnWindowResize<Msg>(_ onResize: @escaping OnResizeHandler<Msg>) -> View<Msg> {
+public func OnWindowResize<Msg>(_ onResize: @escaping OnResizeEvent<Msg>) -> View<Msg> {
     View<Msg>(
         preferredSize: { _ in .zero },
         render: { _, _ in },

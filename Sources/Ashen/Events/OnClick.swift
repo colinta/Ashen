@@ -13,19 +13,19 @@ struct ClickModel {
 }
 
 public func OnLeftClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>, _ options: ClickOptions...
 ) -> View<Msg> {
     OnLeftOrRightClick(.left, inside, msg, options).debugName("OnLeftClick")
 }
 
 public func OnRightClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping @autoclosure () -> Msg, _ options: ClickOptions...
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>, _ options: ClickOptions...
 ) -> View<Msg> {
     OnLeftOrRightClick(.right, inside, msg, options).debugName("OnRightClick")
 }
 
 private func OnLeftOrRightClick<Msg>(
-    _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping () -> Msg,
+    _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping SimpleEvent<Msg>,
     _ options: [ClickOptions]
 ) -> View<Msg> {
     var highlight = true

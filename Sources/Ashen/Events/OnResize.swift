@@ -2,14 +2,14 @@
 ///  OnResize.swift
 //
 
-public typealias OnResizeHandler<Msg> = (Size) -> Msg
+public typealias OnResizeEvent<Msg> = (Size) -> Msg
 
 struct OnResizeModel {
     let size: Size
     let prevSize: Size?
 }
 
-public func OnResize<Msg>(_ inside: View<Msg>, _ onResize: @escaping OnResizeHandler<Msg>) -> View<
+public func OnResize<Msg>(_ inside: View<Msg>, _ onResize: @escaping OnResizeEvent<Msg>) -> View<
     Msg
 > {
     View<Msg>(

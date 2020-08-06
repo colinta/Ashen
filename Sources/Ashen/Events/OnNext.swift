@@ -2,7 +2,7 @@
 ///  OnNext.swift
 //
 
-public func OnNext<Msg>(_ onNext: @escaping SimpleHandler<Msg>) -> View<Msg> {
+public func OnNext<Msg>(_ onNext: @escaping @autoclosure SimpleEvent<Msg>) -> View<Msg> {
     View<Msg>(
         preferredSize: { _ in .zero },
         render: { _, _ in },

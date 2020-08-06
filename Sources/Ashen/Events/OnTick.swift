@@ -2,7 +2,7 @@
 ///  OnTick.swift
 //
 
-public typealias OnTickHandler<Msg> = (Double) -> Msg
+public typealias OnTickEvent<Msg> = (Double) -> Msg
 
 public enum OnTickOptions {
     case every(Double)
@@ -13,7 +13,7 @@ struct OnTickModel {
     let timeout: Double
 }
 
-public func OnTick<Msg>(_ onTick: @escaping OnTickHandler<Msg>, options: [OnTickOptions] = [])
+public func OnTick<Msg>(_ onTick: @escaping OnTickEvent<Msg>, options: [OnTickOptions] = [])
     -> View<Msg>
 {
     var every = 0.001
