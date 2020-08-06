@@ -4,7 +4,7 @@
 
 public typealias OnTickEvent<Msg> = (Double) -> Msg
 
-public enum OnTickOptions {
+public enum OnTickOption {
     case every(Double)
     case paused(Bool)
 }
@@ -13,7 +13,7 @@ struct OnTickModel {
     let timeout: Double
 }
 
-public func OnTick<Msg>(_ onTick: @escaping OnTickEvent<Msg>, options: [OnTickOptions] = [])
+public func OnTick<Msg>(_ onTick: @escaping OnTickEvent<Msg>, options: [OnTickOption] = [])
     -> View<Msg>
 {
     var every = 0.001

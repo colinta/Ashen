@@ -2,26 +2,26 @@
 ///  Box.swift
 //
 
-public enum BoxOptions {
+public enum BoxOption {
     case border(BoxBorder)
     case title(Attributed)
     case alignment(Alignment)
 }
 
 extension View {
-    public func border(_ border: BoxBorder, _ options: BoxOptions...) -> View<Msg> {
+    public func border(_ border: BoxBorder, _ options: BoxOption...) -> View<Msg> {
         Box(self, [.border(border)] + options)
     }
 }
 
-public func Box<Msg>(_ inside: View<Msg>, _ options: BoxOptions...) -> View<Msg> {
+public func Box<Msg>(_ inside: View<Msg>, _ options: BoxOption...) -> View<Msg> {
     Box(inside, options)
 }
 
-public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<Msg> {
+public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<Msg> {
     var border: BoxBorder = .single
     var title: Attributed?
-    var frameOptions: [FrameOptions] = []
+    var frameOption: [FrameOption] = []
     for opt in options {
         switch opt {
         case let .border(borderOpt):
@@ -29,11 +29,11 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
         case let .title(titleOpt):
             title = titleOpt
         case let .alignment(alignmentOpt):
-            frameOptions.append(.alignment(alignmentOpt))
+            frameOption.append(.alignment(alignmentOpt))
         }
     }
 
-    let framedInside = Frame(inside, frameOptions)
+    let framedInside = Frame(inside, frameOption)
 
     let maxSidesWidth =
         max(border.tlCorner.maxWidth, border.leftSide.maxWidth, border.blCorner.maxWidth)
@@ -139,7 +139,8 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
                 while x < innerBorderSize.width {
                     guard x < viewport.mask.maxX else { break }
                     if x + border.topSide.maxWidth >= viewport.mask.minX {
-                        buffer.write(border.topSide, at: Point(x: x + border.tlCorner.maxWidth, y: 0))
+                        buffer.write(
+                            border.topSide, at: Point(x: x + border.tlCorner.maxWidth, y: 0))
                         buffer.write(
                             border.bottomSide,
                             at: Point(
@@ -154,7 +155,8 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOptions] = []) -> View<
             while y < innerBorderSize.height {
                 guard y < viewport.mask.maxY else { break }
                 if y + border.leftSide.countLines >= viewport.mask.minY {
-                    buffer.write(border.leftSide, at: Point(x: 0, y: y + border.tlCorner.countLines))
+                    buffer.write(
+                        border.leftSide, at: Point(x: 0, y: y + border.tlCorner.countLines))
                     buffer.write(
                         border.rightSide,
                         at: Point(

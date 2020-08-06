@@ -2,10 +2,10 @@
 ///  Scroll.swift
 //
 
-public enum ScrollOptions {
+public enum ScrollOption {
     case offset(Point)
-    public static func offset(x: Int) -> ScrollOptions { .offset(Point(x: x, y: 0)) }
-    public static func offset(y: Int) -> ScrollOptions { .offset(Point(x: 0, y: y)) }
+    public static func offset(x: Int) -> ScrollOption { .offset(Point(x: x, y: 0)) }
+    public static func offset(y: Int) -> ScrollOption { .offset(Point(x: 0, y: y)) }
 }
 
 extension View {
@@ -14,7 +14,7 @@ extension View {
     }
 }
 
-public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOptions...) -> View<Msg> {
+public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOption...) -> View<Msg> {
     var offset: Point = .zero
     for opt in options {
         switch opt {

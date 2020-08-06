@@ -4,7 +4,9 @@
 
 import Foundation
 
-public func Timeout<Msg>(_ delay: TimeInterval, _ onTimeout: @escaping @autoclosure SimpleEvent<Msg>)
+public func Timeout<Msg>(
+    _ delay: TimeInterval, _ onTimeout: @escaping @autoclosure SimpleEvent<Msg>
+)
     -> Command<Msg>
 {
     Command { done in

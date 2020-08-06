@@ -2,11 +2,11 @@
 ///  Text.swift
 //
 
-public enum TextOptions {
+public enum TextOption {
     case wrap(Bool)
 }
 
-public func Text<Msg>(_ text: Attributed, _ options: TextOptions...) -> View<Msg> {
+public func Text<Msg>(_ text: Attributed, _ options: TextOption...) -> View<Msg> {
     var wrap = false
     for opt in options {
         switch opt {

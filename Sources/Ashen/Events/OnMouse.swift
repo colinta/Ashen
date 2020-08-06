@@ -2,13 +2,13 @@
 ///  Mouse.swift
 //
 
-public enum MouseOptions {
+public enum MouseOption {
 }
 
 private let ON_MOUSE_KEY = "OnMouse"
 
 public func OnMouse<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: [MouseOptions] = []
+    _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: [MouseOption] = []
 ) -> View<Msg> {
     View<Msg>(
         preferredSize: { inside.preferredSize($0) },

@@ -309,7 +309,9 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".padding(top: \(top), left: \(left), bottom: \(bottom), right: \(right))"
+            key: key, id: id,
+            debugName: debugName
+                + ".padding(top: \(top), left: \(left), bottom: \(bottom), right: \(right))"
         )
     }
 }

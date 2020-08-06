@@ -2,7 +2,7 @@
 ///  Frame.swift
 //
 
-public enum FrameOptions {
+public enum FrameOption {
     case alignment(Alignment)
 }
 
@@ -16,7 +16,7 @@ extension View {
     }
 }
 
-public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> View<Msg> {
+public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOption] = []) -> View<Msg> {
     var alignment: Alignment = .topCenter
     for opt in options {
         switch opt {
