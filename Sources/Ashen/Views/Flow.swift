@@ -58,10 +58,11 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                 maxWidth = max(maxWidth, preferredSize.width)
                 maxHeight = max(maxHeight, preferredSize.height)
                 if case .fixed = flowSize {
-                    allSizes = allSizes + preferredSize
                     if direction.isHorizontal {
+                        allSizes = allSizes + Size(width: preferredSize.width, height: 0)
                         remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
                     } else {
+                        allSizes = allSizes + Size(width: 0, height: preferredSize.height)
                         remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
                     }
                 } else if direction.isHorizontal {
@@ -77,18 +78,25 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
 
             if direction.isHorizontal {
                 return Size(
-                    width: min(parentSize.width, allSizes.width),
-                    height: min(parentSize.height, maxHeight)
+                    width: allSizes.width,
+                    height: maxHeight
                 )
             } else {
                 return Size(
-                    width: min(parentSize.width, maxWidth),
-                    height: min(parentSize.height, allSizes.height)
+                    width: maxWidth,
+                    height: allSizes.height
                 )
             }
         },
-        render: { rect, buffer in
-            var remainingSize = rect.size
+        render: { viewport, buffer in
+            guard !viewport.isEmpty else {
+                for (index, (_, view)) in views.enumerated() {
+                    buffer.render(key: index, view: view, viewport: .zero)
+                }
+                return
+            }
+
+            var remainingSize = viewport.frame.size
             var flexTotal: Float = 0
             var preferredSizes: [Int: Size] = [:]
             var lastFlexIndex = 0
@@ -117,9 +125,9 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             case .leftToRight, .topToBottom:
                 cursor = .zero
             case .rightToLeft:
-                cursor = Point(x: rect.width, y: 0)
+                cursor = Point(x: viewport.frame.size.width, y: 0)
             case .bottomToTop:
-                cursor = Point(x: 0, y: rect.height)
+                cursor = Point(x: 0, y: viewport.frame.size.height)
             }
 
             for (index, (flowSize, view)) in views.enumerated() {
@@ -133,23 +141,23 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                             isLast
                             ? remainingFlexSize.width
                             : Int((flexPercent * Float(startingFlexSize.width)).rounded())
-                        viewSize = Size(width: width, height: rect.height)
+                        viewSize = Size(width: width, height: viewport.frame.size.height)
                         remainingFlexSize = remainingFlexSize - Size(width: width, height: 0)
                     } else {
                         let height =
                             isLast
                             ? remainingFlexSize.height
                             : Int((flexPercent * Float(startingFlexSize.height)).rounded())
-                        viewSize = Size(width: rect.width, height: height)
+                        viewSize = Size(width: viewport.frame.size.width, height: height)
                         remainingFlexSize = remainingFlexSize - Size(width: 0, height: height)
                     }
                 case .fixed:
                     if direction.isHorizontal {
                         viewSize = Size(
-                            width: preferredSizes[index]!.width, height: rect.height)
+                            width: preferredSizes[index]!.width, height: viewport.frame.size.height)
                     } else {
                         viewSize = Size(
-                            width: rect.width, height: preferredSizes[index]!.height)
+                            width: viewport.frame.size.width, height: preferredSizes[index]!.height)
                     }
                 }
 
@@ -160,8 +168,8 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                 }
 
                 buffer.render(
-                    key: index, view: view, at: cursor,
-                    clip: viewSize)
+                    key: index, view: view, viewport: Viewport(Rect(origin: cursor, size: viewSize))
+                )
 
                 if case .leftToRight = direction {
                     cursor = cursor + Point(x: viewSize.width, y: 0)

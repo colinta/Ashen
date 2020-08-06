@@ -92,21 +92,23 @@ private func OnClick<Msg>(
 
     return View<Msg>(
         preferredSize: { inside.preferredSize($0) },
-        render: { rect, buffer in
+        render: { viewport, buffer in
             let model: ClickModel? = buffer.retrieve()
             let isHighlighted = model?.isHighlighted ?? false
 
             let mask: Buffer.Mask? = highlight && isHighlighted ? buffer.mask : nil
-            inside.render(rect, buffer)
+            inside.render(viewport, buffer)
             if highlight && isHighlighted {
-                buffer.modifyCharacters(in: rect, mask: mask) { x, y, c in
+                buffer.modifyCharacters(in: viewport.mask, mask: mask) { x, y, c in
                     c.styled(.reverse)
                 }
             }
             // pay attention to the order - the first view to claim a mouse area
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
-            buffer.claimMouse(key: ON_CLICK_KEY, rect: rect, view: inside)
+            buffer.claimMouse(
+                key: ON_CLICK_KEY, rect: Rect(origin: .zero, size: viewport.frame.size),
+                view: inside)
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)

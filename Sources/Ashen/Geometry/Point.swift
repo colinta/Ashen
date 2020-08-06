@@ -23,6 +23,9 @@ public struct Point: Equatable {
     public static func - (lhs: Point, rhs: Point) -> Point {
         Point(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
     }
+    public static prefix func - (pt: Point) -> Point {
+        Point(x: -pt.x, y: -pt.y)
+    }
     public static func + (point: Point, size: Size) -> Point {
         Point(x: point.x + size.width, y: point.y + size.height)
     }

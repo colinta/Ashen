@@ -4,7 +4,7 @@
 
 public struct View<Msg> {
     let preferredSize: (Size) -> Size
-    let render: (Rect, Buffer) -> Void
+    let render: (Viewport, Buffer) -> Void
     let events: (Event, Buffer) -> ([Msg], [Event])
     let key: String?
     let id: String?
@@ -12,7 +12,7 @@ public struct View<Msg> {
 
     init(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Rect, Buffer) -> Void,
+        render: @escaping (Viewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event])
     ) {
         self.preferredSize = preferredSize
@@ -25,7 +25,7 @@ public struct View<Msg> {
 
     private init(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Rect, Buffer) -> Void,
+        render: @escaping (Viewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
         key: String?, id: String?, debugName: String?
     ) {
@@ -48,7 +48,7 @@ public struct View<Msg> {
 
     public func copy(
         preferredSize: @escaping (Size) -> Size,
-        render: @escaping (Rect, Buffer) -> Void,
+        render: @escaping (Viewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event])
     ) -> View<Msg> {
         View(
@@ -91,8 +91,8 @@ public struct View<Msg> {
     public func map<U>(_ msgMap: @escaping (Msg) -> U) -> View<U> {
         View<U>(
             preferredSize: preferredSize,
-            render: { rect, buffer in
-                self.render(rect, buffer)
+            render: { viewport, buffer in
+                self.render(viewport, buffer)
             },
             events: { event, buffer in
                 let (msgs, newEvents) = self.events(event, buffer)
@@ -105,9 +105,9 @@ public struct View<Msg> {
     public func background(view: View<Msg>) -> View<Msg> {
         View(
             preferredSize: preferredSize,
-            render: { rect, buffer in
-                self.render(rect, buffer)
-                Repeating(view).render(rect, buffer)
+            render: { viewport, buffer in
+                self.render(viewport, buffer)
+                Repeating(view).render(viewport, buffer)
             },
             events: events,
             key: key, id: id, debugName: debugName
@@ -119,12 +119,12 @@ public struct View<Msg> {
     ) -> View<Msg> {
         View(
             preferredSize: preferredSize,
-            render: { rect, buffer in
+            render: { viewport, buffer in
                 let mask = buffer.mask
-                self.render(rect, buffer)
-                let size = rect.size
-                for y in rect.origin.y..<rect.origin.y + rect.height {
-                    for x in rect.origin.x..<rect.origin.x + rect.width {
+                self.render(viewport, buffer)
+                let size = viewport.frame.size
+                for y in viewport.mask.y..<viewport.mask.y + viewport.mask.height {
+                    for x in viewport.mask.x..<viewport.mask.x + viewport.mask.width {
                         let pt = Point(x: x, y: y)
                         buffer.modifyCharacter(at: pt, mask: mask) { modify(pt, size, $0) }
                     }
@@ -175,7 +175,12 @@ extension View {
                     height: previous.height
                 )
             },
-            render: render,
+            render: { viewport, buffer in
+                let innerViewport = viewport.limit(width: width)
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport, buffer)
+                }
+            },
             events: events,
             key: key, id: id, debugName: debugName
         )
@@ -190,7 +195,12 @@ extension View {
                     height: previous.height
                 )
             },
-            render: render,
+            render: { viewport, buffer in
+                let innerViewport = viewport.limit(width: width)
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport, buffer)
+                }
+            },
             events: events,
             key: key, id: id, debugName: debugName
         )
@@ -220,7 +230,12 @@ extension View {
                     height: height
                 )
             },
-            render: render,
+            render: { viewport, buffer in
+                let innerViewport = viewport.limit(height: height)
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport, buffer)
+                }
+            },
             events: events,
             key: key, id: id, debugName: debugName
         )
@@ -235,7 +250,12 @@ extension View {
                     height: min(previous.height, height)
                 )
             },
-            render: render,
+            render: { viewport, buffer in
+                let innerViewport = viewport.limit(height: height)
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport, buffer)
+                }
+            },
             events: events,
             key: key, id: id, debugName: debugName
         )
@@ -259,9 +279,11 @@ extension View {
     public func compact() -> View<Msg> {
         View(
             preferredSize: preferredSize,
-            render: { rect, buffer in
-                let size = self.preferredSize(rect.size)
-                self.render(Rect(origin: rect.origin, size: size), buffer)
+            render: { viewport, buffer in
+                let size = self.preferredSize(viewport.frame.size)
+                let innerViewport = Viewport(
+                    frame: Rect(origin: .zero, size: size), mask: viewport.mask)
+                self.render(innerViewport, buffer)
             },
             events: events,
             key: key, id: id, debugName: debugName
@@ -277,11 +299,12 @@ extension View {
                     height: previous.height + top + bottom
                 )
             },
-            render: { rect, buffer in
-                let innerSize = rect.size.shrink(width: left + right, height: top + bottom)
-                buffer.push(at: Point(x: left, y: top), clip: innerSize) {
-                    let innerRect = Rect(origin: .zero, size: innerSize)
-                    self.render(innerRect, buffer)
+            render: { viewport, buffer in
+                let innerSize = viewport.frame.size.shrink(
+                    width: left + right, height: top + bottom)
+                let innerViewport = Viewport(Rect(origin: Point(x: left, y: top), size: innerSize))
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport.toLocalOrigin(), buffer)
                 }
             },
             events: events,
@@ -297,11 +320,11 @@ extension View {
     public func styled(_ style: Attr) -> View<Msg> {
         copy(
             preferredSize: preferredSize,
-            render: { rect, buffer in
+            render: { viewport, buffer in
                 let mask = buffer.mask
-                self.render(rect, buffer)
-                for y in (0..<rect.height) {
-                    for x in (0..<rect.width) {
+                self.render(viewport, buffer)
+                for y in (0..<viewport.frame.size.height) {
+                    for x in (0..<viewport.frame.size.width) {
                         buffer.modifyCharacter(at: Point(x: x, y: y), mask: mask) { c in
                             guard !c.attributes.contains(style) else { return c }
                             let newC = AttributedCharacter(
@@ -322,11 +345,13 @@ extension View {
     public func bottomLined() -> View<Msg> {
         copy(
             preferredSize: preferredSize,
-            render: { rect, buffer in
+            render: { viewport, buffer in
                 let mask = buffer.mask
-                self.render(rect, buffer)
-                for x in (0..<rect.width) {
-                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1), mask: mask) { c in
+                self.render(viewport, buffer)
+                for x in (0..<viewport.frame.size.width) {
+                    buffer.modifyCharacter(
+                        at: Point(x: x, y: viewport.frame.size.height - 1), mask: mask
+                    ) { c in
                         guard !c.attributes.contains(.underline) else { return c }
                         let newC = AttributedCharacter(
                             character: c.character, attributes: c.attributes + [.underline])
@@ -357,11 +382,13 @@ extension View {
     public func reset() -> View<Msg> {
         copy(
             preferredSize: preferredSize,
-            render: { rect, buffer in
+            render: { viewport, buffer in
                 let mask = buffer.mask
-                self.render(rect, buffer)
-                for x in (0..<rect.width) {
-                    buffer.modifyCharacter(at: Point(x: x, y: rect.height - 1), mask: mask) {
+                self.render(viewport, buffer)
+                for x in (0..<viewport.frame.size.width) {
+                    buffer.modifyCharacter(
+                        at: Point(x: x, y: viewport.frame.size.height - 1), mask: mask
+                    ) {
                         $0.reset()
                     }
                 }

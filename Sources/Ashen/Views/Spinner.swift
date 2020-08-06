@@ -40,7 +40,9 @@ struct SpinnerModel {
 public func Spinner<Msg>() -> View<Msg> {
     View(
         preferredSize: { _ in Size(width: 1, height: 1) },
-        render: { rect, buffer in
+        render: { viewport, buffer in
+            guard !viewport.isEmpty else { return }
+
             let model: SpinnerModel = buffer.retrieve() ?? SpinnerModel()
             buffer.write(model.char, at: .zero)
             buffer.store(model)

@@ -101,7 +101,7 @@ private func main<Model, Msg>(
         if shouldRender || screenSize != prevSize {
             buffer = Buffer(size: screenSize, prev: prevBuffer)
             view = Window(program.view(model, screenSize))
-            view.render(Rect(origin: .zero, size: screenSize), buffer)
+            view.render(Viewport(screenSize), buffer)
             screen.render(buffer: buffer)
             shouldRender = false
             prevBuffer = buffer

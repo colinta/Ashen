@@ -27,8 +27,13 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> V
 
     return View<Msg>(
         preferredSize: { inside.preferredSize($0) },
-        render: { rect, buffer in
-            let innerPreferredSize = inside.preferredSize(rect.size)
+        render: { viewport, buffer in
+            guard !viewport.isEmpty else {
+                buffer.render(key: "Frame", view: inside, viewport: .zero)
+                return
+            }
+
+            let innerPreferredSize = inside.preferredSize(viewport.frame.size)
 
             let positionX: Int
             let positionY: Int
@@ -36,22 +41,23 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOptions] = []) -> V
             case .topLeft, .middleLeft, .bottomLeft:
                 positionX = 0
             case .topCenter, .middleCenter, .bottomCenter:
-                positionX = Int((rect.width - innerPreferredSize.width) / 2)
+                positionX = Int((viewport.frame.size.width - innerPreferredSize.width) / 2)
             case .topRight, .middleRight, .bottomRight:
-                positionX = rect.width - innerPreferredSize.width
+                positionX = viewport.frame.size.width - innerPreferredSize.width
             }
             switch alignment {
             case .topLeft, .topCenter, .topRight:
                 positionY = 0
             case .middleLeft, .middleCenter, .middleRight:
-                positionY = Int((rect.height - innerPreferredSize.height) / 2)
+                positionY = Int((viewport.frame.size.height - innerPreferredSize.height) / 2)
             case .bottomLeft, .bottomCenter, .bottomRight:
-                positionY = rect.height - innerPreferredSize.height
+                positionY = viewport.frame.size.height - innerPreferredSize.height
             }
 
             buffer.render(
-                key: "Frame", view: inside, at: Point(x: positionX, y: positionY),
-                clip: innerPreferredSize)
+                key: "Frame", view: inside,
+                viewport: Viewport(
+                    Rect(origin: Point(x: positionX, y: positionY), size: innerPreferredSize)))
         },
         events: { event, buffer in
             buffer.events(key: "Frame", event: event, view: inside)

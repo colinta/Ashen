@@ -22,11 +22,13 @@ public func Text<Msg>(_ text: Attributed, _ options: TextOptions...) -> View<Msg
             let withNewlines = text.insertNewlines(fitting: size.width)
             return Size(width: withNewlines.maxWidth, height: withNewlines.countLines)
         },
-        render: { size, buffer in
+        render: { viewport, buffer in
+            guard !viewport.isEmpty else { return }
+
             guard wrap else {
                 return buffer.write(text, at: .zero)
             }
-            let withNewlines = text.insertNewlines(fitting: size.width)
+            let withNewlines = text.insertNewlines(fitting: viewport.frame.size.width)
             buffer.write(withNewlines, at: .zero)
         },
         events: { event, _ in ([], [event]) }

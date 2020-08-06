@@ -14,6 +14,10 @@ public struct Size: Equatable {
         self.height = Swift.max(0, height)
     }
 
+    public var isEmpty: Bool {
+        width == 0 || height == 0
+    }
+
     public func shrink(by: Int) -> Size {
         grow(width: -by, height: -by)
     }

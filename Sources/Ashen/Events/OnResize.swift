@@ -14,13 +14,13 @@ public func OnResize<Msg>(_ inside: View<Msg>, _ onResize: @escaping OnResizeHan
 > {
     View<Msg>(
         preferredSize: { inside.preferredSize($0) },
-        render: { rect, buffer in
-            inside.render(rect, buffer)
+        render: { viewport, buffer in
+            inside.render(viewport, buffer)
 
             if let model: OnResizeModel = buffer.retrieve() {
-                buffer.store(OnResizeModel(size: rect.size, prevSize: model.size))
+                buffer.store(OnResizeModel(size: viewport.frame.size, prevSize: model.size))
             } else {
-                buffer.store(OnResizeModel(size: rect.size, prevSize: nil))
+                buffer.store(OnResizeModel(size: viewport.frame.size, prevSize: nil))
             }
         },
         events: { event, buffer in

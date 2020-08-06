@@ -93,8 +93,8 @@ public class Buffer {
 
     var chars: Chars = [:]
     var mask: Mask {
-        let initial = currentOffset
-        let maxPt = currentOffset + currentClipSize
+        let initial = currentOrigin
+        let maxPt = currentOrigin + currentMask.size
         var mask: Mask = [:]
         for y in initial.y..<maxPt.y {
             var row: [Int: Bool] = [:]
@@ -111,12 +111,10 @@ public class Buffer {
     }
 
     // writing at local point "0, 0" writes at this offset
-    private var currentOffset: Point = .zero
+    private var currentOrigin: Point = .zero
     // as the screen is clipped, the offset can be moved *outside* the current clipped area.  The
-    // zeroOrigin refers to the point where drawing is "safe"
-    private var zeroOrigin: Point = .zero
-    // the clipped size, measured from the offset
-    private var currentClipSize: Size
+    // currentMask.origin refers to the point in which drawing is "safe"
+    private var currentMask: Rect
     // the "model key", which stores and retrieves view models
     private var currentKey: String = ""
     private var models: [String: Any]
@@ -124,79 +122,62 @@ public class Buffer {
     private var diff: Chars?
 
     init(size: Size, prev: Buffer?) {
-        self.currentClipSize = size
+        self.currentMask = Rect(origin: .zero, size: size)
         self.models = prev?.models ?? [:]
         self.mouse = [:]
         self.diff = prev?.chars
     }
 
-    func push(
-        at origin: Point,
-        clip nextDesiredSize: Size,
-        _ block: () -> Void
-    ) {
+    func push(viewport: Viewport, _ block: () -> Void) {
         // this method used to guard against renders outside the clipping area,
         // but that prevented events like `OnResize` from being called, so now
         // the clipping guard is only in `write`. Reduces the clipping logic
         // footprint, too, which is a win.
 
-        let nextSize = Size(
-            width: min(currentClipSize.width - origin.x, nextDesiredSize.width),
-            height: min(currentClipSize.height - origin.y, nextDesiredSize.height)
-        )
-        let prevOffset = currentOffset
-        let prevZeroOrigin = zeroOrigin
-        let prevClipSize = currentClipSize
-
-        currentOffset = currentOffset + origin
-        zeroOrigin = Point(
-            x: max(zeroOrigin.x, currentOffset.x),
-            y: max(zeroOrigin.y, currentOffset.y)
-        )
-        currentClipSize = nextSize
+        let prevOrigin = currentOrigin
+        let prevMask = currentMask
+        let nextMask = Rect(origin: currentOrigin + viewport.mask.origin, size: viewport.mask.size)
+        currentMask = currentMask.intersection(with: nextMask)
+        currentOrigin = currentOrigin + viewport.frame.origin
 
         block()
 
-        currentOffset = prevOffset
-        zeroOrigin = prevZeroOrigin
-        currentClipSize = prevClipSize
+        currentOrigin = prevOrigin
+        currentMask = prevMask
     }
 
     func render<Msg>(
         key nextKey: BufferKey,
         view: View<Msg>,
-        at origin: Point,
-        clip nextDesiredSize: Size,
-        offset renderOffset: Point = .zero
+        viewport: Viewport
     ) {
         let prevKey = currentKey
         currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        push(at: origin, clip: nextDesiredSize) {
-            let innerRect = Rect(origin: renderOffset, size: nextDesiredSize)
-            view.render(innerRect, self)
-
+        push(viewport: viewport) {
+            view.render(viewport.toLocalOrigin(), self)
         }
         currentKey = prevKey
     }
 
     func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, view: View<Msg>) {
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        let initial = rect.origin + currentOffset
-        let maxPt = currentOffset + currentClipSize
+        let initial = rect.origin + currentOrigin
+        let maxPt = currentOrigin + currentMask.size
         guard
-            initial.x + rect.width > zeroOrigin.x, initial.y + rect.height > zeroOrigin.y,
+            initial.x + rect.width > currentMask.origin.x,
+            initial.y + rect.height > currentMask.origin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
 
         for y in (initial.y..<initial.y + rect.height) {
             if y > maxPt.y { break }
-            guard y >= zeroOrigin.y else { continue }
+            guard y >= currentMask.origin.y else { continue }
 
             var row = mouse[y] ?? [:]
             for x in (initial.x..<initial.x + rect.width) {
                 if x > maxPt.x { break }
                 guard
-                    x >= zeroOrigin.x,
+                    x >= currentMask.origin.x,
                     row[x] == nil
                 else { continue }
                 row[x] = currentKey
@@ -231,10 +212,10 @@ public class Buffer {
     func write(_ content: Attributed, at localPt: Point, attributes extraAttributes: [Attr] = []) {
         let width = content.maxWidth
         let height = content.countLines
-        let initial = localPt + currentOffset
-        let maxPt = currentOffset + currentClipSize
+        let initial = localPt + currentOrigin
+        let maxPt = currentMask.origin + currentMask.size
         guard
-            initial.x + width > zeroOrigin.x, initial.y + height > zeroOrigin.y,
+            initial.x + width > currentMask.origin.x, initial.y + height > currentMask.origin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
 
@@ -254,10 +235,10 @@ public class Buffer {
 
                 row = chars[y] ?? [:]
                 x = initial.x
-            } else if y >= zeroOrigin.y {
+            } else if y >= currentMask.origin.y {
                 let width = Buffer.displayWidth(of: ac.character)
 
-                if x >= zeroOrigin.x, x < maxPt.x {
+                if x >= currentMask.origin.x, x < maxPt.x {
                     var didWrite = false
                     if let prevC = row[x],
                         prevC.character == AttributedCharacter.null.character
@@ -284,10 +265,10 @@ public class Buffer {
     func modifyCharacter(
         at localPt: Point, mask: Mask?, map modify: (AttributedCharacter) -> AttributedCharacter
     ) {
-        let point = localPt + currentOffset
-        let maxPt = currentOffset + currentClipSize
+        let point = localPt + currentOrigin
+        let maxPt = currentOrigin + currentMask.size
         guard
-            point.x + 1 > zeroOrigin.x, point.y + 1 > zeroOrigin.y,
+            point.x + 1 > currentMask.origin.x, point.y + 1 > currentMask.origin.y,
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
         if let mask = mask, mask[point.y]?[point.x] != true { return }
@@ -303,17 +284,18 @@ public class Buffer {
         in localRect: Rect, mask: Mask?,
         map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
     ) {
-        let initial = localRect.origin + currentOffset
-        let maxPt = currentOffset + currentClipSize
+        let initial = localRect.origin + currentOrigin
+        let maxPt = currentOrigin + currentMask.size
         guard
-            initial.x + localRect.width > zeroOrigin.x, initial.y + localRect.height > zeroOrigin.y,
+            initial.x + localRect.width > currentMask.origin.x,
+            initial.y + localRect.height > currentMask.origin.y,
             initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
         for y in initial.y..<initial.y + localRect.height {
-            guard y >= zeroOrigin.y else { continue }
+            guard y >= currentMask.origin.y else { continue }
             guard y < maxPt.y else { break }
             for x in initial.x..<initial.x + localRect.width {
-                guard x >= zeroOrigin.x else { continue }
+                guard x >= currentMask.origin.x else { continue }
                 guard x < maxPt.x else { break }
 
                 var row = chars[y] ?? [:]
