@@ -37,6 +37,22 @@ public protocol Attributed {
     var maxWidth: Int { get }
 }
 
+extension AttributedCharacter: Attributed {
+    public var attributedCharacters: [AttributedCharacter] { [self] }
+    public var countLines: Int {
+        guard self.character != "\n" else {
+            return 2
+        }
+        return 1
+    }
+    public var maxWidth: Int {
+        guard self.character != "\n" else {
+            return 0
+        }
+        return Buffer.displayWidth(of: self.character)
+    }
+}
+
 extension Attributed {
     public func styled(_ attr: Attr) -> AttributedString {
         AttributedString(

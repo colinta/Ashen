@@ -46,7 +46,9 @@ public func Stack<Msg>(_ direction: FlowDirection, _ views: [View<Msg>]) -> View
     Flow(direction, views.map { (.fixed, $0) }).debugName("Stack")
 }
 
-public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View<Msg>)]) -> View<Msg> {
+public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View<Msg>)]) -> View<
+    Msg
+> {
     View<Msg>(
         preferredSize: { parentSize in
             var allSizes: Size = .zero

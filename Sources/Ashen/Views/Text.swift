@@ -16,11 +16,11 @@ public func Text<Msg>(_ text: Attributed, _ options: TextOption...) -> View<Msg>
     }
     return View(
         preferredSize: { size in
-            guard wrap else {
-                return Size(width: text.maxWidth, height: text.countLines)
+            if wrap {
+                let withNewlines = text.insertNewlines(fitting: size.width)
+                return Size(width: withNewlines.maxWidth, height: withNewlines.countLines)
             }
-            let withNewlines = text.insertNewlines(fitting: size.width)
-            return Size(width: withNewlines.maxWidth, height: withNewlines.countLines)
+            return Size(width: text.maxWidth, height: text.countLines)
         },
         render: { viewport, buffer in
             guard !viewport.isEmpty else { return }

@@ -11,5 +11,4 @@ public enum Event {
     case tick(Double)
     case log(String)
     case redraw
-    case ignore
 }
