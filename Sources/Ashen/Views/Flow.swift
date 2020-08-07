@@ -53,6 +53,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             var maxWidth = 0
             var maxHeight = 0
             var remainingSize = parentSize
+            var foundFlex = false
             for (flowSize, view) in views {
                 let preferredSize = view.preferredSize(remainingSize)
                 maxWidth = max(maxWidth, preferredSize.width)
@@ -66,22 +67,29 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                         remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
                     }
                 } else if direction.isHorizontal {
-                    remainingSize = Size(width: 0, height: remainingSize.height)
-                    allSizes = Size(width: parentSize.width, height: allSizes.height)
-                    break
+                    foundFlex = true
                 } else {
-                    remainingSize = Size(width: remainingSize.width, height: 0)
-                    allSizes = Size(width: allSizes.width, height: parentSize.height)
-                    break
+                    foundFlex = true
                 }
             }
 
-            if direction.isHorizontal {
+            switch (foundFlex, direction.isHorizontal) {
+            case (true, true):
+                return Size(
+                    width: parentSize.width,
+                    height: maxHeight
+                )
+            case (true, false):
+                return Size(
+                    width: maxWidth,
+                    height: parentSize.height
+                )
+            case (false, true):
                 return Size(
                     width: allSizes.width,
                     height: maxHeight
                 )
-            } else {
+            case (false, false):
                 return Size(
                     width: maxWidth,
                     height: allSizes.height
