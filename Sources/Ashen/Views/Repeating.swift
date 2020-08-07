@@ -4,7 +4,7 @@
 
 public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
     return View(
-        preferredSize: { $0 },
+        preferredSize: { _ in .zero },
         render: { viewport, buffer in
             guard !viewport.isEmpty else { return }
 
