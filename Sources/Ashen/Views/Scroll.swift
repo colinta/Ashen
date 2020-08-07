@@ -14,7 +14,15 @@ extension View {
     }
 }
 
-public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOption...) -> View<Msg> {
+struct ScrollModel {
+    let contentSize: Size
+    let prevContentSize: Size?
+    let mask: Rect
+}
+
+public func Scroll<Msg>(
+    _ inside: View<Msg>, onResizeContent: ((Size, Rect) -> Msg)? = nil, _ options: ScrollOption...
+) -> View<Msg> {
     var offset: Point = .zero
     for opt in options {
         switch opt {
@@ -31,10 +39,22 @@ public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOption...) -> View
                 return
             }
 
-            let innerPreferredSize = inside.preferredSize(viewport.size)
+            let contentSize = inside.preferredSize(viewport.size)
+            if onResizeContent != nil {
+                if let model: ScrollModel = buffer.retrieve() {
+                    buffer.store(
+                        ScrollModel(
+                            contentSize: contentSize, prevContentSize: model.prevContentSize,
+                            mask: viewport.mask))
+                } else {
+                    buffer.store(
+                        ScrollModel(
+                            contentSize: contentSize, prevContentSize: nil, mask: viewport.mask))
+                }
+            }
 
             let scrollViewport = Viewport(
-                frame: Rect(origin: viewport.mask.origin - offset, size: innerPreferredSize),
+                frame: Rect(origin: viewport.mask.origin - offset, size: contentSize),
                 mask: viewport.mask
             )
             buffer.render(
@@ -42,7 +62,14 @@ public func Scroll<Msg>(_ inside: View<Msg>, _ options: ScrollOption...) -> View
                 viewport: scrollViewport)
         },
         events: { event, buffer in
-            buffer.events(key: "Scroll", event: event, view: inside)
+            let (msgs, events) = buffer.events(key: "Scroll", event: event, view: inside)
+            guard let onResizeContent = onResizeContent,
+                let model: ScrollModel = buffer.retrieve(),
+                model.contentSize != model.prevContentSize
+            else {
+                return (msgs, events)
+            }
+            return (msgs + [onResizeContent(model.contentSize, model.mask)], events)
         },
         debugName: "Scroll"
     )

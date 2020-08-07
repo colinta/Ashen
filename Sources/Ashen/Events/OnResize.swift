@@ -25,12 +25,10 @@ public func OnResize<Msg>(_ inside: View<Msg>, _ onResize: @escaping OnResizeEve
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)
-            return View.scan(events: events) { event in
-                guard let model: OnResizeModel = buffer.retrieve(),
-                    model.size != model.prevSize
-                else { return (msgs, [event]) }
-                return (msgs + [onResize(model.size)], [event])
-            }
+            guard let model: OnResizeModel = buffer.retrieve(),
+                model.size != model.prevSize
+            else { return (msgs, events) }
+            return (msgs + [onResize(model.size)], events)
         },
         debugName: "OnResize"
     )
