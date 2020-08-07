@@ -3,12 +3,12 @@
 //
 
 public struct View<Msg> {
-    let preferredSize: (Size) -> Size
-    let render: (LocalViewport, Buffer) -> Void
-    let events: (Event, Buffer) -> ([Msg], [Event])
+    public let preferredSize: (Size) -> Size
+    public let render: (LocalViewport, Buffer) -> Void
+    public let events: (Event, Buffer) -> ([Msg], [Event])
     let key: String?
     let id: String?
-    let debugName: String
+    public let debugName: String
 
     public init(
         preferredSize: @escaping (Size) -> Size,
@@ -44,6 +44,17 @@ public struct View<Msg> {
         events.reduce(([Msg](), [Event]())) { info, event in
             let (msgs, newEvents) = scan(event)
             return (info.0 + msgs, info.1 + newEvents)
+        }
+    }
+
+    public static func scan(views: [View<Msg>], event: Event, buffer: Buffer) -> ([Msg], [Event]) {
+        views.enumerated().reduce(([Msg](), [event])) { info, index_view in
+            let (msgs, events) = info
+            let (index, view) = index_view
+            let (newMsgs, newEvents) = View.scan(events: events) { event in
+                return buffer.events(key: index, event: event, view: view)
+            }
+            return (msgs + newMsgs, newEvents)
         }
     }
 

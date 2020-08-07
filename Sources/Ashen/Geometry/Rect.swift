@@ -15,6 +15,11 @@ public struct Rect: Equatable {
 
     public static let zero = Rect(origin: .zero, size: .zero)
 
+    public init(origin: Point, size: Size) {
+        self.origin = origin
+        self.size = size
+    }
+
     public func at(x: Int, y: Int) -> Rect {
         Rect(origin: Point(x: x, y: y), size: size)
     }

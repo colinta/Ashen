@@ -24,14 +24,7 @@ public func ZStack<Msg>(_ views: [View<Msg>]) -> View<Msg> {
             }
         },
         events: { event, buffer in
-            views.enumerated().reduce(([Msg](), [event])) { info, index_view in
-                let (msgs, events) = info
-                let (index, view) = index_view
-                let (newMsgs, newEvents) = View.scan(events: events) { event in
-                    return buffer.events(key: index, event: event, view: view)
-                }
-                return (msgs + newMsgs, newEvents)
-            }
+            View.scan(views: views, event: event, buffer: buffer)
         },
         debugName: "ZStack"
     )

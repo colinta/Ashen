@@ -26,7 +26,7 @@ public struct Size: Equatable {
         grow(width: by, height: by)
     }
 
-    public func shrink(width: Int, height: Int) -> Size {
+    public func shrink(width: Int = 0, height: Int = 0) -> Size {
         grow(width: -width, height: -height)
     }
 

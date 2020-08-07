@@ -2,7 +2,7 @@
 ///  Buffer.swift
 //
 
-protocol BufferKey {
+public protocol BufferKey {
     var bufferKey: String { get }
 }
 
@@ -128,7 +128,7 @@ public class Buffer {
         self.diff = prev?.chars
     }
 
-    func push(viewport: Viewport, _ block: () -> Void) {
+    public func push(viewport: Viewport, _ block: () -> Void) {
         // this method used to guard against renders outside the clipping area,
         // but that prevented events like `OnResize` from being called, so now
         // the clipping guard is only in `write`. Reduces the clipping logic
@@ -146,7 +146,7 @@ public class Buffer {
         currentMask = prevMask
     }
 
-    func render<Msg>(
+    public func render<Msg>(
         key nextKey: BufferKey,
         view: View<Msg>,
         viewport: Viewport
@@ -347,9 +347,9 @@ extension Buffer: CustomStringConvertible {
 }
 
 extension String: BufferKey {
-    var bufferKey: String { return ".\(self)" }
+    public var bufferKey: String { return ".\(self)" }
 }
 
 extension Int: BufferKey {
-    var bufferKey: String { return "[\(self)]" }
+    public var bufferKey: String { return "[\(self)]" }
 }

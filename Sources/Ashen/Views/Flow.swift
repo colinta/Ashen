@@ -46,7 +46,7 @@ public func Stack<Msg>(_ direction: FlowDirection, _ views: [View<Msg>]) -> View
     Flow(direction, views.map { (.fixed, $0) }).debugName("Stack")
 }
 
-public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>)]) -> View<Msg> {
+public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View<Msg>)]) -> View<Msg> {
     View<Msg>(
         preferredSize: { parentSize in
             var allSizes: Size = .zero
@@ -54,7 +54,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             var maxHeight = 0
             var remainingSize = parentSize
             var foundFlex = false
-            for (flowSize, view) in views {
+            for (flowSize, view) in sizedViews {
                 let preferredSize = view.preferredSize(remainingSize)
                 maxWidth = max(maxWidth, preferredSize.width)
                 maxHeight = max(maxHeight, preferredSize.height)
@@ -98,7 +98,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
         },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
-                for (index, (_, view)) in views.enumerated() {
+                for (index, (_, view)) in sizedViews.enumerated() {
                     buffer.render(key: index, view: view, viewport: .zero)
                 }
                 return
@@ -108,7 +108,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             var flexTotal: Float = 0
             var preferredSizes: [Int: Size] = [:]
             var lastFlexIndex = 0
-            for (index, (flowSize, view)) in views.enumerated() {
+            for (index, (flowSize, view)) in sizedViews.enumerated() {
                 if case let .flex(flex) = flowSize {
                     flexTotal += flex
                     lastFlexIndex = index
@@ -138,7 +138,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
                 cursor = Point(x: 0, y: viewport.size.height)
             }
 
-            for (index, (flowSize, view)) in views.enumerated() {
+            for (index, (flowSize, view)) in sizedViews.enumerated() {
                 let viewSize: Size
                 switch flowSize {
                 case let .flex(flex):
@@ -187,14 +187,8 @@ public func Flow<Msg>(_ direction: FlowDirection, _ views: [(FlowSize, View<Msg>
             }
         },
         events: { event, buffer in
-            views.enumerated().reduce(([Msg](), [event])) { info, index_view in
-                let (msgs, events) = info
-                let (index, view) = (index_view.0, index_view.1.1)
-                let (newMsgs, newEvents) = View.scan(events: events) { event in
-                    return buffer.events(key: index, event: event, view: view)
-                }
-                return (msgs + newMsgs, newEvents)
-            }
+            let views = sizedViews.map { $0.1 }
+            return View.scan(views: views, event: event, buffer: buffer)
         },
         debugName: "Flow"
     )
