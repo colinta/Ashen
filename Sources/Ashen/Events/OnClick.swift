@@ -4,6 +4,7 @@
 
 public enum ClickOption {
     case highlight(Bool)
+    case isEnabled(Bool)
 }
 
 private let ON_CLICK_KEY = "OnClick"
@@ -29,10 +30,13 @@ private func OnLeftOrRightClick<Msg>(
     _ options: [ClickOption]
 ) -> View<Msg> {
     var highlight = true
+    var isEnabled = true
     for opt in options {
         switch opt {
         case let .highlight(highlightOpt):
             highlight = highlightOpt
+        case let .isEnabled(isEnabledOpt):
+            isEnabled = isEnabledOpt
         }
     }
 
@@ -42,6 +46,7 @@ private func OnLeftOrRightClick<Msg>(
         render: clickable.render,
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)
+            guard isEnabled else { return (msgs, events) }
             return View.scan(events: events) { event in
                 guard
                     case let .mouse(mouseEvent) = event,
@@ -84,16 +89,23 @@ private func OnClick<Msg>(
     _ inside: View<Msg>, _ msg: ((MouseEvent.Button) -> Msg)?, _ options: [ClickOption]
 ) -> View<Msg> {
     var highlight = true
+    var isEnabled = true
     for opt in options {
         switch opt {
         case let .highlight(highlightOpt):
             highlight = highlightOpt
+        case let .isEnabled(isEnabledOpt):
+            isEnabled = isEnabledOpt
         }
     }
 
     return View<Msg>(
         preferredSize: { inside.preferredSize($0) },
         render: { viewport, buffer in
+            guard isEnabled else {
+                return inside.render(viewport, buffer)
+            }
+
             let model: ClickModel? = buffer.retrieve()
             let isHighlighted = model?.isHighlighted ?? false
 
@@ -113,6 +125,7 @@ private func OnClick<Msg>(
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)
+            guard isEnabled else { return (msgs, events) }
             return View.scan(events: events) { event in
                 guard
                     case let .mouse(mouseEvent) = event,
