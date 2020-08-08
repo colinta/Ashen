@@ -166,10 +166,10 @@ extension View {
     public func minWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: max(previous.width, width),
-                    height: previous.height
+                    width: max(preferredSize.width, width),
+                    height: preferredSize.height
                 )
             },
             render: render,
@@ -181,10 +181,10 @@ extension View {
     public func width(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
                     width: width,
-                    height: previous.height
+                    height: preferredSize.height
                 )
             },
             render: { viewport, buffer in
@@ -201,10 +201,10 @@ extension View {
     public func maxWidth(_ width: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: min(previous.width, width),
-                    height: previous.height
+                    width: min(preferredSize.width, width),
+                    height: preferredSize.height
                 )
             },
             render: { viewport, buffer in
@@ -221,10 +221,10 @@ extension View {
     public func minHeight(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: previous.width,
-                    height: max(previous.height, height)
+                    width: preferredSize.width,
+                    height: max(preferredSize.height, height)
                 )
             },
             render: render,
@@ -236,9 +236,9 @@ extension View {
     public func height(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: previous.width,
+                    width: preferredSize.width,
                     height: height
                 )
             },
@@ -256,10 +256,10 @@ extension View {
     public func maxHeight(_ height: Int) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: previous.width,
-                    height: min(previous.height, height)
+                    width: preferredSize.width,
+                    height: min(preferredSize.height, height)
                 )
             },
             render: { viewport, buffer in
@@ -273,18 +273,35 @@ extension View {
         )
     }
 
-    public func stretch(_ orientation: Orientation) -> View<Msg> {
+    public func matchParent(_ dimension: Dimension) -> View<Msg> {
         View(
-            preferredSize: { size in
-                let previous = self.preferredSize(size)
+            preferredSize: { parentSize in
+                let preferredSize = self.preferredSize(parentSize)
                 return Size(
-                    width: orientation == .horizontal ? size.width : previous.width,
-                    height: orientation == .vertical ? size.height : previous.height
+                    width: dimension == .width ? parentSize.width : preferredSize.width,
+                    height: dimension == .height ? parentSize.height : preferredSize.height
                 )
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".stretch(\(orientation))"
+            key: key, id: id, debugName: debugName + ".matchParent(\(dimension))"
+        )
+    }
+
+    public func fitInParent(_ dimension: Dimension) -> View<Msg> {
+        View(
+            preferredSize: { parentSize in
+                let preferredSize = self.preferredSize(parentSize)
+                return Size(
+                    width: dimension == .width
+                        ? min(preferredSize.width, parentSize.width) : preferredSize.width,
+                    height: dimension == .height
+                        ? min(preferredSize.height, parentSize.height) : preferredSize.height
+                )
+            },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName + ".fitInParent(\(dimension))"
         )
     }
 
@@ -305,10 +322,10 @@ extension View {
     public func padding(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) -> View<Msg> {
         View(
             preferredSize: { size in
-                let previous = self.preferredSize(size)
+                let preferredSize = self.preferredSize(size)
                 return Size(
-                    width: previous.width + left + right,
-                    height: previous.height + top + bottom
+                    width: preferredSize.width + left + right,
+                    height: preferredSize.height + top + bottom
                 )
             },
             render: { viewport, buffer in
