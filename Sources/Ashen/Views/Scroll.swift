@@ -9,19 +9,18 @@ public enum ScrollOption {
 }
 
 extension View {
-    public func scrollable(offset: Point = .zero) -> View<Msg> {
+    public func scrollable(offset: Point) -> View<Msg> {
         Scroll(self, .offset(offset))
     }
 }
 
 struct ScrollModel {
-    let contentSize: Size
-    let prevContentSize: Size?
-    let mask: Rect
+    let scrollableViewport: LocalViewport
+    let prevViewport: LocalViewport?
 }
 
 public func Scroll<Msg>(
-    _ inside: View<Msg>, onResizeContent: ((Size, Rect) -> Msg)? = nil, _ options: ScrollOption...
+    _ inside: View<Msg>, onResizeContent: ((LocalViewport) -> Msg)? = nil, _ options: ScrollOption...
 ) -> View<Msg> {
     var offset: Point = .zero
     for opt in options {
@@ -44,18 +43,17 @@ public func Scroll<Msg>(
                 if let model: ScrollModel = buffer.retrieve() {
                     buffer.store(
                         ScrollModel(
-                            contentSize: contentSize, prevContentSize: model.prevContentSize,
-                            mask: viewport.mask))
+                            scrollableViewport: LocalViewport(size: contentSize, visible: viewport.visible), prevViewport: model.scrollableViewport))
                 } else {
                     buffer.store(
                         ScrollModel(
-                            contentSize: contentSize, prevContentSize: nil, mask: viewport.mask))
+                            scrollableViewport: LocalViewport(size: contentSize, visible: viewport.visible), prevViewport: nil))
                 }
             }
 
             let scrollViewport = Viewport(
-                frame: Rect(origin: viewport.mask.origin - offset, size: contentSize),
-                mask: viewport.mask
+                frame: Rect(origin: viewport.visible.origin - offset, size: contentSize),
+                visible: viewport.visible
             )
             buffer.render(
                 key: "Scroll", view: inside,
@@ -65,11 +63,11 @@ public func Scroll<Msg>(
             let (msgs, events) = buffer.events(key: "Scroll", event: event, view: inside)
             guard let onResizeContent = onResizeContent,
                 let model: ScrollModel = buffer.retrieve(),
-                model.contentSize != model.prevContentSize
+                model.scrollableViewport != model.prevViewport
             else {
                 return (msgs, events)
             }
-            return (msgs + [onResizeContent(model.contentSize, model.mask)], events)
+            return (msgs + [onResizeContent(model.scrollableViewport)], events)
         },
         debugName: "Scroll"
     )

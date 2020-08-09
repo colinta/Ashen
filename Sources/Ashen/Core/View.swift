@@ -135,8 +135,8 @@ public struct View<Msg> {
                 let mask = buffer.mask
                 self.render(viewport, buffer)
                 let size = viewport.size
-                for y in viewport.mask.minY..<viewport.mask.minY + viewport.mask.height {
-                    for x in viewport.mask.minX..<viewport.mask.minX + viewport.mask.width {
+                for y in viewport.visible.minY..<viewport.visible.minY + viewport.visible.height {
+                    for x in viewport.visible.minX..<viewport.visible.minX + viewport.visible.width {
                         let pt = Point(x: x, y: y)
                         buffer.modifyCharacter(at: pt, mask: mask) { modify(pt, size, $0) }
                     }
@@ -152,14 +152,42 @@ public struct View<Msg> {
 // MARK: View + Frame size extensions
 //
 extension View {
-    public func size(_ size: Size) -> View<Msg> {
+    public func minSize(_ constrainSize: Size) -> View<Msg> {
         View(
-            preferredSize: { _ in
-                return size
+            preferredSize: { size in
+                let preferredSize = self.preferredSize(size)
+                return Size(
+                    width: max(preferredSize.width, constrainSize.width),
+                    height: max(preferredSize.height, constrainSize.height)
+                )
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".size(\(size))"
+            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
+        )
+    }
+
+    public func size(_ constrainSize: Size) -> View<Msg> {
+        View(
+            preferredSize: { _ in constrainSize },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
+        )
+    }
+
+    public func maxSize(_ constrainSize: Size) -> View<Msg> {
+        View(
+            preferredSize: { size in
+                let preferredSize = self.preferredSize(size)
+                return Size(
+                    width: min(preferredSize.width, constrainSize.width),
+                    height: min(preferredSize.height, constrainSize.height)
+                )
+            },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
         )
     }
 
@@ -273,7 +301,7 @@ extension View {
         )
     }
 
-    public func matchParent(_ dimension: Dimension) -> View<Msg> {
+    public func matchContainer(_ dimension: Dimension) -> View<Msg> {
         View(
             preferredSize: { parentSize in
                 let preferredSize = self.preferredSize(parentSize)
@@ -284,11 +312,11 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".matchParent(\(dimension))"
+            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension))"
         )
     }
 
-    public func fitInParent(_ dimension: Dimension) -> View<Msg> {
+    public func fitInContainer(_ dimension: Dimension) -> View<Msg> {
         View(
             preferredSize: { parentSize in
                 let preferredSize = self.preferredSize(parentSize)
@@ -301,7 +329,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".fitInParent(\(dimension))"
+            key: key, id: id, debugName: debugName + ".fitInContainer(\(dimension))"
         )
     }
 
@@ -311,12 +339,16 @@ extension View {
             render: { viewport, buffer in
                 let size = self.preferredSize(viewport.size)
                 let innerViewport = LocalViewport(
-                    size: size, mask: viewport.mask)
+                    size: size, visible: viewport.visible)
                 self.render(innerViewport, buffer)
             },
             events: events,
             key: key, id: id, debugName: debugName + ".compact()"
         )
+    }
+
+    public func padding(_ insets: Insets) -> View<Msg> {
+        padding(top: insets.top, left: insets.left, bottom: insets.bottom, right: insets.right)
     }
 
     public func padding(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) -> View<Msg> {
@@ -339,7 +371,14 @@ extension View {
             events: events,
             key: key, id: id,
             debugName: debugName
-                + ".padding(top: \(top), left: \(left), bottom: \(bottom), right: \(right))"
+                + """
+                .padding(\([
+                    top != 0 ? "top: \(top)" : nil,
+                    left != 0 ? "left: \(left)" : nil,
+                    bottom != 0 ? "bottom: \(bottom)" : nil,
+                    right != 0 ? "right: \(right)" : nil,
+                ].compactMap({ $0 }).joined(separator: ", ")))
+                """
         )
     }
 }

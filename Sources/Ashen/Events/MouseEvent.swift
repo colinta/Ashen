@@ -7,13 +7,12 @@ public struct MouseEvent {
     public let y: Int
     public let event: Event
 
-    public var button: Button? {
+    public var button: Button {
         switch event {
         case let .click(button): return button
         case let .drag(button): return button
         case let .release(button): return button
-        default:
-            return nil
+        case .scroll: return .scroll
         }
     }
 
@@ -55,6 +54,7 @@ public struct MouseEvent {
         case left
         case middle
         case right
+        case scroll
     }
 
     public enum Direction {
@@ -77,30 +77,21 @@ extension MouseEvent.Event: Equatable {
 
 extension MouseEvent {
     public var toString: String {
-        switch self.event {
-        case let .drag(btn):
-            return "drag(\(x), \(y), \(btn))"
-        case let .click(btn):
-            return "click(\(x), \(y), \(btn))"
-        case let .scroll(direction):
-            return "scroll(\(x), \(y), \(direction))"
-        case let .release(btn):
-            return "release(\(x), \(y), \(btn))"
-        }
+        "MouseEvent(\(x), \(y), \(event.toString))"
     }
 }
 
 extension MouseEvent.Event {
     public var toString: String {
         switch self {
-        case let .drag(btn):
-            return "drag(\(btn))"
         case let .click(btn):
             return "click(\(btn))"
-        case let .scroll(direction):
-            return "scroll(\(direction))"
+        case let .drag(btn):
+            return "drag(\(btn))"
         case let .release(btn):
             return "release(\(btn))"
+        case let .scroll(direction):
+            return "scroll(\(direction))"
         }
     }
 }

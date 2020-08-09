@@ -91,8 +91,8 @@ public class Buffer {
         return diffedChars
     }
 
-    var chars: Chars = [:]
-    var mask: Mask {
+    private var chars: Chars = [:]
+    public var mask: Mask {
         let initial = currentOrigin
         let maxPt = currentOrigin + currentMask.size
         var mask: Mask = [:]
@@ -118,7 +118,7 @@ public class Buffer {
     // the "model key", which stores and retrieves view models
     private var currentKey: String = ""
     private var models: [String: Any]
-    private var mouse: [Int: [Int: String]]
+    private var mouse: [Int: [Int: [MouseEvent.Button: String]]]
     private var diff: Chars?
 
     init(size: Size, prev: Buffer?) {
@@ -136,7 +136,7 @@ public class Buffer {
 
         let prevOrigin = currentOrigin
         let prevMask = currentMask
-        let nextMask = Rect(origin: currentOrigin + viewport.mask.origin, size: viewport.mask.size)
+        let nextMask = Rect(origin: currentOrigin + viewport.visible.origin, size: viewport.visible.size)
         currentMask = currentMask.intersection(with: nextMask)
         currentOrigin = currentOrigin + viewport.frame.origin
 
@@ -159,7 +159,8 @@ public class Buffer {
         currentKey = prevKey
     }
 
-    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, mask: Mask, view: View<Msg>) {
+    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button], view: View<Msg>) {
+        guard buttons.count > 0 else { return }
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
         let initial = rect.origin + currentOrigin
         let maxPt = currentOrigin + currentMask.size
@@ -178,19 +179,25 @@ public class Buffer {
                 if x > maxPt.x { break }
                 guard
                     x >= currentMask.origin.x,
-                    mask[y]?[x] != true,
-                    row[x] == nil
+                    mask[y]?[x] == true
                 else { continue }
-                row[x] = currentKey
+
+                var claimedEvents = row[x] ?? [:]
+                for event in buttons {
+                    guard claimedEvents[event] == nil else { continue }
+                    claimedEvents[event] = currentKey
+                }
+                row[x] = claimedEvents
             }
             mouse[y] = row
         }
     }
 
-    func checkMouse<Msg>(key nextKey: BufferKey, mouse: MouseEvent, view: View<Msg>) -> Bool {
-        guard let row = self.mouse[mouse.y], let checkKey = row[mouse.x] else { return false }
+    func checkMouse<Msg>(key nextKey: BufferKey, mouse mouseEvent: MouseEvent, view: View<Msg>) -> Bool {
+        guard let row = self.mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else { return false }
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        return currentKey == checkKey
+        let claimedEventKey = claimedEvents[mouseEvent.button]
+        return claimedEventKey == currentKey
     }
 
     func events<Msg>(key nextKey: BufferKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {
@@ -269,10 +276,10 @@ public class Buffer {
         let point = localPt + currentOrigin
         let maxPt = currentOrigin + currentMask.size
         guard
+            mask[point.y]?[point.x] == true,
             point.x + 1 > currentMask.origin.x, point.y + 1 > currentMask.origin.y,
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
-        if mask[point.y]?[point.x] != true { return }
 
         var row = chars[point.y] ?? [:]
         let char = row[point.x] ?? AttributedCharacter.null
@@ -301,8 +308,10 @@ public class Buffer {
 
                 var row = chars[y] ?? [:]
                 let char = row[x] ?? AttributedCharacter.null
-                guard char != AttributedCharacter.skip else { continue }
-                if mask[y]?[x] != true { continue }
+                guard
+                    mask[y]?[x] == true,
+                    char != AttributedCharacter.skip
+                else { continue }
                 row[x] = modify(x, y, char)
                 chars[y] = row
             }

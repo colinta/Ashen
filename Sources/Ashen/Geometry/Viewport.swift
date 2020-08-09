@@ -4,35 +4,35 @@
 
 public struct Viewport: Equatable {
     public let frame: Rect
-    public let mask: Rect
+    public let visible: Rect
 
     public init(_ size: Size) {
         self.init(Rect(origin: .zero, size: size))
     }
 
     public init(_ frame: Rect) {
-        self.init(frame: frame, mask: frame)
+        self.init(frame: frame, visible: frame)
     }
 
-    public init(frame: Rect, mask: Rect) {
+    public init(frame: Rect, visible: Rect) {
         self.frame = frame
-        self.mask = mask
+        self.visible = visible
     }
 
     public var isEmpty: Bool {
-        frame.size.isEmpty || mask.size.isEmpty
+        frame.size.isEmpty || visible.size.isEmpty
     }
 
-    public static let zero: Viewport = Viewport(frame: .zero, mask: .zero)
+    public static let zero: Viewport = Viewport(frame: .zero, visible: .zero)
 
     public func toLocalViewport() -> LocalViewport {
         return LocalViewport(
             size: frame.size,
-            mask: Rect(origin: mask.origin - frame.origin, size: mask.size)
+            visible: Rect(origin: visible.origin - frame.origin, size: visible.size)
         )
     }
 
     public static func == (lhs: Viewport, rhs: Viewport) -> Bool {
-        lhs.frame == rhs.frame && lhs.mask == rhs.mask
+        lhs.frame == rhs.frame && lhs.visible == rhs.visible
     }
 }

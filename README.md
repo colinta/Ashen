@@ -145,63 +145,53 @@ For convenience there are two helper "types":
 Here's a skeleton program template:
 
 ```swift
-// `Program` defines the methods that you need to define in order to be loaded
-// by `App`.  If you are designing a subprogram, you need not adhere to
-// `Program`, though it is handy because you can easily test *just* that part of
-// your application.
-struct SpinnersDemo {
-    // This is usually an enum, but it can be any type.  Your app will respond
-    // to state changes by accepting a `Message` and returning a modified
-    // `Model`.
-    enum Message {
-        case quit  // You can compose/stack programs, but your top-level program
-    }              // will need a way to exit.
+// This is usually an enum, but it can be any type.  Your app will respond
+// to state changes by accepting a `Message` and returning a modified
+// `Model`.
+enum Message {
+    case quit
+}
 
-    // The entired state of you program will be stored here, so a struct is the
-    // most common type.
-    struct Model {
-    }
+// The entired state of you program will be stored here, so a struct is the
+// most common type.
+struct Model {
+}
 
-    // Return your initial model and commands. if your app requires
-    // initialization from an API (i.eg. a loading spinner), use a
-    // `loading/loaded/error` enum to represent the initial state.  If you
-    // persist your application to the database you could load that here, either
-    // synchronously or via a `Command`.
-    func initial() -> Initial<Model, Message> {
-        Initial(Model())
-    }
+// Return your initial model and commands. if your app requires
+// initialization from an API (i.eg. a loading spinner), use a
+// `loading/loaded/error` enum to represent the initial state.  If you
+// persist your application to the database you could load that here, either
+// synchronously or via a `Command`.
+func initial() -> Initial<Model, Message> {
+    Initial(Model())
+}
 
-    // Ashen will call this method with the current model, and a message that
-    // you use to update your model.  This will result in a screen refresh, but
-    // it also means that your program is very easy to test; pass a model to
-    // this method along with the message you want to test, and check the values
-    // of the model.
-    //
-    // The return value also includes a list of "commands".  Commands are
-    // another form of event emitters, like Components, but they talk with
-    // external services, either asynchronously or synchronously.
-    func update(model: inout Model, message: Message)
-        -> State<Model, Message>
-    {
-        switch message {
-        case .quit:
-            return .quit
-        }
+// Ashen will call this method with the current model, and a message that
+// you use to update your model.  This will result in a screen refresh, but
+// it also means that your program is very easy to test; pass a model to
+// this method along with the message you want to test, and check the values
+// of the model.
+//
+// The return value also includes a list of "commands".  Commands are
+// another form of event emitters, like Components, but they talk with
+// external services, either asynchronously or synchronously.
+func update(model: inout Model, message: Message)
+    -> State<Model, Message>
+{
+    switch message {
+    case .quit:
+        return .quit
     }
+}
 
-    // Finally the render() method is given a model and a size, and you return
-    // a component - usually a Window or Box that contains child components. The
-    // screenSize is used to assist view sizing or adaptive layouts.  render()
-    // is also called when the window is resized.
-    func render(model: Model, in screenSize: Size) -> View<Message> {
-        let spinners = model.spinners.enumerated().map { (i, spinnerModel) in
-            Spinner(.middleCenter(x: 2 * i - model.spinners.count / 2), model: spinnerModel)
-        }
-        return Stack(.down, // alias for .topToBottom
-            spinners + [
-                OnKeyPress(.enter, { Message.quit }),
-            ])
-    }
+// Finally the render() method is given your model and you return
+// an array of views. Why an array? I optimized for the common case: some key
+// handlers, maybe some mouse events, and a "main" view.
+func render(model: Model) -> [View<Message>] {
+    [
+        OnKeyPress(.enter, { Message.quit }),
+        Frame(Spinner(), .alignment(.middleCenter)),
+    ])
 }
 ```
 
@@ -231,6 +221,13 @@ exit.
     ```swift
     Text("Some plain text")
     Text("Some underlined text".underlined())
+    ```
+- `Input()` - editable text, make sure to pass `.isResponder(true)` to the active `Input`.
+    ```swift
+    enum Message {
+        case textChanged(String)
+    }
+    Input("Editable text", Message.textChanged, .isResponder(true))
     ```
 - `Box()` - surround a view with a customizable border.
     ```swift
@@ -269,12 +266,53 @@ exit.
     ```swift
     Spinner()
     ```
+- `Scroll(view, .offset(pt|x:|y:))` - Make a view scrollable. By default the scroll view does not respond to key or mouse events. To make the view scrollable via mouse, try this:
+    ```swift
+    enum Message {
+        case scroll(Int)  // update model.scrollY by this value
+    }
+    OnMouseWheel(
+        Scroll(Stack(.down, [...]), .offset(model.scrollY)),
+        Message.scroll
+    )
+    ```
+    Also consider adding a "listener" for the `onResizeContent:` message, which will pass a `LocalViewport` (which has the `size` of the entire scrollable area and the `visible: Rect`)
+- `Repeating(view)` - Useful for background drawing. By itself it has `preferredSize: .zero`, but will draw the passed `view` to fill the available area.
+    ```swift
+    // draw the text "Hi!" centered, then fill the rest of the background with red.
+    ZStack([Frame(Text("Hi!".background(.red)), .alignment(.middleCenter)), Repeating(Text(" ".background(.red)))])
+    ```
 
 ## View Modifiers
 
 Views can be created in a fluent syntax (these will feel much like SwiftUI, though not nearly that level of complexity & sophistication).
 
+- `.size(preferredSize), .minSize(preferredSize), .maxSize(preferredSize)` - ensures the view is at least, exactly, or at most `preferredSize`. See also `.width(w), .minWidth(w), .maxWidth(w), .height(h), .minHeight(h), .maxHeight(h)` to control only the width or height.
+    ```swift
+    Text("Hi!").width(5)
+    Stack(.ltr, [...]).maxSize(Size(width: 20, height: 5))
+    ```
+- `.matchContainer(.width|.height)` - Ignores the view's preferred size in favor of the size provided by the containing view.
+- `.fitInContainer(.width|.height)` - Make sure the width or height is equal to or less than the containing view's width or height.
+- `.compact()` - Usually the containing view's size is passed to the view's `render` function, even if it's much more than the preferred size. This method renders the view using the `preferredSize` instead.
+- `.padding(left:,top:,right:,bottom:)` or `.padding(Insets)` - Increases the preferred size to accommodate padding, and renders the view inside the padded area. If you are interested in peaking into some simple rendering/masking code, this is a good place to start.
+- `.styled(Attr)` - After drawing the view, the rendered area is modified to include the `Attr`. See also: `underlined()`, `bottomLined()`, `reversed()`, `bold()`, `foreground(color:)`, `background(color:)`, `reset()`
+    ```swift
+    Text("Hi!".underlined()).background(color: .red)
+    Stack(.ltr, [...]).reversed()
+    ```
+- `.border(BoxBorder)` - Surrounds the view in a border.
+    ```swift
+    Text("Hi!").border(.single, .title("Message"))
+    ```
+- `.aligned(Alignment)` - This is useful when you know a view will be rendered in an area much larger than the view's `preferredSize`. The `Alignment` options are `topLeft`, `topCenter`, `topRight`, `middleLeft`, `middleCenter`, `middleRight`, `bottomLeft`, `bottomCenter`, `bottomRight`.
+    ```swift
+    Text("Hi!").aligned(.middleCenter)
+    ```
+    See also `.centered()`, which is shorthand for `.aligned(.topCenter)`, useful for centering text or a group of views.
+- `.scrollable(offset: Point)` - Wraps the view in `Scroll(view, .offset(offset))`
 
+# Events
 
 [elm]: http://elm-lang.org
 [react]: https://facebook.github.io/react/

@@ -1,15 +1,11 @@
 ////
-///  OnMouse.swift
+///  ClaimMouse.swift
 //
 
-public enum OnMouseOption {
-    case button(MouseEvent.Button)
-}
+private let ON_MOUSE_KEY = "ClaimMouse"
 
-private let ON_MOUSE_KEY = "OnMouse"
-
-public func OnMouse<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: OnMouseOption...
+public func ClaimMouse<Msg>(
+    _ inside: View<Msg>, _ options: OnMouseOption...
 ) -> View<Msg> {
     var buttons: [MouseEvent.Button] = []
     for opt in options {
@@ -35,15 +31,8 @@ public func OnMouse<Msg>(
                 mask: mask, buttons: buttons, view: inside)
         },
         events: { event, buffer in
-            let (msgs, events) = inside.events(event, buffer)
-            return View.scan(events: events) { event in
-                guard
-                    case let .mouse(mouseEvent) = event,
-                    buffer.checkMouse(key: ON_MOUSE_KEY, mouse: mouseEvent, view: inside)
-                else { return (msgs, [event]) }
-                return (msgs + [msg(mouseEvent)], [])
-            }
+            inside.events(event, buffer)
         },
-        debugName: "OnMouse"
+        debugName: "ClaimMouse"
     )
 }
