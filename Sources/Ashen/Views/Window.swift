@@ -13,7 +13,7 @@ public func Window<Msg>(_ views: [View<Msg>]) -> View<Msg> {
                 return
             }
 
-            for (index, view) in views.enumerated() {
+            for (index, view) in views.enumerated().reversed() {
                 buffer.render(
                     key: index, view: view, viewport: viewport.toViewport())
             }

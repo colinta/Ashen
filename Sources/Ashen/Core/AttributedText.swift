@@ -3,15 +3,36 @@
 //
 
 public struct AttributedCharacter: Equatable {
-    let character: Character
-    let attributes: [Attr]
+    public let character: Character
+    public let attributes: [Attr]
+
+    public init(character: Character, attributes: [Attr]) {
+        self.character = character
+        self.attributes = attributes
+    }
 
     public func styled(_ attr: Attr) -> AttributedCharacter {
         if attributes.contains(attr) {
             return self
         } else {
+            let attributes: [Attr]
+            if case .foreground = attr {
+                attributes = self.attributes.filter { attr in
+                    guard case .foreground = attr else { return true }
+                    return false
+                }
+            }
+            else if case .background = attr {
+                attributes = self.attributes.filter { attr in
+                    guard case .background = attr else { return true }
+                    return false
+                }
+            }
+            else {
+                attributes = self.attributes
+            }
             return AttributedCharacter(
-                character: self.character, attributes: self.attributes + [attr])
+                character: self.character, attributes: attributes + [attr])
         }
     }
 

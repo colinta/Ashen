@@ -314,5 +314,14 @@ Views can be created in a fluent syntax (these will feel much like SwiftUI, thou
 
 # Events
 
+- `OnKeyPress`
+- `OnTick`
+- `OnResize`
+- `OnNext`
+- `OnClick`
+- `OnMouseWheel`
+- `OnMouse`
+- `IgnoreMouse`
+
 [elm]: http://elm-lang.org
 [react]: https://facebook.github.io/react/

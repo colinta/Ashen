@@ -7,9 +7,9 @@ public protocol BufferKey {
 }
 
 public class Buffer {
-    public typealias Mask = [Int: [Int: Bool]]
     public typealias Row = [Int: AttributedCharacter]
     public typealias Chars = [Int: Row]
+    public typealias Mask = Chars
 
     public static func desc(_ chars: Chars) -> String {
         var description = ""
@@ -97,13 +97,13 @@ public class Buffer {
         let maxPt = currentOrigin + currentMask.size
         var mask: Mask = [:]
         for y in initial.y..<maxPt.y {
-            var row: [Int: Bool] = [:]
+            var row: Row = [:]
             for x in initial.x..<maxPt.x {
                 guard
                     chars[y]?[x] == nil
                         || chars[y]?[x]?.character == AttributedCharacter.null.character
                 else { continue }
-                row[x] = true
+                row[x] = chars[y]?[x] ?? AttributedCharacter.null
             }
             mask[y] = row
         }
@@ -179,7 +179,7 @@ public class Buffer {
                 if x > maxPt.x { break }
                 guard
                     x >= currentMask.origin.x,
-                    mask[y]?[x] == true
+                    mask[y]?[x] != nil
                 else { continue }
 
                 var claimedEvents = row[x] ?? [:]
@@ -276,7 +276,7 @@ public class Buffer {
         let point = localPt + currentOrigin
         let maxPt = currentOrigin + currentMask.size
         guard
-            mask[point.y]?[point.x] == true,
+            let maskChar = mask[point.y]?[point.x],
             point.x + 1 > currentMask.origin.x, point.y + 1 > currentMask.origin.y,
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
@@ -284,7 +284,7 @@ public class Buffer {
         var row = chars[point.y] ?? [:]
         let char = row[point.x] ?? AttributedCharacter.null
         guard char != AttributedCharacter.skip else { return }
-        row[point.x] = modify(char)
+        row[point.x] = modify(char).styled(maskChar.attributes)
         chars[point.y] = row
     }
 
@@ -309,10 +309,10 @@ public class Buffer {
                 var row = chars[y] ?? [:]
                 let char = row[x] ?? AttributedCharacter.null
                 guard
-                    mask[y]?[x] == true,
+                    let maskChar = mask[y]?[x],
                     char != AttributedCharacter.skip
                 else { continue }
-                row[x] = modify(x, y, char)
+                row[x] = modify(x, y, char).styled(maskChar.attributes)
                 chars[y] = row
             }
         }

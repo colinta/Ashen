@@ -1,11 +1,11 @@
 ////
-///  ClaimMouse.swift
+///  IgnoreMouse.swift
 //
 
-private let ON_MOUSE_KEY = "ClaimMouse"
+private let KEY = "IgnoreMouse"
 
-public func ClaimMouse<Msg>(
-    _ inside: View<Msg>, _ options: OnMouseOption...
+public func IgnoreMouse<Msg>(
+    _ inside: View<Msg> = Space(), _ options: OnMouseOption...
 ) -> View<Msg> {
     var buttons: [MouseEvent.Button] = []
     for opt in options {
@@ -27,12 +27,12 @@ public func ClaimMouse<Msg>(
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
             buffer.claimMouse(
-                key: ON_MOUSE_KEY, rect: Rect(origin: .zero, size: viewport.size),
+                key: KEY, rect: Rect(origin: .zero, size: viewport.size),
                 mask: mask, buttons: buttons, view: inside)
         },
         events: { event, buffer in
             inside.events(event, buffer)
         },
-        debugName: "ClaimMouse"
+        debugName: "IgnoreMouse"
     )
 }

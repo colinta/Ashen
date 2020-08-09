@@ -100,7 +100,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
         },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
-                for (index, (_, view)) in sizedViews.enumerated() {
+                for (index, (_, view)) in sizedViews.enumerated().reversed() {
                     buffer.render(key: index, view: view, viewport: .zero)
                 }
                 return
@@ -140,6 +140,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
                 cursor = Point(x: 0, y: viewport.size.height)
             }
 
+            var renderViews: [(Int, View<Msg>, Viewport)] = []
             for (index, (flowSize, view)) in sizedViews.enumerated() {
                 let viewSize: Size
                 switch flowSize {
@@ -177,15 +178,17 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
                     cursor = cursor - Point(x: 0, y: viewSize.height)
                 }
 
-                buffer.render(
-                    key: index, view: view, viewport: Viewport(Rect(origin: cursor, size: viewSize))
-                )
+                renderViews.append((index, view, Viewport(Rect(origin: cursor, size: viewSize))))
 
                 if case .leftToRight = direction {
                     cursor = cursor + Point(x: viewSize.width, y: 0)
                 } else if case .topToBottom = direction {
                     cursor = cursor + Point(x: 0, y: viewSize.height)
                 }
+            }
+            for (index, view, viewport) in renderViews.reversed() {
+                buffer.render(
+                    key: index, view: view, viewport: viewport)
             }
         },
         events: { event, buffer in

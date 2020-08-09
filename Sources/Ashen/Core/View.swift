@@ -48,7 +48,7 @@ public struct View<Msg> {
     }
 
     public static func scan(views: [View<Msg>], event: Event, buffer: Buffer) -> ([Msg], [Event]) {
-        views.enumerated().reduce(([Msg](), [event])) { info, index_view in
+        views.enumerated().reversed().reduce(([Msg](), [event])) { info, index_view in
             let (msgs, events) = info
             let (index, view) = index_view
             let (newMsgs, newEvents) = View.scan(events: events) { event in

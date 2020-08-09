@@ -18,7 +18,7 @@ public func ZStack<Msg>(_ views: [View<Msg>]) -> View<Msg> {
             }
         },
         render: { viewport, buffer in
-            for (index, view) in views.enumerated() {
+            for (index, view) in views.enumerated().reversed() {
                 buffer.render(
                     key: index, view: view, viewport: viewport.toViewport())
             }

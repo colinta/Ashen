@@ -6,7 +6,7 @@ public enum OnMouseOption {
     case button(MouseEvent.Button)
 }
 
-private let ON_MOUSE_KEY = "OnMouse"
+private let KEY = "OnMouse"
 
 public func OnMouse<Msg>(
     _ inside: View<Msg>, _ msg: @escaping (MouseEvent) -> Msg, _ options: OnMouseOption...
@@ -31,7 +31,7 @@ public func OnMouse<Msg>(
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
             buffer.claimMouse(
-                key: ON_MOUSE_KEY, rect: Rect(origin: .zero, size: viewport.size),
+                key: KEY, rect: Rect(origin: .zero, size: viewport.size),
                 mask: mask, buttons: buttons, view: inside)
         },
         events: { event, buffer in
@@ -39,7 +39,7 @@ public func OnMouse<Msg>(
             return View.scan(events: events) { event in
                 guard
                     case let .mouse(mouseEvent) = event,
-                    buffer.checkMouse(key: ON_MOUSE_KEY, mouse: mouseEvent, view: inside)
+                    buffer.checkMouse(key: KEY, mouse: mouseEvent, view: inside)
                 else { return (msgs, [event]) }
                 return (msgs + [msg(mouseEvent)], [])
             }
