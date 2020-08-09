@@ -109,7 +109,7 @@ private func OnClick<Msg>(
             let model: ClickModel? = buffer.retrieve()
             let isHighlighted = model?.isHighlighted ?? false
 
-            let mask: Buffer.Mask? = highlight && isHighlighted ? buffer.mask : nil
+            let mask: Buffer.Mask = buffer.mask
             inside.render(viewport, buffer)
             if highlight && isHighlighted {
                 buffer.modifyCharacters(in: viewport.mask, mask: mask) { x, y, c in
@@ -121,7 +121,7 @@ private func OnClick<Msg>(
             // *after* the child view has had a chance.
             buffer.claimMouse(
                 key: ON_CLICK_KEY, rect: Rect(origin: .zero, size: viewport.size),
-                view: inside)
+                mask: mask, view: inside)
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)

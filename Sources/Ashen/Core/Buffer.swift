@@ -159,7 +159,7 @@ public class Buffer {
         currentKey = prevKey
     }
 
-    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, view: View<Msg>) {
+    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, mask: Mask, view: View<Msg>) {
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
         let initial = rect.origin + currentOrigin
         let maxPt = currentOrigin + currentMask.size
@@ -178,6 +178,7 @@ public class Buffer {
                 if x > maxPt.x { break }
                 guard
                     x >= currentMask.origin.x,
+                    mask[y]?[x] != true,
                     row[x] == nil
                 else { continue }
                 row[x] = currentKey
@@ -263,7 +264,7 @@ public class Buffer {
     }
 
     func modifyCharacter(
-        at localPt: Point, mask: Mask?, map modify: (AttributedCharacter) -> AttributedCharacter
+        at localPt: Point, mask: Mask, map modify: (AttributedCharacter) -> AttributedCharacter
     ) {
         let point = localPt + currentOrigin
         let maxPt = currentOrigin + currentMask.size
@@ -271,7 +272,7 @@ public class Buffer {
             point.x + 1 > currentMask.origin.x, point.y + 1 > currentMask.origin.y,
             point.x < maxPt.x, point.y < maxPt.y
         else { return }
-        if let mask = mask, mask[point.y]?[point.x] != true { return }
+        if mask[point.y]?[point.x] != true { return }
 
         var row = chars[point.y] ?? [:]
         let char = row[point.x] ?? AttributedCharacter.null
@@ -281,7 +282,7 @@ public class Buffer {
     }
 
     func modifyCharacters(
-        in localRect: Rect, mask: Mask?,
+        in localRect: Rect, mask: Mask,
         map modify: (Int, Int, AttributedCharacter) -> AttributedCharacter
     ) {
         let initial = localRect.origin + currentOrigin
@@ -301,7 +302,7 @@ public class Buffer {
                 var row = chars[y] ?? [:]
                 let char = row[x] ?? AttributedCharacter.null
                 guard char != AttributedCharacter.skip else { continue }
-                if let mask = mask, mask[y]?[x] != true { continue }
+                if mask[y]?[x] != true { continue }
                 row[x] = modify(x, y, char)
                 chars[y] = row
             }
