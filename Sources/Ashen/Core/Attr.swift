@@ -5,6 +5,7 @@
 import Termbox
 
 public enum Attr: Equatable {
+    case none
     case underline
     case reverse
     case bold
@@ -13,6 +14,7 @@ public enum Attr: Equatable {
 
     var toTermbox: TermboxAttributes {
         switch self {
+        case .none: return .zero
         case .underline: return .underline
         case .reverse: return .reverse
         case .bold: return .bold
@@ -23,6 +25,8 @@ public enum Attr: Equatable {
 
     public static func == (lhs: Attr, rhs: Attr) -> Bool {
         switch (lhs, rhs) {
+        case (.none, .none):
+            return true
         case (.underline, .underline):
             return true
         case (.reverse, .reverse):

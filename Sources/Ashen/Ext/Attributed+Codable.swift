@@ -43,6 +43,7 @@ public struct AttributedCoder: Codable {
 
     struct AttrCoder: Codable {
         enum AttrType: String, Codable {
+            case none
             case underline
             case reverse
             case bold
@@ -74,6 +75,10 @@ public struct AttributedCoder: Codable {
 
         init(attr: Attr) {
             switch attr {
+            case .none:
+                self.attr = .none
+                self.namedColor = nil
+                self.intColor = nil
             case .underline:
                 self.attr = .underline
                 self.namedColor = nil
@@ -180,6 +185,8 @@ public struct AttributedCoder: Codable {
 
         func toAttr() -> Attr? {
             switch attr {
+            case .none:
+                return Attr.none
             case .underline:
                 return .underline
             case .reverse:
