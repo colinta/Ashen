@@ -181,7 +181,8 @@ public func Input<Msg>(
             buffer.store(model)
         },
         events: { event, buffer in
-            guard case let .key(key) = event,
+            guard isResponder,
+                case let .key(key) = event,
                 let model: InputModel = buffer.retrieve()
             else { return ([], [event]) }
             let (nextModel, msgs, events): (InputModel, [Msg], [Event]) = model.keyEvent(
@@ -228,7 +229,7 @@ extension InputModel {
         } else if key == .end {
             (nextModel, events) = moveToEndOfLine()
         } else {
-            return (self, [], [])
+            return (self, [], [.key(key)])
         }
 
         let msgs: [Msg]
