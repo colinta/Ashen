@@ -20,7 +20,8 @@ struct ScrollModel {
 }
 
 public func Scroll<Msg>(
-    _ inside: View<Msg>, onResizeContent: ((LocalViewport) -> Msg)? = nil, _ options: ScrollOption...
+    _ inside: View<Msg>, onResizeContent: ((LocalViewport) -> Msg)? = nil,
+    _ options: ScrollOption...
 ) -> View<Msg> {
     var offset: Point = .zero
     for opt in options {
@@ -43,11 +44,14 @@ public func Scroll<Msg>(
                 if let model: ScrollModel = buffer.retrieve() {
                     buffer.store(
                         ScrollModel(
-                            scrollableViewport: LocalViewport(size: contentSize, visible: viewport.visible), prevViewport: model.scrollableViewport))
+                            scrollableViewport: LocalViewport(
+                                size: contentSize, visible: viewport.visible),
+                            prevViewport: model.scrollableViewport))
                 } else {
                     buffer.store(
                         ScrollModel(
-                            scrollableViewport: LocalViewport(size: contentSize, visible: viewport.visible), prevViewport: nil))
+                            scrollableViewport: LocalViewport(
+                                size: contentSize, visible: viewport.visible), prevViewport: nil))
                 }
             }
 

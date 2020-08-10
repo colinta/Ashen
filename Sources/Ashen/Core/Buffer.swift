@@ -136,7 +136,8 @@ public class Buffer {
 
         let prevOrigin = currentOrigin
         let prevMask = currentMask
-        let nextMask = Rect(origin: currentOrigin + viewport.visible.origin, size: viewport.visible.size)
+        let nextMask = Rect(
+            origin: currentOrigin + viewport.visible.origin, size: viewport.visible.size)
         currentMask = currentMask.intersection(with: nextMask)
         currentOrigin = currentOrigin + viewport.frame.origin
 
@@ -159,7 +160,10 @@ public class Buffer {
         currentKey = prevKey
     }
 
-    func claimMouse<Msg>(key nextKey: BufferKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button], view: View<Msg>) {
+    func claimMouse<Msg>(
+        key nextKey: BufferKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button],
+        view: View<Msg>
+    ) {
         guard buttons.count > 0 else { return }
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
         let initial = rect.origin + currentOrigin
@@ -193,8 +197,12 @@ public class Buffer {
         }
     }
 
-    func checkMouse<Msg>(key nextKey: BufferKey, mouse mouseEvent: MouseEvent, view: View<Msg>) -> Bool {
-        guard let row = self.mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else { return false }
+    func checkMouse<Msg>(key nextKey: BufferKey, mouse mouseEvent: MouseEvent, view: View<Msg>)
+        -> Bool
+    {
+        guard let row = self.mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else {
+            return false
+        }
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
         let claimedEventKey = claimedEvents[mouseEvent.button]
         return claimedEventKey == currentKey

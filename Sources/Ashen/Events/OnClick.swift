@@ -27,19 +27,22 @@ struct OnClickModel {
 }
 
 public func OnLeftClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>, _ options: OnSingleClickOption...
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
+    _ options: OnSingleClickOption...
 ) -> View<Msg> {
     OnButtonClick(.left, inside, msg, options).debugName("OnLeftClick")
 }
 
 public func OnRightClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>, _ options: OnSingleClickOption...
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
+    _ options: OnSingleClickOption...
 ) -> View<Msg> {
     OnButtonClick(.right, inside, msg, options).debugName("OnRightClick")
 }
 
 public func OnMiddleClick<Msg>(
-    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>, _ options: OnSingleClickOption...
+    _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
+    _ options: OnSingleClickOption...
 ) -> View<Msg> {
     OnButtonClick(.middle, inside, msg, options).debugName("OnLeftClick")
 }
@@ -159,7 +162,10 @@ private func OnClick<Msg>(
 
                 if mouseEvent.isReleased {
                     buffer.store(OnClickModel(isHighlighted: false))
-                    return (msgs + (msg.map { [$0(mouseEvent.button)] } ?? []), highlight ? [.redraw] : [])
+                    return (
+                        msgs + (msg.map { [$0(mouseEvent.button)] } ?? []),
+                        highlight ? [.redraw] : []
+                    )
                 } else if mouseEvent.isPressed && highlight {
                     buffer.store(OnClickModel(isHighlighted: true))
                     return (msgs, [.redraw])

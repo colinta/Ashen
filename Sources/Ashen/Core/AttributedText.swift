@@ -21,14 +21,12 @@ public struct AttributedCharacter: Equatable {
                     guard case .foreground = attr else { return true }
                     return false
                 }
-            }
-            else if case .background = attr {
+            } else if case .background = attr {
                 attributes = self.attributes.filter { attr in
                     guard case .background = attr else { return true }
                     return false
                 }
-            }
-            else {
+            } else {
                 attributes = self.attributes
             }
             return AttributedCharacter(

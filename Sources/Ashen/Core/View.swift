@@ -136,7 +136,8 @@ public struct View<Msg> {
                 self.render(viewport, buffer)
                 let size = viewport.size
                 for y in viewport.visible.minY..<viewport.visible.minY + viewport.visible.height {
-                    for x in viewport.visible.minX..<viewport.visible.minX + viewport.visible.width {
+                    for x in viewport.visible.minX..<viewport.visible.minX + viewport.visible.width
+                    {
                         let pt = Point(x: x, y: y)
                         buffer.modifyCharacter(at: pt, mask: mask) { modify(pt, size, $0) }
                     }
