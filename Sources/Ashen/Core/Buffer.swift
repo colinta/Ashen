@@ -200,7 +200,7 @@ public class Buffer {
     func checkMouse<Msg>(key nextKey: BufferKey, mouse mouseEvent: MouseEvent, view: View<Msg>)
         -> Bool
     {
-        guard let row = self.mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else {
+        guard let row = mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else {
             return false
         }
         let currentKey = calculateNextKey(view: view, nextKey: nextKey)
