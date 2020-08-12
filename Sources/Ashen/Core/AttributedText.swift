@@ -205,21 +205,3 @@ public struct AttributedString: Attributed {
         AttributedString(characters: lhs.attributedCharacters + rhs.attributedCharacters)
     }
 }
-
-extension String: Attributed {
-    public var attributedCharacters: [AttributedCharacter] {
-        self.map { AttributedCharacter(character: $0, attributes: []) }
-    }
-}
-
-extension Array: Attributed where Element: Attributed {
-    public var attributedCharacters: [AttributedCharacter] {
-        self.flatMap { str in str.attributedCharacters }
-    }
-    public var countLines: Int {
-        AttributedString(characters: attributedCharacters).countLines
-    }
-    public var maxWidth: Int {
-        AttributedString(characters: attributedCharacters).maxWidth
-    }
-}

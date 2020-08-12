@@ -25,3 +25,9 @@ extension String {
         }
     }
 }
+
+extension String: Attributed {
+    public var attributedCharacters: [AttributedCharacter] {
+        self.map { AttributedCharacter(character: $0, attributes: []) }
+    }
+}
