@@ -149,6 +149,8 @@ extension Attributed {
 
 public struct AttributedString: Attributed {
     public let attributedCharacters: [AttributedCharacter]
+    public var count: Int { attributedCharacters.count }
+    public var isEmpty: Bool { count == 0 }
     public var countLines: Int {
         self.attributedCharacters.reduce(1) { memo, ac in
             if ac.character == "\n" {
