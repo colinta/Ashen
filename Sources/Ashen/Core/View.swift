@@ -192,12 +192,16 @@ extension View {
         )
     }
 
-    public func minWidth(_ width: Int) -> View<Msg> {
+    public func minWidth(_ width: Int, fittingContainer: Bool = false) -> View<Msg> {
         View(
             preferredSize: { size in
                 let preferredSize = self.preferredSize(size)
+                var newWidth = max(preferredSize.width, width)
+                if fittingContainer {
+                    newWidth = min(size.width, newWidth)
+                }
                 return Size(
-                    width: max(preferredSize.width, width),
+                    width: newWidth,
                     height: preferredSize.height
                 )
             },
@@ -247,13 +251,17 @@ extension View {
         )
     }
 
-    public func minHeight(_ height: Int) -> View<Msg> {
+    public func minHeight(_ height: Int, fittingContainer: Bool = false) -> View<Msg> {
         View(
             preferredSize: { size in
                 let preferredSize = self.preferredSize(size)
+                var newHeight = max(preferredSize.height, height)
+                if fittingContainer {
+                    newHeight = min(size.height, newHeight)
+                }
                 return Size(
                     width: preferredSize.width,
-                    height: max(preferredSize.height, height)
+                    height: newHeight
                 )
             },
             render: render,
