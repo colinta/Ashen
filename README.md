@@ -292,7 +292,8 @@ Views can be created in a fluent syntax (these will feel much like SwiftUI, thou
     Text("Hi!").width(5)
     Stack(.ltr, [...]).maxSize(Size(width: 20, height: 5))
     ```
-- `.matchContainer(.width|.height)` - Ignores the view's preferred size in favor of the size provided by the containing view.
+- `.matchContainer(), .matchContainer(dimension: .width|.height)` - Ignores the view's preferred size in favor of the size provided by the containing view.
+- `.matchSize(ofView: view), .matchSize(ofView: view, dimension: .width|.height)` - Ignores the view's preferred size in favor of another view (usually a sibling view, in a ZStack).
 - `.fitInContainer(.width|.height)` - Make sure the width or height is equal to or less than the containing view's width or height.
 - `.compact()` - Usually the containing view's size is passed to the view's `render` function, even if it's much more than the preferred size. This method renders the view using the `preferredSize` instead.
 - `.padding(left:,top:,right:,bottom:)` or `.padding(Insets)` - Increases the preferred size to accommodate padding, and renders the view inside the padded area. If you are interested in peaking into some simple rendering/masking code, this is a good place to start.

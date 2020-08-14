@@ -310,9 +310,10 @@ extension View {
         )
     }
 
-    public func matchContainer(_ dimension: Dimension) -> View<Msg> {
+    public func matchContainer(dimension: Dimension? = nil) -> View<Msg> {
         View(
             preferredSize: { parentSize in
+                guard let dimension = dimension else { return parentSize }
                 let preferredSize = self.preferredSize(parentSize)
                 return Size(
                     width: dimension == .width ? parentSize.width : preferredSize.width,
@@ -321,24 +322,41 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension))"
+            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
 
-    public func fitInContainer(_ dimension: Dimension) -> View<Msg> {
+    public func matchSize(ofView: View<Msg>, dimension: Dimension? = nil) -> View<Msg> {
+        View(
+            preferredSize: { parentSize in
+                let ofViewSize = ofView.preferredSize(parentSize)
+                guard let dimension = dimension else { return ofViewSize }
+                let preferredSize = self.preferredSize(parentSize)
+                return Size(
+                    width: dimension == .width ? ofViewSize.width : preferredSize.width,
+                    height: dimension == .height ? ofViewSize.height : preferredSize.height
+                )
+            },
+            render: render,
+            events: events,
+            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
+        )
+    }
+
+    public func fitInContainer(dimension: Dimension? = nil) -> View<Msg> {
         View(
             preferredSize: { parentSize in
                 let preferredSize = self.preferredSize(parentSize)
                 return Size(
-                    width: dimension == .width
+                    width: dimension == .width || dimension == nil
                         ? min(preferredSize.width, parentSize.width) : preferredSize.width,
-                    height: dimension == .height
+                    height: dimension == .height || dimension == nil
                         ? min(preferredSize.height, parentSize.height) : preferredSize.height
                 )
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".fitInContainer(\(dimension))"
+            key: key, id: id, debugName: debugName + ".fitInContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
 
