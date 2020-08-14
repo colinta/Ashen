@@ -3,9 +3,9 @@
 //
 
 public struct Command<Msg> {
-    public let run: ((Msg) -> Void) -> Void
+    public let run: (@escaping (Msg) -> Void) -> Void
 
-    public init(_ run: @escaping ((Msg) -> Void) -> Void) {
+    public init(_ run: @escaping (@escaping (Msg) -> Void) -> Void) {
         self.run = run
     }
 

@@ -9,8 +9,8 @@ public func Timeout<Msg>(
 )
     -> Command<Msg>
 {
-    Command { done in
+    Command { send in
         Thread.sleep(forTimeInterval: delay)
-        done(onTimeout())
+        send(onTimeout())
     }
 }
