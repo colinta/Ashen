@@ -114,6 +114,32 @@ public struct View<Msg> {
         )
     }
 
+    public func enableDebug() -> View<Msg> {
+        View<Msg>(
+            preferredSize: { size in
+                let silenced = debugSilenced()
+                debugSilenced(false)
+                let preferredSize = self.preferredSize(size)
+                debugSilenced(silenced)
+                return preferredSize
+            },
+            render: { viewport, buffer in
+                let silenced = debugSilenced()
+                debugSilenced(false)
+                self.render(viewport, buffer)
+                debugSilenced(silenced)
+            },
+            events: { event, buffer in
+                let silenced = debugSilenced()
+                debugSilenced(false)
+                let events = self.events(event, buffer)
+                debugSilenced(silenced)
+                return events
+            },
+            key: key, id: id, debugName: debugName
+        )
+    }
+
     public func background(view: View<Msg>) -> View<Msg> {
         View(
             preferredSize: preferredSize,
