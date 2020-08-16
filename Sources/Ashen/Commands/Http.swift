@@ -87,25 +87,30 @@ public struct HttpRequest<Msg> {
                 httpPrivateRequest.cancel()
             }
             self.httpPrivateRequest = httpPrivateRequest
-        }
-        else {
+        } else {
             self.httpPrivateRequest = nil
             self.cancel = {}
         }
     }
 
-    public func decodeJson<T>(_ type: T.Type) -> HttpMappedRequest<Msg, T> where T : Decodable {
-        HttpMappedRequest<Msg, T>(httpRequest: self, map: { response in
-            let (_, _, data) = response
-            let coder = JSONDecoder()
-            return try coder.decode(type, from: data)
-        })
+    public func decodeJson<T>(_ type: T.Type) -> HttpMappedRequest<Msg, T> where T: Decodable {
+        HttpMappedRequest<Msg, T>(
+            httpRequest: self,
+            map: { response in
+                let (_, _, data) = response
+                let coder = JSONDecoder()
+                return try coder.decode(type, from: data)
+            })
     }
 
-    public func mapResponse<T>(_ map: @escaping (Http.Response) throws -> T) -> HttpMappedRequest<Msg, T> {
-        HttpMappedRequest<Msg, T>(httpRequest: self, map: { response in
-            return try map(response)
-        })
+    public func mapResponse<T>(_ map: @escaping (Http.Response) throws -> T) -> HttpMappedRequest<
+        Msg, T
+    > {
+        HttpMappedRequest<Msg, T>(
+            httpRequest: self,
+            map: { response in
+                return try map(response)
+            })
     }
 
     public func start(
@@ -162,8 +167,7 @@ public struct HttpMappedRequest<Msg, T> {
                 } catch {
                     if let error = error as? Http.Error {
                         return onComplete(.failure(error))
-                    }
-                    else {
+                    } else {
                         return onComplete(.failure(Http.Error.system(error)))
                     }
                 }
@@ -283,7 +287,8 @@ public struct Http {
         case system
         case mock((URLSessionConfiguration) -> URLSessionProtocol)
 
-        func create(config: URLSessionConfiguration, delegate: URLSessionDelegate) -> URLSessionProtocol
+        func create(config: URLSessionConfiguration, delegate: URLSessionDelegate)
+            -> URLSessionProtocol
         {
             switch self {
             case .system:
@@ -323,14 +328,11 @@ class HttpPrivateRequest {
             option.apply(toRequest: &request)
             if case let .background(identifier) = option {
                 configOpt = .background(withIdentifier: identifier)
-            }
-            else if case .ephemeral = option {
+            } else if case .ephemeral = option {
                 configOpt = .ephemeral
-            }
-            else if case let .body(body) = option {
+            } else if case let .body(body) = option {
                 request.httpBody = body.toData
-            }
-            else if case let .sessionHandler(sessionHandler) = option {
+            } else if case let .sessionHandler(sessionHandler) = option {
                 sessionHandlerOpt = sessionHandler
             }
         }
@@ -367,11 +369,9 @@ class HttpPrivateRequest {
             let result: Http.Result
             if let data = data {
                 result = .success((statusCode, headers, data))
-            }
-            else if let error = error {
+            } else if let error = error {
                 result = .failure(.status(statusCode, error))
-            }
-            else {
+            } else {
                 result = .failure(.unknown(statusCode, headers))
             }
 
@@ -384,8 +384,7 @@ class HttpPrivateRequest {
                 onProgress(amt)
             }
             startDownloadTask(request)
-        }
-        else {
+        } else {
             startDataTask(request)
         }
     }
@@ -460,9 +459,13 @@ private func responseToHeaders(_ response: URLResponse?) -> [Http.Header] {
 }
 
 public protocol URLSessionProtocol: class {
-    func ashenDataTask(with: URLRequest, completionHandler: ((Int, [Http.Header], Data?, Swift.Error?) -> Void)?)
+    func ashenDataTask(
+        with: URLRequest, completionHandler: ((Int, [Http.Header], Data?, Swift.Error?) -> Void)?
+    )
         -> URLSessionTaskProtocol
-    func ashenDownloadTask(with: URLRequest, completionHandler: ((Int, [Http.Header], Data?, Swift.Error?) -> Void)?)
+    func ashenDownloadTask(
+        with: URLRequest, completionHandler: ((Int, [Http.Header], Data?, Swift.Error?) -> Void)?
+    )
         -> URLSessionTaskProtocol
     func ashenCancel()
 }
@@ -496,8 +499,7 @@ extension URLSession: URLSessionProtocol {
                     data,
                     error
                 )
-            }
-            else {
+            } else {
                 completionHandler?(
                     (response as? HTTPURLResponse)?.statusCode ?? 0,
                     responseToHeaders(response),

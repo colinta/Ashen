@@ -342,7 +342,8 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
+            key: key, id: id,
+            debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
 
@@ -359,7 +360,8 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
+            key: key, id: id,
+            debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
 
@@ -376,7 +378,8 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".fitInContainer(\(dimension.map({ "\($0) "}) ?? ""))"
+            key: key, id: id,
+            debugName: debugName + ".fitInContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
 
