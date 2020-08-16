@@ -55,43 +55,25 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
             var maxWidth = 0
             var maxHeight = 0
             var remainingSize = parentSize
-            var foundFlex = false
-            for (flowSize, view) in sizedViews {
+            for (_, view) in sizedViews {
                 let preferredSize = view.preferredSize(remainingSize)
                 maxWidth = max(maxWidth, preferredSize.width)
                 maxHeight = max(maxHeight, preferredSize.height)
-                if case .fixed = flowSize {
-                    if direction.isHorizontal {
-                        allSizes = allSizes + Size(width: preferredSize.width, height: 0)
-                        remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
-                    } else {
-                        allSizes = allSizes + Size(width: 0, height: preferredSize.height)
-                        remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
-                    }
-                } else if direction.isHorizontal {
-                    foundFlex = true
+                if direction.isHorizontal {
+                    allSizes = allSizes + Size(width: preferredSize.width, height: 0)
+                    remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
                 } else {
-                    foundFlex = true
+                    allSizes = allSizes + Size(width: 0, height: preferredSize.height)
+                    remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
                 }
             }
 
-            switch (foundFlex, direction.isHorizontal) {
-            case (true, true):
-                return Size(
-                    width: parentSize.width,
-                    height: maxHeight
-                )
-            case (true, false):
-                return Size(
-                    width: maxWidth,
-                    height: parentSize.height
-                )
-            case (false, true):
+            if direction.isHorizontal {
                 return Size(
                     width: allSizes.width,
                     height: maxHeight
                 )
-            case (false, false):
+            } else {
                 return Size(
                     width: maxWidth,
                     height: allSizes.height
