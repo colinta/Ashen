@@ -61,7 +61,7 @@ private func calculateSizes<Msg>(_ views: [View<Msg>], inSize parentSize: Size) 
 
     if maxWidth > 0 {
         let columnCount = max(1, parentSize.width / maxWidth)
-        let idealHeight = totalHeight / columnCount
+        let idealHeight = Int((Float(totalHeight) / Float(columnCount)).rounded(.up))
         return (viewsAndSizes, columnCount, idealHeight)
     } else {
         return (viewsAndSizes, 0, totalHeight)
