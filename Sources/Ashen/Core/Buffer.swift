@@ -118,12 +118,14 @@ public class Buffer {
     // the "model key", which stores and retrieves view models
     private var currentKey: String = ""
     private var models: [String: Any]
+    private var prevModels: [String: Any]
     private var mouse: [Int: [Int: [MouseEvent.Button: String]]]
     private var diff: Chars?
 
     init(size: Size, prev: Buffer?) {
         self.currentMask = Rect(origin: .zero, size: size)
-        self.models = prev?.models ?? [:]
+        self.models = [:]
+        self.prevModels = prev?.models ?? [:]
         self.mouse = [:]
         self.diff = prev?.chars
     }
@@ -221,7 +223,14 @@ public class Buffer {
     }
 
     func retrieve<T>() -> T? {
-        return models[currentKey] as? T
+        if let model = models[currentKey] as? T {
+            return model
+        }
+        else if let model = prevModels[currentKey] as? T {
+            models[currentKey] = model
+            return model
+        }
+        return nil
 
     }
 
