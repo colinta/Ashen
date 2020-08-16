@@ -14,14 +14,23 @@ public enum Color: Equatable {
     case magenta
     case cyan
     case white
+
+    case gray
+    case grayscale(AttrSize)
+    case brightRed
+    case brightGreen
+    case brightYellow
+    case brightBlue
+    case brightMagenta
+    case brightCyan
+    case brightWhite
+
     case any(AttrSize)
 
     var toTermbox: TermboxAttributes {
         switch self {
         case .none:
             return .default
-        case .black:
-            return .black
         case .red:
             return .red
         case .green:
@@ -36,6 +45,30 @@ public enum Color: Equatable {
             return .cyan
         case .white:
             return .white
+
+        case .gray:
+            return TermboxAttributes(rawValue: 8)
+        case .brightRed:
+            return TermboxAttributes(rawValue: 9)
+        case .brightGreen:
+            return TermboxAttributes(rawValue: 10)
+        case .brightYellow:
+            return TermboxAttributes(rawValue: 11)
+        case .brightBlue:
+            return TermboxAttributes(rawValue: 12)
+        case .brightMagenta:
+            return TermboxAttributes(rawValue: 13)
+        case .brightCyan:
+            return TermboxAttributes(rawValue: 14)
+        case .brightWhite:
+            return TermboxAttributes(rawValue: 15)
+
+        case .black:
+            return .black
+
+        case let .grayscale(shade):
+            let clamped = min(23, max(0, shade))
+            return TermboxAttributes(rawValue: 232 + clamped)
 
         case let .any(color):
             guard color >= 0 && color < 256 else { return .default }

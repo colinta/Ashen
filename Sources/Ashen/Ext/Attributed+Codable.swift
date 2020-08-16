@@ -61,6 +61,15 @@ public struct AttributedCoder: Codable {
             case magenta
             case cyan
             case white
+            case gray
+            case grayscale
+            case brightRed
+            case brightGreen
+            case brightYellow
+            case brightBlue
+            case brightMagenta
+            case brightCyan
+            case brightWhite
         }
 
         let attr: AttrType
@@ -150,6 +159,24 @@ public struct AttributedCoder: Codable {
                 return (.cyan, nil)
             case .white:
                 return (.white, nil)
+            case .gray:
+                return (.gray, nil)
+            case .brightRed:
+                return (.brightRed, nil)
+            case .brightGreen:
+                return (.brightGreen, nil)
+            case .brightYellow:
+                return (.brightYellow, nil)
+            case .brightBlue:
+                return (.brightBlue, nil)
+            case .brightMagenta:
+                return (.brightMagenta, nil)
+            case .brightCyan:
+                return (.brightCyan, nil)
+            case .brightWhite:
+                return (.brightWhite, nil)
+            case let .grayscale(shade):
+                return (.grayscale, shade)
             case let .any(intColor):
                 return (nil, intColor)
             }
@@ -176,6 +203,25 @@ public struct AttributedCoder: Codable {
                     return .cyan
                 case .white:
                     return .white
+                case .gray:
+                    return .gray
+                case .brightRed:
+                    return .brightRed
+                case .brightGreen:
+                    return .brightGreen
+                case .brightYellow:
+                    return .brightYellow
+                case .brightBlue:
+                    return .brightBlue
+                case .brightMagenta:
+                    return .brightMagenta
+                case .brightCyan:
+                    return .brightCyan
+                case .brightWhite:
+                    return .brightWhite
+                case .grayscale:
+                    guard let intColor = intColor else { return .gray }
+                    return .grayscale(intColor)
                 }
             } else if let intColor = intColor {
                 return .any(intColor)
