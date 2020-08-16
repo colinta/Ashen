@@ -438,6 +438,10 @@ extension View {
 //
 extension View {
     public func styled(_ style: Attr) -> View<Msg> {
+        styled([style])
+    }
+
+    public func styled(_ styles: [Attr]) -> View<Msg> {
         copy(
             preferredSize: preferredSize,
             render: { viewport, buffer in
@@ -446,10 +450,8 @@ extension View {
                 for y in (0..<viewport.size.height) {
                     for x in (0..<viewport.size.width) {
                         buffer.modifyCharacter(at: Point(x: x, y: y), mask: mask) { c in
-                            guard !c.attributes.contains(style) else { return c }
-                            let newC = AttributedCharacter(
-                                character: c.character, attributes: c.attributes + [style])
-                            return newC
+                            AttributedCharacter(
+                                character: c.character, attributes: c.attributes + styles)
                         }
                     }
                 }

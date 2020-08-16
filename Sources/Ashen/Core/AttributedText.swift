@@ -78,6 +78,10 @@ extension Attributed {
             characters: self.attributedCharacters.map { $0.styled(attr) })
     }
 
+    public func styled(_ attrs: [Attr]) -> AttributedString {
+        attrs.reduce(self.styled(.none)) { $0.styled($1) }
+    }
+
     public func underlined() -> AttributedString {
         styled(.underline)
     }
