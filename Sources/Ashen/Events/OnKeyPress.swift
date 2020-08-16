@@ -9,7 +9,7 @@ public enum OnKeyPressOption {
     case except([KeyEvent])
 }
 
-public func OnKeyPress<Msg>(key: KeyEvent, _ onKeyPress: @escaping @autoclosure SimpleEvent<Msg>)
+public func OnKeyPress<Msg>(_ key: KeyEvent, _ onKeyPress: @escaping @autoclosure SimpleEvent<Msg>)
     -> View<Msg>
 {
     OnKeyPress({ _ in onKeyPress() }, options: [.only([key])])
