@@ -9,6 +9,24 @@ public struct Size: Equatable {
     public static let zero = Size(width: 0, height: 0)
     public static let max = Size(width: Int.max, height: Int.max)
 
+    static func max(_ sizes: Size...) -> Size {
+        sizes.reduce(Size.zero) { memo, size in
+            Size(
+                width: Swift.max(memo.width, size.width),
+                height: Swift.max(memo.height, size.height)
+            )
+        }
+    }
+
+    static func min(_ sizes: Size...) -> Size {
+        sizes.reduce(Size.max) { memo, size in
+            Size(
+                width: Swift.min(memo.width, size.width),
+                height: Swift.min(memo.height, size.height)
+            )
+        }
+    }
+
     public init(width: Int, height: Int) {
         self.width = Swift.max(0, width)
         self.height = Swift.max(0, height)

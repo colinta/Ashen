@@ -183,10 +183,7 @@ extension View {
         View(
             preferredSize: { size in
                 let preferredSize = self.preferredSize(size)
-                return Size(
-                    width: max(preferredSize.width, constrainSize.width),
-                    height: max(preferredSize.height, constrainSize.height)
-                )
+                return Size.max(preferredSize, constrainSize)
             },
             render: render,
             events: events,
@@ -207,10 +204,7 @@ extension View {
         View(
             preferredSize: { size in
                 let preferredSize = self.preferredSize(size)
-                return Size(
-                    width: min(preferredSize.width, constrainSize.width),
-                    height: min(preferredSize.height, constrainSize.height)
-                )
+                return Size.min(preferredSize, constrainSize)
             },
             render: render,
             events: events,

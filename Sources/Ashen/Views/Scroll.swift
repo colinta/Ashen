@@ -32,14 +32,18 @@ public func Scroll<Msg>(
     }
 
     return View<Msg>(
-        preferredSize: { $0 },
+        preferredSize: { size in
+            let innerSize = inside.preferredSize(size)
+            return Size.min(size, innerSize)
+        },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
                 buffer.render(key: "Box", view: inside, viewport: .zero)
                 return
             }
 
-            let contentSize = inside.preferredSize(viewport.size)
+            let insideSize = inside.preferredSize(viewport.size)
+            let contentSize = Size.max(insideSize, viewport.size)
             if onResizeContent != nil {
                 if let model: ScrollModel = buffer.retrieve() {
                     buffer.store(

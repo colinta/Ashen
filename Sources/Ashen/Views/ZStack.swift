@@ -11,10 +11,7 @@ public func ZStack<Msg>(_ views: [View<Msg>]) -> View<Msg> {
         preferredSize: { size in
             views.reduce(Size.zero) { memo, view in
                 let viewSize = view.preferredSize(size)
-                return Size(
-                    width: max(memo.width, viewSize.width),
-                    height: max(memo.height, viewSize.height)
-                )
+                return Size.max(memo, viewSize)
             }
         },
         render: { viewport, buffer in
