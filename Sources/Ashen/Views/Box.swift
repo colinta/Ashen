@@ -5,7 +5,6 @@
 public enum BoxOption {
     case border(BoxBorder)
     case title(Attributed)
-    case alignment(Alignment)
 }
 
 extension View {
@@ -21,19 +20,14 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: BoxOption...) -> View<Msg> 
 public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<Msg> {
     var border: BoxBorder = .single
     var title: Attributed?
-    var frameOption: [FrameOption] = []
     for opt in options {
         switch opt {
         case let .border(borderOpt):
             border = borderOpt
         case let .title(titleOpt):
             title = titleOpt
-        case let .alignment(alignmentOpt):
-            frameOption.append(.alignment(alignmentOpt))
         }
     }
-
-    let framedInside = Frame(inside, frameOption)
 
     let maxSidesWidth =
         max(border.tlCorner.maxWidth, border.leftSide.maxWidth, border.blCorner.maxWidth)
@@ -50,15 +44,18 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<M
 
     return View<Msg>(
         preferredSize: { size in
-            let innerSize = size.shrink(width: minSidesWidth, height: minTopsHeight)
-            return framedInside.preferredSize(innerSize).grow(
+            let innerSize = size.shrink(
+                width: minSidesWidth,
+                height: minTopsHeight
+            )
+            return inside.preferredSize(innerSize).grow(
                 width: minSidesWidth,
                 height: minTopsHeight
             )
         },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
-                buffer.render(key: "Box", view: framedInside, viewport: .zero)
+                buffer.render(key: "Box", view: inside, viewport: .zero)
                 return
             }
 
@@ -174,12 +171,12 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<M
                     border.tlCorner.countLines, border.topSide.countLines,
                     border.trCorner.countLines))
             buffer.render(
-                key: "Box", view: framedInside,
+                key: "Box", view: inside,
                 viewport: Viewport(Rect(origin: innerOffset, size: innerVisibleSize))
             )
         },
         events: { event, buffer in
-            buffer.events(key: "Box", event: event, view: framedInside)
+            buffer.events(key: "Box", event: event, view: inside)
         },
         debugName: "Box"
     )
