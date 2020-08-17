@@ -48,7 +48,7 @@ public struct Size: Equatable {
         grow(width: -width, height: -height)
     }
 
-    public func grow(width dw: Int, height dh: Int) -> Size {
+    public func grow(width dw: Int = 0, height dh: Int = 0) -> Size {
         let width: Int
         if Int.max - self.width < dw {
             width = Int.max
