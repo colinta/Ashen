@@ -3,6 +3,7 @@
 //
 
 public enum InputOption {
+    case placeholder(String)
     case wrap(Bool)
     case isMultiline(Bool)
     case isResponder(Bool)
@@ -49,6 +50,7 @@ public func Input<Msg>(
     var wrap = false
     var isMultiline = false
     var isResponder = false
+    var placeholder = ""
     for opt in options {
         switch opt {
         case let .wrap(wrapOpt):
@@ -57,11 +59,15 @@ public func Input<Msg>(
             isMultiline = isMultilineOpt
         case let .isResponder(isResponderOpt):
             isResponder = isResponderOpt
+        case let .placeholder(placeholderOpt):
+            placeholder = placeholderOpt
         }
     }
-    let textView: View<Msg> = Text(text, .wrap(wrap))
+
+    let displayText = !isResponder && text.isEmpty ? placeholder : text
+    let textView: View<Msg> = Text(displayText, .wrap(wrap))
     return View(
-        preferredSize: textView.preferredSize,
+        preferredSize: { textView.preferredSize($0).grow(width: isResponder ? 1 : 0) },
         render: { viewport, buffer in
             guard !viewport.isEmpty else { return }
 
@@ -124,9 +130,11 @@ public func Input<Msg>(
             xOffset = 0
             cOffset = 0
 
-            for char in text {
+            for char in displayText {
                 var attrs: [Attr]
-                if normalCursor.selection > 0 && cOffset >= normalCursor.at
+                if text.isEmpty {
+                    attrs = [.foreground(.gray)]
+                } else if normalCursor.selection > 0 && cOffset >= normalCursor.at
                     && cOffset < normalCursor.at + normalCursor.selection
                 {
                     attrs = [.reverse]
