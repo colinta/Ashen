@@ -44,24 +44,24 @@ public enum Color: Equatable {
         case .cyan:
             return .cyan
         case .white:
-            return .white
+            return .lighterGray
 
         case .gray:
-            return TermboxAttributes(rawValue: 8)
+            return .mediumGray
         case .brightRed:
-            return TermboxAttributes(rawValue: 9)
+            return .lightRed
         case .brightGreen:
-            return TermboxAttributes(rawValue: 10)
+            return .lightGreen
         case .brightYellow:
-            return TermboxAttributes(rawValue: 11)
+            return .lightYellow
         case .brightBlue:
-            return TermboxAttributes(rawValue: 12)
+            return .lightBlue
         case .brightMagenta:
-            return TermboxAttributes(rawValue: 13)
+            return .lightMagenta
         case .brightCyan:
-            return TermboxAttributes(rawValue: 14)
+            return .lightCyan
         case .brightWhite:
-            return TermboxAttributes(rawValue: 15)
+            return .white
 
         case .black:
             return .black

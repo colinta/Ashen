@@ -225,8 +225,7 @@ public class Buffer {
     func retrieve<T>() -> T? {
         if let model = models[currentKey] as? T {
             return model
-        }
-        else if let model = prevModels[currentKey] as? T {
+        } else if let model = prevModels[currentKey] as? T {
             models[currentKey] = model
             return model
         }
