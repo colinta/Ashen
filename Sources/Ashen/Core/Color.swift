@@ -17,6 +17,7 @@ public enum Color: Equatable {
 
     case gray
     case grayscale(AttrSize)
+
     case brightRed
     case brightGreen
     case brightYellow
@@ -24,6 +25,12 @@ public enum Color: Equatable {
     case brightMagenta
     case brightCyan
     case brightWhite
+
+    // darkestGray
+    // darkerGray
+    // darkGray
+    // lightGray
+    // lightestGray
 
     case any(AttrSize)
 

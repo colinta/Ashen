@@ -83,9 +83,8 @@ public class TermboxScreen {
     private func convertTermboxEvent(_ termboxEvent: TermboxEvent) -> Event? {
         switch termboxEvent {
         case let .key(mod, value):
-            if let key = termboxKey(mod, value) {
-                return .key(key)
-            }
+            guard let key = termboxKey(mod, value) else { break }
+            return .key(key)
         case let .character(mod, value):
             guard let key = termboxCharacter(mod, value) else { return nil }
             return .key(key)
