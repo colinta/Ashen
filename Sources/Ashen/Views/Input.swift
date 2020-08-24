@@ -71,10 +71,15 @@ public func Input<Msg>(
         render: { viewport, buffer in
             guard !viewport.isEmpty else { return }
 
-            let model: InputModel =
-                buffer.retrieve()
-                ?? InputModel(
+
+            let model: InputModel
+            if let prevModel: InputModel = buffer.retrieve(), text == prevModel.text {
+                model = InputModel(
+                    text: text, isMultiline: isMultiline, cursor: prevModel.cursor)
+            } else {
+                model = InputModel(
                     text: text, isMultiline: isMultiline, cursor: TextCursor.default(for: text))
+            }
             let normalCursor = model.cursor.normalized
 
             var yOffset = 0
@@ -82,15 +87,18 @@ public func Input<Msg>(
             var cOffset = 0
 
             var cursorPoint: Point = .zero
-            let text: String
-            if wrap {
-                text = model.text.insertNewlines(fitting: viewport.size.width).string
+            let currentText: String
+            if model.text.isEmpty {
+                currentText = placeholder
+            } else if wrap {
+                currentText = model.text.insertNewlines(fitting: viewport.size.width).string
             } else {
-                text = model.text
+                currentText = model.text
             }
+
             if isResponder {
                 var didSetCursor = false
-                for char in text {
+                for char in currentText {
                     if cOffset == normalCursor.at {
                         didSetCursor = true
                         cursorPoint = Point(x: xOffset, y: yOffset)
@@ -130,9 +138,9 @@ public func Input<Msg>(
             xOffset = 0
             cOffset = 0
 
-            for char in displayText {
+            for char in currentText {
                 var attrs: [Attr]
-                if text.isEmpty {
+                if model.text.isEmpty {
                     attrs = [.foreground(.gray)]
                 } else if normalCursor.selection > 0 && cOffset >= normalCursor.at
                     && cOffset < normalCursor.at + normalCursor.selection
@@ -181,7 +189,7 @@ public func Input<Msg>(
                 cOffset += 1
             }
 
-            if isResponder && normalCursor.at == text.count {
+            if isResponder && normalCursor.at == model.text.count {
                 buffer.write(
                     AttributedCharacter(character: " ", attributes: [.underline]),
                     at: Point(x: xOffset + xClip, y: yOffset + yClip))
