@@ -111,13 +111,32 @@ extension Attributed {
         var current = AttributedString()
         var buffer = AttributedString()
         var width = 0
+        var lineIsEmpty = true
         var shouldAddNewline = false
         for ac in self.attributedCharacters {
             if ac.character == "\n" {
                 current = current + buffer + AttributedString("\n")
                 buffer = AttributedString("")
-                shouldAddNewline = false
                 width = 0
+                lineIsEmpty = false
+                shouldAddNewline = false
+                continue
+            }
+            else if ac.character == " " {
+                if buffer.attributedCharacters.isEmpty {
+                    buffer = buffer + ac
+                    continue
+                }
+
+                current = current + buffer
+
+                if width + 1 < fitting {
+                    current = current + AttributedString(" ", attributes: ac.attributes)
+                }
+
+                buffer = AttributedString("")
+                lineIsEmpty = false
+                width += 1
                 continue
             }
 
@@ -128,8 +147,10 @@ extension Attributed {
 
             let characterWidth = Buffer.displayWidth(of: ac.character)
             if width + characterWidth > fitting {
-                current = current + buffer
-                buffer = AttributedString("")
+                if lineIsEmpty {
+                    current = current + buffer
+                    buffer = AttributedString("")
+                }
                 shouldAddNewline = true
                 width = 0
             }
@@ -144,7 +165,7 @@ extension Attributed {
         return current + buffer
     }
 
-    var string: String {
+    public var string: String {
         attributedCharacters.reduce("") { str, c in
             "\(str)\(c.character)"
         }
