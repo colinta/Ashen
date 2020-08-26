@@ -11,68 +11,28 @@ items and renders them as a list.
 
 In a traditional controller/view pattern, views are created during
 initialization, and updated later as needed with your application data. Loading
-data from a server to load a list of views might look something like this:
-
-```swift
-init() {
-    label = LabelView(text: "Our Things:")
-    label.isHidden = true
-
-    loadingView = SpinnerView()
-    loadingView.isHidden = false
-
-    listView = ListView<Thing>()
-    listView.rowHeight = 3
-    listView.cellGenerator = cellForRow
-    listView.isHidden = true
-
-    startLoadingData(completion: loaded)
-}
-
-func loaded(data: [Thing]) {
-    listView.data = data
-
-    label.isHidden = false
-    listView.isHidden = false
-    loadingView.isHidden = true
-}
-
-func cellForRow(row: Thing) -> Component {
-    LabelView(text: row.title)
-}
-```
+data from a server to load a list of views. Views are stored in instance
+variables and edited "in place", and the views/subviews are added/removed as
+events happen, so a lot of code is there to manage view state.
 
 ###### New way
 
 What would this look like using Ashen or Elm or React? In these frameworks,
-rendering output is stateless; it is based the model, and you render _all_ the
-views and their properties based on that state.
+rendering output is declarative; it is based the model, and you render _all_ the
+views and their properties based on that state. Model goes in, View comes out.
 
 ```swift
-func render(model: Model, size: Size) -> View<Message> {
+func render(model: Model) -> View<Message> {
     guard
         let data = model.data
     else {
-        // no data?  Show the spinner.  Defaults to centering itself in the
-        // parent view.
+        // no data?  Show the spinner.
         return Spinner()
     }
 
-    // data is available - use a rowHeight based on the available viewport
-    let rowHeight: Int
-    if screenSize.height >= 30 {
-      rowHeight = 3
-    }
-    else if screenSize.height >= 20 {
-      rowHeight = 2
-    }
-    else {
-      rowHeight = 1
-    }
-
     return Stack(.topToBottom, [
-        Text("Our things"),
-        ListView(dataList: data, rowHeight: rowHeight) { row in
+        Text("List of things"),
+        ListView(dataList: data) { row in
             LabelView(text: row.title)
         }
         // 👆 this view is similar to how UITableView renders cells - only
@@ -85,10 +45,11 @@ func render(model: Model, size: Size) -> View<Message> {
 }
 ```
 
-So instead of mutating the `isHidden` property of these views, we render the views
-we need based on our model.
+So instead of mutating the `isHidden` property of views, or `addSubview`, we
+just render the views we need based on our model.  SwiftUI has also adopted this
+model, so if you've been using it, Ashen will feel very familiar.
 
-###### Async tasks
+###### Commands and Messages
 
 To fetch our data, we need to call out to the runtime to ask it to perform a
 background task, aka a `Command`, and then report the results back as a
@@ -98,7 +59,7 @@ types in a "name" text field you probably want to know about that so you can
 update the model's `name` property.
 
 Sources of Messages include Views, Commands, and system event components
-(e.g. a `KeyEvent` message is created via the `OnKeyPress` component, which
+(e.g. a `KeyEvent` message can be captured via the `OnKeyPress` component, which
 receives system-level events and maps those into an instance of your app's
 `Message` type).
 
