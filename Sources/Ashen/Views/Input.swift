@@ -7,6 +7,8 @@ public enum InputOption {
     case wrap(Bool)
     case isMultiline(Bool)
     case isResponder(Bool)
+    case style(Attr)
+    case styles([Attr])
 }
 
 struct InputModel {
@@ -51,6 +53,7 @@ public func Input<Msg>(
     var isMultiline = false
     var isResponder = false
     var placeholder = ""
+    var extraAttrs: [Attr] = []
     for opt in options {
         switch opt {
         case let .wrap(wrapOpt):
@@ -61,6 +64,10 @@ public func Input<Msg>(
             isResponder = isResponderOpt
         case let .placeholder(placeholderOpt):
             placeholder = placeholderOpt
+        case let .style(attrsOpt):
+            extraAttrs = extraAttrs + [attrsOpt]
+        case let .styles(attrsOpt):
+            extraAttrs += attrsOpt
         }
     }
 
@@ -73,7 +80,7 @@ public func Input<Msg>(
 
 
             let model: InputModel
-            if let prevModel: InputModel = buffer.retrieve(), text == prevModel.text {
+            if let prevModel: InputModel = buffer.retrieve(), text.count == prevModel.text.count {
                 model = InputModel(
                     text: text, isMultiline: isMultiline, cursor: prevModel.cursor)
             } else {
@@ -149,7 +156,7 @@ public func Input<Msg>(
                 } else if cOffset == normalCursor.at && isResponder {
                     attrs = [.underline]
                 } else {
-                    attrs = []
+                    attrs = extraAttrs
                 }
 
                 let printableChar: Character
