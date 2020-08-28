@@ -115,18 +115,18 @@ private func main<Model, Msg>(
         prevTimestamp = nextTimestamp
 
         for event in events {
-            if case let .key(key) = event, key == .signalQuit {
-                return
-            } else if case let .key(key) = event, key == .signalInt {
-                return
-            }
-
             let (msgs, events) = view.events(event, buffer)
             sync {
                 msgs.forEach { queue.append($0) }
             }
 
             for event in events {
+                if case let .key(key) = event, key == .signalQuit {
+                    return
+                } else if case let .key(key) = event, key == .signalInt {
+                    return
+                }
+
                 if case .redraw = event {
                     shouldRender = true
                     break
