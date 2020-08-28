@@ -11,7 +11,9 @@ public enum InputOption {
     case styles([Attr])
 }
 
+
 struct InputModel {
+    static var clipboard: String = ""
     let text: String
     let isMultiline: Bool
     let cursor: TextCursor
@@ -247,6 +249,12 @@ extension InputModel {
             (nextModel, events) = moveToTop()
         } else if key == .ctrl(.e) {
             (nextModel, events) = moveToBottom()
+        } else if key == .ctrl(.x) {
+            (nextModel, events) = cut()
+        } else if key == .ctrl(.c) {
+            (nextModel, events) = copy()
+        } else if key == .ctrl(.v) {
+            (nextModel, events) = paste()
         } else if key == .home {
             (nextModel, events) = moveToBeginOfLine()
         } else if key == .end {
@@ -451,6 +459,28 @@ extension InputModel {
 
         let nextCursor = TextCursor(at: text.count, selection: 0)
         return (InputModel(text: text, isMultiline: isMultiline, cursor: nextCursor), [.redraw])
+    }
+
+    fileprivate func cut() -> (InputModel, [Event]) {
+        return self.copy().0.delete()
+    }
+
+    fileprivate func copy() -> (InputModel, [Event]) {
+        let first = min(cursor.at, cursor.at + cursor.selection)
+        let second = max(cursor.at, cursor.at + cursor.selection)
+        let clipboard = String(
+            text[
+            text.index(text.startIndex, offsetBy: first)
+            ..<
+            text.index(text.startIndex, offsetBy: second)
+            ]
+        )
+        InputModel.clipboard = clipboard
+        return (self, [])
+    }
+
+    fileprivate func paste() -> (InputModel, [Event]) {
+        return self.insert(string: InputModel.clipboard)
     }
 
     fileprivate func moveToBeginOfLine() -> (InputModel, [Event]) {
