@@ -11,40 +11,23 @@ public class Buffer {
     public typealias Chars = [Int: Row]
     public typealias Mask = Chars
 
-    public static func desc(_ chars: Chars) -> String {
-        var description = ""
-        let height = chars.reduce(0) { m0, kv0 in
-            max(m0, kv0.key)
-        }
-        let width = chars.reduce(0) { memo, kv in
-            max(
-                memo,
-                kv.value.reduce(0) { m1, kv1 in
-                    max(m1, kv1.key)
-                })
-        }
-        for y in 0...height {
-            guard let row = chars[y] else {
-                description += "↩︎\n"
-                continue
+    private var chars: Chars = [:]
+    public var mask: Mask {
+        let initial = currentOrigin
+        let maxPt = currentOrigin + currentMask.size
+        var mask: Mask = [:]
+        for y in initial.y..<maxPt.y {
+            var row: Row = [:]
+            for x in initial.x..<maxPt.x {
+                guard
+                    chars[y]?[x] == nil
+                        || chars[y]?[x]?.character == AttributedCharacter.null.character
+                else { continue }
+                row[x] = chars[y]?[x] ?? AttributedCharacter.null
             }
-
-            for x in 0...width {
-                guard let c = row[x] else {
-                    description += "."
-                    continue
-                }
-
-                if c.character == AttributedCharacter.null.character {
-                    description += String("◦")
-                } else {
-                    description += String(c.character)
-                }
-            }
-
-            description += "↩︎\n"
+            mask[y] = row
         }
-        return description
+        return mask
     }
 
     var diffedChars: Chars {
@@ -89,25 +72,6 @@ public class Buffer {
         }
 
         return diffedChars
-    }
-
-    private var chars: Chars = [:]
-    public var mask: Mask {
-        let initial = currentOrigin
-        let maxPt = currentOrigin + currentMask.size
-        var mask: Mask = [:]
-        for y in initial.y..<maxPt.y {
-            var row: Row = [:]
-            for x in initial.x..<maxPt.x {
-                guard
-                    chars[y]?[x] == nil
-                        || chars[y]?[x]?.character == AttributedCharacter.null.character
-                else { continue }
-                row[x] = chars[y]?[x] ?? AttributedCharacter.null
-            }
-            mask[y] = row
-        }
-        return mask
     }
 
     // writing at local point "0, 0" writes at this offset
@@ -367,6 +331,42 @@ public class Buffer {
 }
 
 extension Buffer: CustomStringConvertible {
+    public static func desc(_ chars: Chars) -> String {
+        var description = ""
+        let height = chars.reduce(0) { m0, kv0 in
+            max(m0, kv0.key)
+        }
+        let width = chars.reduce(0) { memo, kv in
+            max(
+                memo,
+                kv.value.reduce(0) { m1, kv1 in
+                    max(m1, kv1.key)
+                })
+        }
+        for y in 0...height {
+            guard let row = chars[y] else {
+                description += "↩︎\n"
+                continue
+            }
+
+            for x in 0...width {
+                guard let c = row[x] else {
+                    description += "."
+                    continue
+                }
+
+                if c.character == AttributedCharacter.null.character {
+                    description += String("◦")
+                } else {
+                    description += String(c.character)
+                }
+            }
+
+            description += "↩︎\n"
+        }
+        return description
+    }
+
     public var description: String {
         "currentKey: \(currentKey)\n\(Buffer.desc(chars))"
     }
