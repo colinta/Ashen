@@ -110,53 +110,60 @@ extension Attributed {
     public func insertNewlines(fitting: Int) -> AttributedString {
         var current = AttributedString()
         var buffer = AttributedString()
-        var width = 0
-        var lineIsEmpty = true
+        var lineWidth = 0
+        var wordWidth = 0
         var shouldAddNewline = false
+        var shouldSkipSpaces = false
         for ac in self.attributedCharacters {
+            var characterWidth: Int { Buffer.displayWidth(of: ac.character) }
+
             if ac.character == "\n" {
                 current = current + buffer + AttributedString("\n")
                 buffer = AttributedString("")
-                width = 0
-                lineIsEmpty = false
+                lineWidth = 0
+                wordWidth = 0
                 shouldAddNewline = false
-                continue
+                shouldSkipSpaces = false
+            }
+            else if ac.character == " ", buffer.attributedCharacters.isEmpty, !shouldSkipSpaces {
+                current = current + ac
+                lineWidth += characterWidth
             }
             else if ac.character == " " {
-                if buffer.attributedCharacters.isEmpty {
-                    buffer = buffer + ac
-                    continue
-                }
-
-                current = current + buffer
-
-                if width + 1 < fitting {
-                    current = current + AttributedString(" ", attributes: ac.attributes)
-                }
-
-                buffer = AttributedString("")
-                lineIsEmpty = false
-                width += 1
-                continue
-            }
-
-            if shouldAddNewline {
-                current = current + AttributedString("\n")
-                shouldAddNewline = false
-            }
-
-            let characterWidth = Buffer.displayWidth(of: ac.character)
-            if width + characterWidth > fitting {
-                if lineIsEmpty {
+                if wordWidth > 0 {
                     current = current + buffer
+                    lineWidth += wordWidth
                     buffer = AttributedString("")
+                    wordWidth = 0
                 }
-                shouldAddNewline = true
-                width = 0
-            }
 
-            buffer = buffer + ac
-            width += characterWidth
+                if lineWidth + characterWidth > fitting {
+                    current = current + AttributedString("\n", attributes: ac.attributes)
+                    lineWidth = 0
+                    shouldSkipSpaces = true
+                }
+                else if !shouldSkipSpaces {
+                    current = current + ac
+                    lineWidth += characterWidth
+                }
+            }
+            else {
+                if lineWidth + wordWidth + characterWidth > fitting {
+                    if lineWidth == 0 {
+                        current = current + buffer
+                        buffer = AttributedString("")
+                    }
+                    current = current + AttributedString("\n", attributes: ac.attributes)
+                    lineWidth = 0
+                    shouldSkipSpaces = true
+                }
+                else {
+                    shouldSkipSpaces = false
+                }
+
+                buffer = buffer + ac
+                wordWidth += characterWidth
+            }
         }
 
         if shouldAddNewline {
