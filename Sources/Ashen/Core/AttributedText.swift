@@ -124,12 +124,10 @@ extension Attributed {
                 wordWidth = 0
                 shouldAddNewline = false
                 shouldSkipSpaces = false
-            }
-            else if ac.character == " ", buffer.attributedCharacters.isEmpty, !shouldSkipSpaces {
+            } else if ac.character == " ", buffer.attributedCharacters.isEmpty, !shouldSkipSpaces {
                 current = current + ac
                 lineWidth += characterWidth
-            }
-            else if ac.character == " " {
+            } else if ac.character == " " {
                 if wordWidth > 0 {
                     current = current + buffer
                     lineWidth += wordWidth
@@ -141,13 +139,11 @@ extension Attributed {
                     current = current + AttributedString("\n", attributes: ac.attributes)
                     lineWidth = 0
                     shouldSkipSpaces = true
-                }
-                else if !shouldSkipSpaces {
+                } else if !shouldSkipSpaces {
                     current = current + ac
                     lineWidth += characterWidth
                 }
-            }
-            else {
+            } else {
                 if lineWidth + wordWidth + characterWidth > fitting {
                     if lineWidth == 0 {
                         current = current + buffer
@@ -156,8 +152,7 @@ extension Attributed {
                     current = current + AttributedString("\n", attributes: ac.attributes)
                     lineWidth = 0
                     shouldSkipSpaces = true
-                }
-                else {
+                } else {
                     shouldSkipSpaces = false
                 }
 

@@ -470,9 +470,9 @@ extension InputModel {
         let second = max(cursor.at, cursor.at + cursor.selection)
         let clipboard = String(
             text[
-            text.index(text.startIndex, offsetBy: first)
-            ..<
-            text.index(text.startIndex, offsetBy: second)
+                text.index(
+                    text.startIndex, offsetBy: first)..<text.index(
+                        text.startIndex, offsetBy: second)
             ]
         )
         InputModel.clipboard = clipboard
