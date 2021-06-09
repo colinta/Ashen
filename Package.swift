@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "Ashen", targets: ["Ashen"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/colinta/Termbox.git", .branch("master")),
+        .package(url: "https://github.com/colinta/Termbox.git", .branch("main")),
     ],
     targets: [
         .target(name: "Ashen", dependencies: ["Termbox"]),
