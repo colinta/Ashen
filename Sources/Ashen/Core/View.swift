@@ -361,7 +361,23 @@ extension View {
             render: render,
             events: events,
             key: key, id: id,
-            debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
+            debugName: debugName + ".matchContainer(of: \(ofView.debugName), \(dimension.map({ "\($0) "}) ?? ""))"
+        )
+    }
+
+    public func shrink(_ dimension: Dimension, by: Int) -> View<Msg> {
+        View(
+            preferredSize: { parentSize in
+                let preferredSize = self.preferredSize(parentSize)
+                return Size(
+                    width: dimension == .width ? preferredSize.width - by : preferredSize.width,
+                    height: dimension == .height ? preferredSize.height - by : preferredSize.height
+                )
+            },
+            render: render,
+            events: events,
+            key: key, id: id,
+            debugName: debugName + ".shrink(\(dimension), by: \(by))"
         )
     }
 

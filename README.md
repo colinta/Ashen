@@ -165,7 +165,7 @@ you could create a `ScreenType` for other output paradigms.
 
 ```swift
 do {
-    try Ashen(Program(initial, update, view))
+    try ashen(Program(initial, update, view))
     exit(EX_OK)
 } catch {
     exit(EX_IOERR)

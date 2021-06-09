@@ -8,7 +8,7 @@ import XCTest
 class BasicTests: XCTestCase {
     func testAshen() {
         XCTAssertNoThrow(
-            try Ashen(Program({ Initial(1) }, { _, _ in 1 }, { _, _ in Text("") }
+            try ashen(Program({ Initial(1) }, { _, _ in 1 }, { _, _ in Text("") }
             )))
     }
 }

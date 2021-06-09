@@ -4,7 +4,8 @@
 
 import Foundation
 
-public func Ashen<Model, Msg>(_ program: Program<Model, Msg>) throws {
+/// This is how you run an Ashen program.
+public func ashen<Model, Msg>(_ program: Program<Model, Msg>) throws {
     let screen = TermboxScreen()
 
     signal(SIGINT, SIG_IGN)
@@ -100,6 +101,7 @@ private func main<Model, Msg>(
         let buffer: Buffer
         if shouldRender || screenSize != prevSize {
             buffer = Buffer(size: screenSize, prev: prevBuffer)
+
             view = Window(program.view(model))
             view.render(LocalViewport(screenSize), buffer)
             screen.render(buffer: buffer)
@@ -153,7 +155,7 @@ private func collectSystemEvents(screen: TermboxScreen, prevTimestamp: UInt64, t
     let currentTime = mach_absolute_time()
     let dt: Double = convertDt(
         now: currentTime, prevTimestamp: prevTimestamp, timeFactor: timeFactor)
-    if dt > 0.001 {
+    if dt > 0.01 {
         events.append(.tick(dt))
         return (events, currentTime)
     } else {

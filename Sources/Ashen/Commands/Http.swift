@@ -113,7 +113,7 @@ public struct HttpRequest<Msg> {
             })
     }
 
-    public func start(
+    public func command(
         onComplete: @escaping OnCompleteHandler<Msg>,
         onProgress: OnProgressHandler<Msg>? = nil
     )
@@ -152,13 +152,13 @@ public struct HttpMappedRequest<Msg, T> {
         httpRequest.cancel()
     }
 
-    public func start(
+    public func command(
         onComplete: @escaping OnCompleteHandler<Msg>,
         onProgress: OnProgressHandler<Msg>? = nil
     )
         -> Command<Msg>
     {
-        httpRequest.start(
+        httpRequest.command(
             onComplete: { result in
                 do {
                     let value = try result.get()
@@ -458,7 +458,7 @@ private func responseToHeaders(_ response: URLResponse?) -> [Http.Header] {
     }
 }
 
-public protocol URLSessionProtocol: class {
+public protocol URLSessionProtocol {
     func ashenDataTask(
         with: URLRequest, completionHandler: ((Int, [Http.Header], Data?, Swift.Error?) -> Void)?
     )
@@ -515,7 +515,7 @@ extension URLSession: URLSessionProtocol {
     }
 }
 
-public protocol URLSessionTaskProtocol: class {
+public protocol URLSessionTaskProtocol {
     func ashenStart()
 }
 
