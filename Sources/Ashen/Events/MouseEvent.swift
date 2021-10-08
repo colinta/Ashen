@@ -3,8 +3,7 @@
 //
 
 public struct MouseEvent {
-    public let x: Int
-    public let y: Int
+    public let location: Point
     public let event: Event
 
     public var button: Button {
@@ -63,8 +62,12 @@ public struct MouseEvent {
     }
 
     init(x: Int, y: Int, event: Event) {
-        self.x = x
-        self.y = y
+        self.location = Point(x: x, y: y)
+        self.event = event
+    }
+
+    init(at location: Point, event: Event) {
+        self.location = location
         self.event = event
     }
 }
@@ -77,7 +80,7 @@ extension MouseEvent.Event: Equatable {
 
 extension MouseEvent {
     public var toString: String {
-        "MouseEvent(\(x), \(y), \(event.toString))"
+        "MouseEvent(\(location.x), \(location.y), \(event.toString))"
     }
 }
 

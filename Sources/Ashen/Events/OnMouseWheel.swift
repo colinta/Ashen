@@ -2,7 +2,7 @@
 ///  OnMouseWheel.swift
 //
 
-private let KEY = "OnMouseWheel"
+private let NAME = "OnMouseWheel"
 
 public func OnMouseWheel<Msg>(
     _ inside: View<Msg>, _ msg: @escaping (Int) -> Msg
@@ -13,8 +13,8 @@ public func OnMouseWheel<Msg>(
             let mask = buffer.mask
             inside.render(viewport, buffer)
             buffer.claimMouse(
-                key: KEY, rect: Rect(origin: .zero, size: viewport.size),
-                mask: mask, buttons: [.scroll], view: inside)
+                key: inside.viewKey ?? .name(NAME), rect: Rect(origin: .zero, size: viewport.size),
+                mask: mask, buttons: [.scroll])
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)
@@ -22,11 +22,11 @@ public func OnMouseWheel<Msg>(
                 guard
                     case let .mouse(mouseEvent) = event,
                     case let .scroll(direction) = mouseEvent.event,
-                    buffer.checkMouse(key: KEY, mouse: mouseEvent, view: inside)
+                    buffer.checkMouse(key: inside.viewKey ?? .name(NAME), mouse: mouseEvent)
                 else { return (msgs, [event]) }
                 return (msgs + [msg(direction == .up ? -1 : 1)], [])
             }
         },
-        debugName: "OnMouse"
+        debugName: NAME
     )
 }

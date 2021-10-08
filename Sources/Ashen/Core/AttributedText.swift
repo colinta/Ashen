@@ -11,6 +11,10 @@ public struct AttributedCharacter: Equatable {
         self.attributes = attributes
     }
 
+    public func has(attr: Attr) -> Bool {
+        attributes.contains(attr)
+    }
+
     public func styled(_ attr: Attr) -> AttributedCharacter {
         if attributes.contains(attr) {
             return self

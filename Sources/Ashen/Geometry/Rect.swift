@@ -56,6 +56,11 @@ public struct Rect: Equatable {
         Rect(origin: origin, size: size.grow(width: dw, height: dh))
     }
 
+    public func contains(_ point: Point) -> Bool {
+        point.x >= minX && point.x < maxX &&
+        point.y >= minY && point.y < maxY
+    }
+
     public func intersection(with rect: Rect) -> Rect {
         let x0 = max(minX, rect.minX)
         let x1 = min(maxX, rect.maxX)

@@ -17,6 +17,8 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: BoxOption...) -> View<Msg> 
     Box(inside, options)
 }
 
+private let NAME = "Box"
+
 public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<Msg> {
     var border: BoxBorder = .single
     var title: Attributed?
@@ -55,7 +57,7 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<M
         },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
-                buffer.render(key: "Box", view: inside, viewport: .zero)
+                buffer.render(key: .name(NAME), view: inside, viewport: .zero)
                 return
             }
 
@@ -171,14 +173,14 @@ public func Box<Msg>(_ inside: View<Msg>, _ options: [BoxOption] = []) -> View<M
                     border.tlCorner.countLines, border.topSide.countLines,
                     border.trCorner.countLines))
             buffer.render(
-                key: "Box", view: inside,
+                key: .name(NAME), view: inside,
                 viewport: Viewport(Rect(origin: innerOffset, size: innerVisibleSize))
             )
         },
         events: { event, buffer in
-            buffer.events(key: "Box", event: event, view: inside)
+            buffer.events(key: .name(NAME), event: event, view: inside)
         },
-        debugName: "Box"
+        debugName: NAME
     )
 }
 

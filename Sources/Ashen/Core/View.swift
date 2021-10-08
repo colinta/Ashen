@@ -6,8 +6,7 @@ public struct View<Msg> {
     public let preferredSize: (Size) -> Size
     public let render: (LocalViewport, Buffer) -> Void
     public let events: (Event, Buffer) -> ([Msg], [Event])
-    let key: String?
-    let id: String?
+    let viewKey: ViewKey?
     public let debugName: String
 
     public init(
@@ -19,8 +18,7 @@ public struct View<Msg> {
         self.preferredSize = preferredSize
         self.render = render
         self.events = events
-        self.key = nil
-        self.id = nil
+        self.viewKey = nil
         self.debugName = debugName
     }
 
@@ -28,13 +26,12 @@ public struct View<Msg> {
         preferredSize: @escaping (Size) -> Size,
         render: @escaping (LocalViewport, Buffer) -> Void,
         events: @escaping (Event, Buffer) -> ([Msg], [Event]),
-        key: String?, id: String?, debugName: String
+        viewKey: ViewKey?, debugName: String
     ) {
         self.preferredSize = preferredSize
         self.render = render
         self.events = events
-        self.key = key
-        self.id = id
+        self.viewKey = viewKey
         self.debugName = debugName
     }
 
@@ -52,7 +49,7 @@ public struct View<Msg> {
             let (msgs, events) = info
             let (index, view) = index_view
             let (newMsgs, newEvents) = View.scan(events: events) { event in
-                return buffer.events(key: index, event: event, view: view)
+                return buffer.events(key: .index(index), event: event, view: view)
             }
             return (msgs + newMsgs, newEvents)
         }
@@ -67,7 +64,7 @@ public struct View<Msg> {
             preferredSize: preferredSize,
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName
+            viewKey: viewKey, debugName: debugName
         )
     }
 
@@ -76,7 +73,7 @@ public struct View<Msg> {
             preferredSize: preferredSize,
             render: render,
             events: events,
-            key: key, id: nil, debugName: debugName
+            viewKey: .key(key), debugName: debugName
         )
     }
 
@@ -85,7 +82,7 @@ public struct View<Msg> {
             preferredSize: preferredSize,
             render: render,
             events: events,
-            key: nil, id: id, debugName: debugName
+            viewKey: .id(id), debugName: debugName
         )
     }
 
@@ -94,8 +91,7 @@ public struct View<Msg> {
             preferredSize: preferredSize,
             render: render,
             events: events,
-            key: key,
-            id: id,
+            viewKey: viewKey,
             debugName: debugName
         )
     }
@@ -110,7 +106,7 @@ public struct View<Msg> {
                 let (msgs, newEvents) = self.events(event, buffer)
                 return (msgs.map(msgMap), newEvents)
             },
-            key: key, id: id, debugName: debugName
+            viewKey: viewKey, debugName: debugName
         )
     }
 
@@ -136,7 +132,7 @@ public struct View<Msg> {
                 debugSilenced(silenced)
                 return events
             },
-            key: key, id: id, debugName: debugName
+            viewKey: viewKey, debugName: debugName
         )
     }
 
@@ -148,7 +144,7 @@ public struct View<Msg> {
                 Repeating(view).render(viewport, buffer)
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".background(\(view.debugName))"
+            viewKey: viewKey, debugName: debugName + ".background(\(view.debugName))"
         )
     }
 
@@ -170,7 +166,7 @@ public struct View<Msg> {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName
+            viewKey: viewKey, debugName: debugName
         )
     }
 }
@@ -187,7 +183,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
+            viewKey: viewKey, debugName: debugName + ".size(\(constrainSize))"
         )
     }
 
@@ -196,7 +192,7 @@ extension View {
             preferredSize: { _ in constrainSize },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
+            viewKey: viewKey, debugName: debugName + ".size(\(constrainSize))"
         )
     }
 
@@ -208,7 +204,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".size(\(constrainSize))"
+            viewKey: viewKey, debugName: debugName + ".size(\(constrainSize))"
         )
     }
 
@@ -227,7 +223,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".minWidth(\(width))"
+            viewKey: viewKey, debugName: debugName + ".minWidth(\(width))"
         )
     }
 
@@ -247,7 +243,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".width(\(width))"
+            viewKey: viewKey, debugName: debugName + ".width(\(width))"
         )
     }
 
@@ -267,7 +263,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".maxWidth(\(width))"
+            viewKey: viewKey, debugName: debugName + ".maxWidth(\(width))"
         )
     }
 
@@ -286,7 +282,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id, debugName: debugName + ".minHeight(\(height))"
+            viewKey: viewKey, debugName: debugName + ".minHeight(\(height))"
         )
     }
 
@@ -306,7 +302,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".height(\(height))"
+            viewKey: viewKey, debugName: debugName + ".height(\(height))"
         )
     }
 
@@ -326,7 +322,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".maxHeight(\(height))"
+            viewKey: viewKey, debugName: debugName + ".maxHeight(\(height))"
         )
     }
 
@@ -342,7 +338,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id,
+            viewKey: viewKey,
             debugName: debugName + ".matchContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
@@ -360,7 +356,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id,
+            viewKey: viewKey,
             debugName: debugName + ".matchContainer(of: \(ofView.debugName), \(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
@@ -376,7 +372,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id,
+            viewKey: viewKey,
             debugName: debugName + ".shrink(\(dimension), by: \(by))"
         )
     }
@@ -394,7 +390,7 @@ extension View {
             },
             render: render,
             events: events,
-            key: key, id: id,
+            viewKey: viewKey,
             debugName: debugName + ".fitInContainer(\(dimension.map({ "\($0) "}) ?? ""))"
         )
     }
@@ -409,7 +405,7 @@ extension View {
                 self.render(innerViewport, buffer)
             },
             events: events,
-            key: key, id: id, debugName: debugName + ".compact()"
+            viewKey: viewKey, debugName: debugName + ".compact()"
         )
     }
 
@@ -435,7 +431,7 @@ extension View {
                 }
             },
             events: events,
-            key: key, id: id,
+            viewKey: viewKey,
             debugName: debugName
                 + """
                 .padding(\([
@@ -453,11 +449,11 @@ extension View {
 // MARK: View + Attr extensions
 //
 extension View {
-    public func styled(_ style: Attr) -> View<Msg> {
-        styled([style])
+    public func styled(_ style: Attr, preserve: Bool = false) -> View<Msg> {
+        styled([style], preserve: preserve)
     }
 
-    public func styled(_ styles: [Attr]) -> View<Msg> {
+    public func styled(_ styles: [Attr], preserve: Bool = false) -> View<Msg> {
         copy(
             preferredSize: preferredSize,
             render: { viewport, buffer in
@@ -466,8 +462,11 @@ extension View {
                 for y in (0..<viewport.size.height) {
                     for x in (0..<viewport.size.width) {
                         buffer.modifyCharacter(at: Point(x: x, y: y), mask: mask) { c in
-                            AttributedCharacter(
-                                character: c.character, attributes: c.attributes + styles)
+                            let attributes = preserve
+                                ? styles + c.attributes
+                                : c.attributes + styles
+                            return AttributedCharacter(
+                                character: c.character, attributes: attributes)
                         }
                     }
                 }
@@ -515,6 +514,10 @@ extension View {
 
     public func background(color: Color) -> View<Msg> {
         styled(.background(color))
+    }
+
+    public func defaultBackground(color: Color) -> View<Msg> {
+        return styled(.background(color), preserve: true)
     }
 
     public func reset() -> View<Msg> {

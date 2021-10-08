@@ -20,7 +20,7 @@ public func Reactive<Msg>(_ views: [View<Msg>]) -> View<Msg> {
             for (index, view_size) in viewsAndSizes.enumerated() {
                 let (view, preferredSize) = view_size
                 buffer.render(
-                    key: index, view: view,
+                    key: .index(index), view: view,
                     viewport: Viewport(
                         Rect(
                             origin: origin,

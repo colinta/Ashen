@@ -143,28 +143,36 @@ public class TermboxScreen {
     }
 }
 
-private func foregroundAttrs(_ attrs: [Attr]) -> Attributes {
-    let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
+private func foregroundAttrs(_ attrs: [Attr]) -> TermboxAttributes {
+    var foreground: Attr = .none
+    let retval = attrs.reduce(TermboxAttributes.zero) { memo, attr -> TermboxAttributes in
         switch attr {
+        case .foreground:
+            foreground = attr
+            return memo
         case .background:
             return memo
         default:
             return memo.union(attr.toTermbox)
         }
     }
-    return retval
+    return retval.union(foreground.toTermbox)
 }
 
-private func backgroundAttrs(_ attrs: [Attr]) -> Attributes {
-    let retval = attrs.reduce(Attributes.zero) { memo, attr -> Attributes in
+private func backgroundAttrs(_ attrs: [Attr]) -> TermboxAttributes {
+    var background: Attr = .none
+    let retval = attrs.reduce(TermboxAttributes.zero) { memo, attr -> TermboxAttributes in
         switch attr {
         case .foreground:
+            return memo
+        case .background:
+            background = attr
             return memo
         default:
             return memo.union(attr.toTermbox)
         }
     }
-    return retval
+    return retval.union(background.toTermbox)
 }
 
 private func termboxKey(_ mod: TermboxModifier, _ key: TermboxKey) -> KeyEvent? {

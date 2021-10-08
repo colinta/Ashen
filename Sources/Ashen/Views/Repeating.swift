@@ -2,6 +2,8 @@
 ///  Repeating.swift
 //
 
+private let NAME = "Repeating"
+
 public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
     return View(
         preferredSize: { _ in .zero },
@@ -19,13 +21,13 @@ public func Repeating<Msg>(_ view: View<Msg>) -> View<Msg> {
                     let repeatingViewport = Viewport(
                         Rect(origin: Point(x: x, y: y), size: viewSize))
                     buffer.render(
-                        key: "Repeating-\(x)-\(y)", view: view, viewport: repeatingViewport)
+                        key: .name("\(NAME)-\(x)-\(y)"), view: view, viewport: repeatingViewport)
                     x += viewSize.width
                 }
                 y += viewSize.height
             }
         },
         events: { event, _ in ([], [event]) },
-        debugName: "Repeating"
+        debugName: NAME
     )
 }

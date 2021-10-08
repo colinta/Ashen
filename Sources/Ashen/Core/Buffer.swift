@@ -2,17 +2,16 @@
 ///  Buffer.swift
 //
 
-public protocol BufferKey {
-    var bufferKey: String { get }
-}
-
 public class Buffer {
     public typealias Row = [Int: AttributedCharacter]
     public typealias Chars = [Int: Row]
     public typealias Mask = Chars
+    typealias ClaimedMouseEvents = (ViewKey, [MouseEvent.Button])
+    typealias MouseEvents = [Int: [Int: ClaimedMouseEvents]]
 
     private var chars: Chars = [:]
-    public var mask: Mask {
+    // the mask represents the "writable" region of the buffer
+    var mask: Mask {
         let initial = currentOrigin
         let maxPt = currentOrigin + currentMask.size
         var mask: Mask = [:]
@@ -80,13 +79,13 @@ public class Buffer {
     // currentMask.origin refers to the point in which drawing is "safe"
     private var currentMask: Rect
     // the "model key", which stores and retrieves view models
-    private var currentKey: String = ""
+    private var currentKey: ViewKey = .none
     private var models: [String: Any]
     private var prevModels: [String: Any]
-    private var mouse: [Int: [Int: [MouseEvent.Button: String]]]
+    private var mouse: MouseEvents
     private var diff: Chars?
 
-    init(size: Size, prev: Buffer?) {
+    public init(size: Size, prev: Buffer?) {
         self.currentMask = Rect(origin: .zero, size: size)
         self.models = [:]
         self.prevModels = prev?.models ?? [:]
@@ -113,26 +112,67 @@ public class Buffer {
         currentMask = prevMask
     }
 
+    public func copy(into: Buffer, from: Rect, at dest: Point) {
+        let mask = into.mask
+        var text: Chars = [:]
+        for y in 0..<from.height {
+            var row: Row = [:]
+            for x in 0..<from.width {
+                let char = chars[y + from.minY]?[x + from.minX]
+                row[x] = AttributedCharacter(character: char.map { $0.character } ?? Character(" "), attributes: [])
+                guard
+                    let char = char,
+                    char.character != AttributedCharacter.null.character
+                else { continue }
+                into.write(char, at: dest + Point(x: x, y: y))
+
+                if let mouseEvents = mouse[y]?[x] {
+                    let (key, buttons): (ViewKey, [MouseEvent.Button]) = mouseEvents
+                    let mouseRect = Rect(origin: dest + Point(x: x, y: y), size: Size(width: 1, height: 1))
+                    into.claimMouse(key: key, rect: mouseRect, mask: mask, buttons: buttons)
+                }
+            }
+            text[y] = row
+        }
+    }
+
     public func render<Msg>(
-        key nextKey: BufferKey,
+        key nextKey: ViewKey,
         view: View<Msg>,
         viewport: Viewport
     ) {
         let prevKey = currentKey
-        currentKey = calculateNextKey(view: view, nextKey: nextKey)
+        currentKey = calculateNextKey(view.viewKey ?? nextKey)
         push(viewport: viewport) {
             view.render(viewport.toLocalViewport(), self)
         }
         currentKey = prevKey
     }
 
-    func claimMouse<Msg>(
-        key nextKey: BufferKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button],
-        view: View<Msg>
+    public func absolute(point: Point) -> Point {
+        currentOrigin + point
+    }
+
+    public func absolute(rect: Rect) -> Rect {
+        Rect(
+            origin: absolute(point: rect.origin),
+            size: rect.size
+        )
+    }
+
+    // Before a view "claims" an area, it must first get a 'mask' of the buffer – this
+    // defines the part of the buffer that is available for writing and claiming
+    // events. Then, write to the buffer – this gives child views a chance to claim the
+    // mouse events first. Finally, claim the area using the original mask. Only
+    // still-available mouse event locations will be claimable.
+    //
+    // The view argument is optional, in case a view is claiming an area *for itself*,
+    // rather than assigning it to a child view.
+    func claimMouse(
+        key nextKey: ViewKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button]
     ) {
         guard buttons.count > 0 else { return }
-        let currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        let initial = rect.origin + currentOrigin
+        let initial = absolute(point: rect.origin)
         let maxPt = currentOrigin + currentMask.size
         guard
             initial.x + rect.width > currentMask.origin.x,
@@ -140,6 +180,7 @@ public class Buffer {
             initial.x < maxPt.x, initial.y < maxPt.y
         else { return }
 
+        let currentKey = calculateNextKey(nextKey)
         for y in (initial.y..<initial.y + rect.height) {
             if y > maxPt.y { break }
             guard y >= currentMask.origin.y else { continue }
@@ -149,55 +190,51 @@ public class Buffer {
                 if x > maxPt.x { break }
                 guard
                     x >= currentMask.origin.x,
-                    mask[y]?[x] != nil
+                    mask[y]?[x] != nil,
+                    row[x] == nil
                 else { continue }
 
-                var claimedEvents = row[x] ?? [:]
-                for event in buttons {
-                    guard claimedEvents[event] == nil else { continue }
-                    claimedEvents[event] = currentKey
-                }
-                row[x] = claimedEvents
+                row[x] = (currentKey, buttons)
             }
             mouse[y] = row
         }
     }
 
-    func checkMouse<Msg>(key nextKey: BufferKey, mouse mouseEvent: MouseEvent, view: View<Msg>)
+    func checkMouse(key nextKey: ViewKey, mouse mouseEvent: MouseEvent)
         -> Bool
     {
-        guard let row = mouse[mouseEvent.y], let claimedEvents = row[mouseEvent.x] else {
+        guard let row = mouse[mouseEvent.location.y], let claimedEvents = row[mouseEvent.location.x] else {
             return false
         }
-        let currentKey = calculateNextKey(view: view, nextKey: nextKey)
-        let claimedEventKey = claimedEvents[mouseEvent.button]
-        return claimedEventKey == currentKey
+        let currentKey = calculateNextKey(nextKey)
+        let claimedEventKey = claimedEvents.0
+        return claimedEventKey == currentKey && claimedEvents.1.contains(mouseEvent.button)
     }
 
-    func events<Msg>(key nextKey: BufferKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {
+    public func events<Msg>(key nextKey: ViewKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {
         let prevKey = currentKey
-        currentKey = calculateNextKey(view: view, nextKey: nextKey)
+        currentKey = calculateNextKey(view.viewKey ?? nextKey)
         let events = view.events(event, self)
         currentKey = prevKey
         return events
     }
 
-    func store(_ model: Any) {
-        models[currentKey] = model
+    public func store(_ model: Any) {
+        models[currentKey.bufferKey] = model
     }
 
-    func retrieve<T>() -> T? {
-        if let model = models[currentKey] as? T {
+    public func retrieve<T>() -> T? {
+        if let model = models[currentKey.bufferKey] as? T {
             return model
-        } else if let model = prevModels[currentKey] as? T {
-            models[currentKey] = model
+        } else if let model = prevModels[currentKey.bufferKey] as? T {
+            models[currentKey.bufferKey] = model
             return model
         }
         return nil
 
     }
 
-    func write(_ content: Attributed, at localPt: Point) {
+    public func write(_ content: Attributed, at localPt: Point) {
         let width = content.maxWidth
         let height = content.countLines
         let initial = localPt + currentOrigin
@@ -298,14 +335,8 @@ public class Buffer {
         }
     }
 
-    func calculateNextKey<Msg>(view: View<Msg>, nextKey: BufferKey) -> String {
-        if let id = view.id {
-            return "#\(id)"
-        } else if let overrideKey = view.key {
-            return "\(currentKey){\(overrideKey)}"
-        } else {
-            return currentKey + nextKey.bufferKey
-        }
+    func calculateNextKey(_ nextKey: ViewKey) -> ViewKey {
+        currentKey.append(key: nextKey)
     }
 
     static func displayWidth(of char: Character) -> Int {
@@ -367,15 +398,40 @@ extension Buffer: CustomStringConvertible {
         return description
     }
 
-    public var description: String {
-        "currentKey: \(currentKey)\n\(Buffer.desc(chars))"
+    private static func mouse(_ mouse: MouseEvents) -> String {
+        var description = ""
+        let height = mouse.reduce(0) { my, kv0 in
+            max(my, kv0.key)
+        }
+        let width = mouse.reduce(0) { my, kv in
+            max(
+                my,
+                kv.value.reduce(0) { mx, kv1 in
+                    max(mx, kv1.key)
+                }
+            )
+        }
+        for y in 0...height {
+            guard let row = mouse[y] else {
+                description += "\n"
+                continue
+            }
+
+            for x in 0...width {
+                guard row[x] != nil else {
+                    description += "."
+                    continue
+                }
+
+                description += String("◦")
+            }
+
+            description += "↩︎\n"
+        }
+        return description
     }
-}
 
-extension String: BufferKey {
-    public var bufferKey: String { return ".\(self)" }
-}
-
-extension Int: BufferKey {
-    public var bufferKey: String { return "[\(self)]" }
+    public var description: String {
+        "currentKey: \(currentKey)\n\(Buffer.desc(chars))\n\(Buffer.mouse(mouse))"
+    }
 }

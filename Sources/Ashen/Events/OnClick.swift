@@ -20,7 +20,7 @@ public enum OnClickOption {
     case button(MouseEvent.Button)
 }
 
-private let KEY = "OnClick"
+private let NAME = "OnClick"
 
 struct OnClickModel {
     let isHighlighted: Bool
@@ -30,26 +30,26 @@ public func OnLeftClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
     _ options: OnSingleClickOption...
 ) -> View<Msg> {
-    OnButtonClick(.left, inside, msg, options).debugName("OnLeftClick")
+    OnButtonClick(.left, inside, msg, options, debugName: "OnLeftClick")
 }
 
 public func OnRightClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
     _ options: OnSingleClickOption...
 ) -> View<Msg> {
-    OnButtonClick(.right, inside, msg, options).debugName("OnRightClick")
+    OnButtonClick(.right, inside, msg, options, debugName: "OnRightClick")
 }
 
 public func OnMiddleClick<Msg>(
     _ inside: View<Msg>, _ msg: @escaping @autoclosure SimpleEvent<Msg>,
     _ options: OnSingleClickOption...
 ) -> View<Msg> {
-    OnButtonClick(.middle, inside, msg, options).debugName("OnLeftClick")
+    OnButtonClick(.middle, inside, msg, options, debugName: "OnLeftClick")
 }
 
 private func OnButtonClick<Msg>(
     _ button: MouseEvent.Button, _ inside: View<Msg>, _ msg: @escaping SimpleEvent<Msg>,
-    _ options: [OnSingleClickOption]
+    _ options: [OnSingleClickOption], debugName: String
 ) -> View<Msg> {
     var highlight = true
     var isEnabled = true
@@ -77,7 +77,7 @@ private func OnButtonClick<Msg>(
                     return (msgs, [event])
                 }
                 guard
-                    buffer.checkMouse(key: KEY, mouse: mouseEvent, view: inside)
+                    buffer.checkMouse(key: inside.viewKey ?? .name(NAME), mouse: mouseEvent)
                 else {
                     let model: OnClickModel? = buffer.retrieve()
                     if model?.isHighlighted == true {
@@ -97,7 +97,7 @@ private func OnButtonClick<Msg>(
                 return (msgs, [])
             }
         },
-        debugName: ""
+        debugName: debugName
     )
 }
 
@@ -148,8 +148,8 @@ private func OnClick<Msg>(
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
             buffer.claimMouse(
-                key: KEY, rect: Rect(origin: .zero, size: viewport.size),
-                mask: mask, buttons: buttons, view: inside)
+                key: inside.viewKey ?? .name(NAME), rect: Rect(origin: .zero, size: viewport.size),
+                mask: mask, buttons: buttons)
         },
         events: { event, buffer in
             let (msgs, events) = inside.events(event, buffer)
@@ -157,7 +157,7 @@ private func OnClick<Msg>(
             return View.scan(events: events) { event in
                 guard
                     case let .mouse(mouseEvent) = event,
-                    buffer.checkMouse(key: KEY, mouse: mouseEvent, view: inside)
+                    buffer.checkMouse(key: inside.viewKey ?? .name(NAME), mouse: mouseEvent)
                 else { return (msgs, [event]) }
 
                 if mouseEvent.isReleased {
@@ -173,6 +173,6 @@ private func OnClick<Msg>(
                 return (msgs, [event])
             }
         },
-        debugName: "OnClick"
+        debugName: NAME
     )
 }

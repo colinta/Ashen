@@ -16,6 +16,8 @@ extension View {
     }
 }
 
+private let NAME = "Frame"
+
 public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOption] = []) -> View<Msg> {
     var alignment: Alignment = .topCenter
     for opt in options {
@@ -29,7 +31,7 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOption] = []) -> Vi
         preferredSize: { inside.preferredSize($0) },
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
-                buffer.render(key: "Frame", view: inside, viewport: .zero)
+                buffer.render(key: .name(NAME), view: inside, viewport: .zero)
                 return
             }
 
@@ -55,13 +57,13 @@ public func Frame<Msg>(_ inside: View<Msg>, _ options: [FrameOption] = []) -> Vi
             }
 
             buffer.render(
-                key: "Frame", view: inside,
+                key: .name(NAME), view: inside,
                 viewport: Viewport(
                     Rect(origin: Point(x: positionX, y: positionY), size: innerPreferredSize)))
         },
         events: { event, buffer in
-            buffer.events(key: "Frame", event: event, view: inside)
+            buffer.events(key: .name(NAME), event: event, view: inside)
         },
-        debugName: "Frame"
+        debugName: NAME
     )
 }

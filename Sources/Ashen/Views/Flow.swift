@@ -55,7 +55,22 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
             var maxWidth = 0
             var maxHeight = 0
             var remainingSize = parentSize
-            for (_, view) in sizedViews {
+            for (flowSize, view) in sizedViews {
+                guard case .fixed = flowSize else { continue }
+                let preferredSize = view.preferredSize(remainingSize)
+                maxWidth = max(maxWidth, preferredSize.width)
+                maxHeight = max(maxHeight, preferredSize.height)
+                if direction.isHorizontal {
+                    allSizes = allSizes + Size(width: preferredSize.width, height: 0)
+                    remainingSize = remainingSize - Size(width: preferredSize.width, height: 0)
+                } else {
+                    allSizes = allSizes + Size(width: 0, height: preferredSize.height)
+                    remainingSize = remainingSize - Size(width: 0, height: preferredSize.height)
+                }
+            }
+
+            for (flowSize, view) in sizedViews {
+                guard case .flex = flowSize else { continue }
                 let preferredSize = view.preferredSize(remainingSize)
                 maxWidth = max(maxWidth, preferredSize.width)
                 maxHeight = max(maxHeight, preferredSize.height)
@@ -83,7 +98,7 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
         render: { viewport, buffer in
             guard !viewport.isEmpty else {
                 for (index, (_, view)) in sizedViews.enumerated().reversed() {
-                    buffer.render(key: index, view: view, viewport: .zero)
+                    buffer.render(key: .index(index), view: view, viewport: .zero)
                 }
                 return
             }
@@ -168,9 +183,10 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
                     cursor = cursor + Point(x: 0, y: viewSize.height)
                 }
             }
+
             for (index, view, viewport) in renderViews.reversed() {
                 buffer.render(
-                    key: index, view: view, viewport: viewport)
+                    key: .index(index), view: view, viewport: viewport)
             }
         },
         events: { event, buffer in

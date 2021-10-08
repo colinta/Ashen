@@ -2,7 +2,7 @@
 ///  IgnoreMouse.swift
 //
 
-private let KEY = "IgnoreMouse"
+private let NAME = "IgnoreMouse"
 
 public func IgnoreMouse<Msg>(
     _ inside: View<Msg> = Space(), _ options: OnMouseOption...
@@ -27,12 +27,12 @@ public func IgnoreMouse<Msg>(
             // "wins" that area, and so usually you should claim the area
             // *after* the child view has had a chance.
             buffer.claimMouse(
-                key: KEY, rect: Rect(origin: .zero, size: viewport.size),
-                mask: mask, buttons: buttons, view: inside)
+                key: inside.viewKey ?? .name(NAME), rect: Rect(origin: .zero, size: viewport.size),
+                mask: mask, buttons: buttons)
         },
         events: { event, buffer in
             inside.events(event, buffer)
         },
-        debugName: "IgnoreMouse"
+        debugName: NAME
     )
 }
