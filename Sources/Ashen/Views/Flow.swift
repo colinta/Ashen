@@ -125,7 +125,6 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
 
             flexTotal = max(flexTotal, 1)
 
-            let startingFlexSize = remainingSize
             var remainingFlexSize = remainingSize
             var cursor: Point
             switch direction {
@@ -148,17 +147,18 @@ public func Flow<Msg>(_ direction: FlowDirection, _ sizedViews: [(FlowSize, View
                         let width =
                             isLast
                             ? remainingFlexSize.width
-                            : Int((flexPercent * Float(startingFlexSize.width)).rounded())
+                            : Int((flexPercent * Float(remainingFlexSize.width)).rounded(.down))
                         viewSize = Size(width: width, height: viewport.size.height)
                         remainingFlexSize = remainingFlexSize - Size(width: width, height: 0)
                     } else {
                         let height =
                             isLast
                             ? remainingFlexSize.height
-                            : Int((flexPercent * Float(startingFlexSize.height)).rounded())
+                            : Int((flexPercent * Float(remainingFlexSize.height)).rounded(.down))
                         viewSize = Size(width: viewport.size.width, height: height)
                         remainingFlexSize = remainingFlexSize - Size(width: 0, height: height)
                     }
+                    flexTotal -= flex
                 case .fixed:
                     if direction.isHorizontal {
                         viewSize = Size(

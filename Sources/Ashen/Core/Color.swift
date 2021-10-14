@@ -6,7 +6,6 @@ import Termbox
 
 public enum Color: Equatable {
     case none
-    case black
     case red
     case green
     case yellow
@@ -14,8 +13,9 @@ public enum Color: Equatable {
     case magenta
     case cyan
     case white
-
     case gray
+    case black
+
     case grayscale(AttrSize)
 
     case brightRed
@@ -26,11 +26,11 @@ public enum Color: Equatable {
     case brightCyan
     case brightWhite
 
-    // darkestGray
-    // darkerGray
-    // darkGray
-    // lightGray
-    // lightestGray
+    // case darkestGray
+    // case darkerGray
+    // case darkGray
+    // case lightGray
+    // case lightestGray
 
     case any(AttrSize)
 
@@ -69,6 +69,17 @@ public enum Color: Equatable {
             return .lightCyan
         case .brightWhite:
             return .white
+
+        // case .darkestGray:
+        //     return .darkestGray
+        // case .darkerGray:
+        //     return .darkerGray
+        // case .darkGray:
+        //     return .darkGray
+        // case .lightGray:
+        //     return .lightGray
+        // case .lightestGray:
+        //     return .lightestGray
 
         case .black:
             return .black
