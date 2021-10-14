@@ -64,7 +64,7 @@ receives system-level events and maps those into an instance of your app's
 `Message` type).
 
 Our application starts at the `initial()` method. We return our initial model
-and a list of commands to run. We will add an `Http` Command:
+and a command to run. We will return an `Http` command:
 
 ```swift
 enum Message {
@@ -77,7 +77,7 @@ func initial() -> Initial<Model, Message> {
       Message.received(result)
     }
 
-    return Initial(Model(), [cmd])
+    return Initial(Model(), cmd)
 }
 ```
 
@@ -85,20 +85,22 @@ When the Http request succeeds (or fails) the result will be turned into an
 instance of your application's `Message` type (usually an enum), and passed to
 the `update()` function that you provide.
 
+To send multiple commands, group them with `Command.list([cmd1, cmd2, ...])`
+
 ###### Updating
 
 In your application's `update()` function, you will instruct the runtime how the
 message affects your state. Your options are:
 
 -   `.noChange` — ignore the message
--   `.update(model, [cmds])` — return a model and a list of Commands to run
+-   `.update(model, command)` — return a model and a list of Commands to run
 -   `.quit` — graceful exit (usually means exit with status 0)
 -   `.quitAnd({ ... })`— graceful exit with a closure that runs just before the runtime
     is done cleaning up. You can also throw an error in that closure.
 
 For convenience there are two helper "types":
 
--   `.model(model)` — return just updated model, no commands (shortcut for `.update(model, [])`)
+-   `.model(model)` — return just updated model, no commands (shortcut for `.update(model, Command.none())`)
 -   `.error(error)` — quit and raise an error.
 
 # Program
@@ -136,7 +138,7 @@ func initial() -> Initial<Model, Message> {
 // The return value also includes a list of "commands".  Commands are
 // another form of event emitters, like Components, but they talk with
 // external services, either asynchronously or synchronously.
-func update(model: inout Model, message: Message)
+func update(model: Model, message: Message)
     -> State<Model, Message>
 {
     switch message {

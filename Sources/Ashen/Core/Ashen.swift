@@ -24,6 +24,7 @@ public func ashen<Model, Msg>(_ program: Program<Model, Msg>) throws {
         }
     }
 
+    try screen.setup()
     try main(screen, program)
 }
 
@@ -45,11 +46,9 @@ private func main<Model, Msg>(
     _ screen: TermboxScreen,
     _ program: Program<Model, Msg>
 ) throws {
-    try screen.setup()
-
     let initial = program.initial()
     var model = initial.model
-    var cmds = initial.commands
+    var cmds = [initial.command]
     var view: View<Msg>!
 
     var prevTimestamp = mach_absolute_time()
@@ -62,7 +61,8 @@ private func main<Model, Msg>(
     var prevBuffer: Buffer? = nil
     var prevSize: Size? = nil
 
-    while true {
+    let runLoop = RunLoop.current
+    while runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 0.01)) {
         cmds.forEach { cmd in
             background {
                 cmd.run({ msg in
@@ -80,17 +80,19 @@ private func main<Model, Msg>(
             queue = []
         }
         for msg in currentQueue {
-            let newState = program.update(&model, msg)
+            let newState = program.update(model, msg)
             switch newState {
             case .noChange:
                 break
             case let .update(newModel, newCommand):
                 model = newModel
-                cmds += newCommand
+                cmds += [newCommand]
                 shouldRender = true
             case .quit:
+                program.unmount?(model)
                 return
             case let .quitAnd(closure):
+                program.unmount?(model)
                 try closure()
                 return
             }
@@ -124,8 +126,10 @@ private func main<Model, Msg>(
 
             for event in events {
                 if case let .key(key) = event, key == .signalQuit {
+                    program.unmount?(model)
                     return
                 } else if case let .key(key) = event, key == .signalInt {
+                    program.unmount?(model)
                     return
                 }
 
