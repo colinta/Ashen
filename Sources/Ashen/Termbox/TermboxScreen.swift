@@ -91,14 +91,14 @@ public class TermboxScreen {
         case let .resize(width, height):
             return .window(width: Int(width), height: Int(height))
         case let .mouse(x, y, type):
-            return .mouse(MouseEvent(x: Int(x), y: Int(y), event: termboxMouseEvent(x, y, type)))
+            return .mouse(MouseEvent(x: x, y: y, event: termboxMouseEvent(x, y, type)))
         default:
             break
         }
         return nil
     }
 
-    private func termboxMouseEvent(_ x: UInt16, _ y: UInt16, _ type: TermboxMouse)
+    private func termboxMouseEvent(_ x: Int, _ y: Int, _ type: TermboxMouse)
         -> MouseEvent
         .Event
     {
