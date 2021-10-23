@@ -7,6 +7,7 @@ public enum InputOption {
     case wrap(Bool)
     case isMultiline(Bool)
     case isResponder(Bool)
+    case isSecure(Bool)
     case style(Attr)
     case styles([Attr])
 }
@@ -53,6 +54,7 @@ public func Input<Msg>(
     var wrap = false
     var isMultiline = false
     var isResponder = false
+    var isSecure = false
     var placeholder = ""
     var extraAttrs: [Attr] = []
     for opt in options {
@@ -63,6 +65,8 @@ public func Input<Msg>(
             isMultiline = isMultilineOpt
         case let .isResponder(isResponderOpt):
             isResponder = isResponderOpt
+        case let .isSecure(isSecureOpt):
+            isSecure = isSecureOpt
         case let .placeholder(placeholderOpt):
             placeholder = placeholderOpt
         case let .style(attrsOpt):
@@ -99,6 +103,8 @@ public func Input<Msg>(
                 currentText = placeholder
             } else if wrap {
                 currentText = model.text.insertNewlines(fitting: viewport.size.width).string
+            } else if isSecure {
+                currentText = String(repeating: "•", count: model.text.count)
             } else {
                 currentText = model.text
             }
