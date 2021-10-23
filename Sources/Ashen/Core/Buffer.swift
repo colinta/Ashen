@@ -6,8 +6,8 @@ public class Buffer {
     public typealias Row = [Int: AttributedCharacter]
     public typealias Chars = [Int: Row]
     public typealias Mask = Chars
-    typealias ClaimedMouseEvents = (ViewKey, [MouseEvent.Button])
-    typealias MouseEvents = [Int: [Int: ClaimedMouseEvents]]
+    typealias ClaimedMouseEvent = [MouseEvent.Button: ViewKey]
+    typealias MouseEvents = [Int: [Int: ClaimedMouseEvent]]
 
     private var chars: Chars = [:]
     // the mask represents the "writable" region of the buffer
@@ -127,9 +127,10 @@ public class Buffer {
                 into.write(char, at: dest + Point(x: x, y: y))
 
                 if let mouseEvents = mouse[y]?[x] {
-                    let (key, buttons): (ViewKey, [MouseEvent.Button]) = mouseEvents
                     let mouseRect = Rect(origin: dest + Point(x: x, y: y), size: Size(width: 1, height: 1))
-                    into.claimMouse(key: key, rect: mouseRect, mask: mask, buttons: buttons)
+                    for (button, key) in mouseEvents {
+                        into.claimMouse(key: key, rect: mouseRect, mask: mask, buttons: [button])
+                    }
                 }
             }
             text[y] = row
@@ -160,18 +161,17 @@ public class Buffer {
         )
     }
 
-    // Before a view "claims" an area, it must first get a 'mask' of the buffer – this
-    // defines the part of the buffer that is available for writing and claiming
+    // Before a view "claims" a mouse area, it must first get a 'mask' of the buffer –
+    // this defines the part of the buffer that is available for writing and claiming
     // events. Then, write to the buffer – this gives child views a chance to claim the
     // mouse events first. Finally, claim the area using the original mask. Only
-    // still-available mouse event locations will be claimable.
-    //
-    // The view argument is optional, in case a view is claiming an area *for itself*,
-    // rather than assigning it to a child view.
+    // still-available mouse event locations will be claimable. See *OnClick.swift* and
+    // *OnMouseWheel* for examples.
     func claimMouse(
         key nextKey: ViewKey, rect: Rect, mask: Mask, buttons: [MouseEvent.Button]
     ) {
         guard buttons.count > 0 else { return }
+
         let initial = absolute(point: rect.origin)
         let maxPt = currentOrigin + currentMask.size
         guard
@@ -190,11 +190,15 @@ public class Buffer {
                 if x > maxPt.x { break }
                 guard
                     x >= currentMask.origin.x,
-                    mask[y]?[x] != nil,
-                    row[x] == nil
+                    mask[y]?[x] != nil
                 else { continue }
 
-                row[x] = (currentKey, buttons)
+                var cell = row[x] ?? [:]
+                for button in buttons {
+                    guard cell[button] == nil else { continue }
+                    cell[button] = currentKey
+                }
+                row[x] = cell
             }
             mouse[y] = row
         }
@@ -207,8 +211,8 @@ public class Buffer {
             return false
         }
         let currentKey = calculateNextKey(nextKey)
-        let claimedEventKey = claimedEvents.0
-        return claimedEventKey == currentKey && claimedEvents.1.contains(mouseEvent.button)
+        let claimedEventKey = claimedEvents[mouseEvent.button]
+        return claimedEventKey == currentKey
     }
 
     public func events<Msg>(key nextKey: ViewKey, event: Event, view: View<Msg>) -> ([Msg], [Event]) {

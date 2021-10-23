@@ -255,20 +255,20 @@ public struct BoxBorder {
         tlCorner: """
             ┌╥╥
             ╞╝╚
-            ╞╗•
+            ╞╗◻︎
             """,
         trCorner: """
             ╥╥┐
             ╝╚╡
-            •╔╡
+            ◻︎╔╡
             """,
         blCorner: """
-            ╞╝•
+            ╞╝◻︎
             ╞╗╔
             └╨╨
             """,
         brCorner: """
-            •╚╡
+            ◻︎╚╡
             ╗╔╡
             ╨╨┘
             """,

@@ -409,6 +409,37 @@ extension View {
         )
     }
 
+    public func offset(_ point: Point) -> View<Msg> {
+        offset(x: point.x, y: point.y)
+    }
+
+    public func offset(x: Int, y: Int) -> View<Msg> {
+        View(
+            preferredSize: { size in
+                let preferredSize = self.preferredSize(size)
+                return Size(
+                    width: preferredSize.width + x,
+                    height: preferredSize.height + y
+                )
+            },
+            render: { viewport, buffer in
+                let innerSize = viewport.size.shrink(width: x, height: y)
+                let innerViewport = Viewport(Rect(origin: Point(x: x, y: y), size: innerSize))
+                buffer.push(viewport: innerViewport) {
+                    self.render(innerViewport.toLocalViewport(), buffer)
+                }
+            },
+            events: events,
+            viewKey: viewKey,
+            debugName: debugName
+                + """
+                .padding(\([
+                    y != 0 ? "y: \(y)" : nil,
+                    x != 0 ? "x: \(x)" : nil,
+                ].compactMap({ $0 }).joined(separator: ", ")))
+                """
+        )
+    }
     public func padding(_ insets: Insets) -> View<Msg> {
         padding(top: insets.top, left: insets.left, bottom: insets.bottom, right: insets.right)
     }

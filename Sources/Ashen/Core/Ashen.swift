@@ -4,28 +4,39 @@
 
 import Foundation
 
+enum ExitCode<T> {
+    case quit(T)
+    case quitAnd(T, () throws -> Void)
+
+    var model: T {
+        switch self {
+        case let .quit(model):
+            return model
+        case let .quitAnd(model, _):
+            return model
+        }
+    }
+}
+
 /// This is how you run an Ashen program.
 public func ashen<Model, Msg>(_ program: Program<Model, Msg>) throws {
     let screen = TermboxScreen()
 
-    signal(SIGINT, SIG_IGN)
-    let sourceInterrupt = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
-    sourceInterrupt.setEventHandler {
-        screen.teardown()
-        exit(SIGINT)
-    }
-    sourceInterrupt.resume()
-
-    defer {
-        screen.teardown()
-
-        while debugEntries.count > 0 {
-            print(debugEntries.removeFirst())
-        }
-    }
-
     try screen.setup()
-    try main(screen, program)
+    defer {
+    }
+
+    let exit = main(screen, program)
+    screen.teardown()
+    program.unmount?(exit.model)
+
+    while debugEntries.count > 0 {
+        print(debugEntries.removeFirst())
+    }
+
+    if case let .quitAnd(_, closure) = exit {
+        try closure()
+    }
 }
 
 let messageThread = DispatchQueue(label: "messageThread")
@@ -45,7 +56,7 @@ func background(_ block: @escaping () -> Void) {
 private func main<Model, Msg>(
     _ screen: TermboxScreen,
     _ program: Program<Model, Msg>
-) throws {
+) -> ExitCode<Model> {
     let initial = program.initial()
     var model = initial.model
     var cmds = [initial.command]
@@ -89,12 +100,9 @@ private func main<Model, Msg>(
                 cmds += [newCommand]
                 shouldRender = true
             case .quit:
-                program.unmount?(model)
-                return
+                return .quit(model)
             case let .quitAnd(closure):
-                program.unmount?(model)
-                try closure()
-                return
+                return .quitAnd(model, closure)
             }
         }
 
@@ -125,12 +133,9 @@ private func main<Model, Msg>(
             }
 
             for event in events {
-                if case let .key(key) = event, key == .signalQuit {
-                    program.unmount?(model)
-                    return
-                } else if case let .key(key) = event, key == .signalInt {
-                    program.unmount?(model)
-                    return
+                if case let .key(key) = event,
+                    key == .signalInt {
+                    return .quit(model)
                 }
 
                 if case .redraw = event {
@@ -140,6 +145,7 @@ private func main<Model, Msg>(
             }
         }
     }
+    return .quit(model)
 }
 
 private func collectSystemEvents(screen: TermboxScreen, prevTimestamp: UInt64, timeFactor: Double)

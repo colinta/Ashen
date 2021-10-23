@@ -160,10 +160,9 @@ func render(model: Model) -> [View<Message>] {
 
 ## Running your Program
 
-To run your program, pass your `initial`, `update`, and `view`, passing in a program and a
-screen. It will return `.quit` or `.error`, depending on how the program
-exited. `TermboxScreen` is recommended for the screen parameter, but in theory
-you could create a `ScreenType` for other output paradigms.
+To run your program, pass your `initial`, `update`, `view`, and `unmount`
+functions to `Ashen.Program` and run it with `ashen(program)`. It will return
+`.quit` or `.error`, depending on how the program exited.
 
 ```swift
 do {
@@ -174,9 +173,8 @@ do {
 }
 ```
 
-Important note: ALL Ashen programs can be aborted using `ctrl+c` and `ctrl+\`.
-`ctrl+c` is considered an error/abort and `ctrl+\` is considered a graceful
-exit.
+*Important note*: ALL Ashen programs can be aborted using `ctrl+c`. It is
+_recommended_ that you support `ctrl+\` to gracefully exit your program.
 
 # Views
 
