@@ -26,11 +26,8 @@ public enum Color: Equatable {
     case brightCyan
     case brightWhite
 
-    // case darkestGray
-    // case darkerGray
-    // case darkGray
-    // case lightGray
-    // case lightestGray
+    public static let darkGray: Color = .grayscale(3)
+    public static let lightGray: Color = .grayscale(19)
 
     case any(AttrSize)
 
