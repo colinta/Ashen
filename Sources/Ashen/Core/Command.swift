@@ -22,6 +22,10 @@ public struct Command<Msg> {
         Command<U> { _ in }
     }
 
+    public static func send<U>(_ message: U) -> Command<U> {
+        Command<U> { send in send(message) }
+    }
+
     public static func list<U>(_ commands: [Command<U>]) -> Command<U> {
         Command<U> { send in
             for command in commands {
