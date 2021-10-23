@@ -202,7 +202,12 @@ extension View {
                 let preferredSize = self.preferredSize(size)
                 return Size.min(preferredSize, constrainSize)
             },
-            render: render,
+            render: { viewport, buffer in
+                let innerViewport = viewport.limit(size: constrainSize)
+                buffer.push(viewport: innerViewport.toViewport()) {
+                    self.render(innerViewport, buffer)
+                }
+            },
             events: events,
             viewKey: viewKey, debugName: debugName + ".size(\(constrainSize))"
         )

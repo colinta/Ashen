@@ -21,6 +21,22 @@ public struct LocalViewport: Equatable {
 
     public static let zero: LocalViewport = LocalViewport(size: .zero, visible: .zero)
 
+    public func limit(size: Size) -> LocalViewport {
+        let maxFrameX = size.width
+        let maxMaskWidth = maxFrameX - visible.minX
+
+        let maxFrameY = size.height
+        let maxMaskHeight = maxFrameY - visible.minY
+
+        return LocalViewport(
+            size: Size(width: min(self.size.width, size.width), height: min(self.size.height, size.height)),
+            visible: visible.sized(Size(
+                width: min(visible.width, maxMaskWidth),
+                height: min(visible.height, maxMaskHeight)
+            ))
+        )
+    }
+
     public func limit(width: Int) -> LocalViewport {
         let maxFrameX = width
         let maxMaskWidth = maxFrameX - visible.minX
