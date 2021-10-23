@@ -213,6 +213,8 @@ extension View {
         )
     }
 
+    /// fittingContainer: true indicates that the minimum dimension should be ignored
+    /// if the container is too small.
     public func minWidth(_ width: Int, fittingContainer: Bool = false) -> View<Msg> {
         View(
             preferredSize: { size in
@@ -272,6 +274,8 @@ extension View {
         )
     }
 
+    /// fittingContainer: true indicates that the minimum dimension should be ignored
+    /// if the container is too small.
     public func minHeight(_ height: Int, fittingContainer: Bool = false) -> View<Msg> {
         View(
             preferredSize: { size in
