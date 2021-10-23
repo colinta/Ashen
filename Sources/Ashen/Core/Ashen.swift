@@ -127,21 +127,20 @@ private func main<Model, Msg>(
         prevTimestamp = nextTimestamp
 
         for event in events {
-            let (msgs, events) = view.events(event, buffer)
+            if case let .key(key) = event,
+                key == .signalInt {
+                return .quit(model)
+            }
+
+            let (msgs, viewEvents) = view.events(event, buffer)
             sync {
                 msgs.forEach { queue.append($0) }
             }
 
-            for event in events {
-                if case let .key(key) = event,
-                    key == .signalInt {
-                    return .quit(model)
-                }
-
-                if case .redraw = event {
-                    shouldRender = true
-                    break
-                }
+            for event in viewEvents {
+                guard case .redraw = event else { continue }
+                shouldRender = true
+                break
             }
         }
     }
