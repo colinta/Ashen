@@ -8,9 +8,11 @@ public class TermboxScreen {
     var size: Size { Size(width: Int(Termbox.width), height: Int(Termbox.height)) }
     private var queuedEvents: [Event] = []
     private var currentMouseClick: (MouseEvent.Button)?
+    private var prevSize: Size
     var didSendFirstResize = false
 
     init() {
+        prevSize = Size(width: Int(Termbox.width), height: Int(Termbox.height))
     }
 
     func setup() throws {
@@ -28,10 +30,13 @@ public class TermboxScreen {
     func render(buffer: Buffer) {
         let chars = buffer.diffedChars
 
-        // There were issues rendering after a screen resize (increasing the size causes
-        // characters to not be rendered, even though they are in diffedChars), and putting
-        // in this extra Termbox.render fixed things. I don't understand why.
-        Termbox.render()
+        if prevSize != size {
+            // There were issues rendering after a screen resize (increasing the size causes
+            // characters to not be rendered, even though they are in diffedChars), and putting
+            // in this extra Termbox.render fixed things. I don't understand why.
+            Termbox.render()
+            prevSize = size
+        }
 
         for (y, row) in chars {
             guard y >= 0 && y < size.height else { continue }
@@ -61,7 +66,6 @@ public class TermboxScreen {
         }
 
         Termbox.render()
-        Termbox.goto(x: Termbox.width, y: Termbox.height)
     }
 
     func nextEvent() -> Event? {
