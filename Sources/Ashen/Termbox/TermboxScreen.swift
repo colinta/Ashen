@@ -61,6 +61,7 @@ public class TermboxScreen {
         }
 
         Termbox.render()
+        Termbox.goto(x: Termbox.width, y: Termbox.height)
     }
 
     func nextEvent() -> Event? {
