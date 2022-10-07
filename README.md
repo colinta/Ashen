@@ -7,6 +7,8 @@ items and renders them as a list.
 
 ### Example
 
+[Fully working app – TheSheet](https://github.com/colinta/TheSheet)
+
 ###### Old way
 
 In a traditional controller/view pattern, views are created during
